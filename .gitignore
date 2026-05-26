@@ -1,0 +1,33 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Operational / sensitive content — NOT for git
+Project Log/
+R&D/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Node / Next.js / Vercel
+node_modules/
+.next/
+.vercel/
+.turbo/
+dist/
+build/
+*.log
+*.tsbuildinfo
+
+# Misc
+.DS_Store
+
+# Claude Code — local-only settings (per-user, per-machine)
+.claude/settings.local.json

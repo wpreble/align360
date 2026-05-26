@@ -1,0 +1,2706 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light"><!-- light is default -->
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#18232a" media="(prefers-color-scheme: dark)" />
+<title>Align360 — Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ═══════════════════════════════════════════════
+     BRAND TOKENS — Align360 palette
+     ═══════════════════════════════════════════════ */
+  :root {
+    --azure:        #2e3c45;
+    --azure-deep:   #1e2a31;
+    --azure-shade:  #18232a;
+    --azure-tint:   #3d4f5a;
+    --ylg:          #edefe8;
+    --ylg-dim:      #d8dbd2;
+    --turq:         #7aa49c;
+    --turq-light:   #9fc0ba;
+    --turq-deep:    #5d8880;
+    --orange:       #e09b67;
+    --orange-soft:  #e8b085;
+    --red:          #e45742;
+
+    --font-display: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif:   'Fraunces', Georgia, serif;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 22px;
+    --radius-pill: 999px;
+
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* ── DARK THEME (default) ───────────────────────── */
+  [data-theme="dark"] {
+    --bg-body:     var(--azure-shade);
+    --bg-surface:  #1f2a31;
+    --bg-raised:   #263238;
+    --bg-input:    rgba(255, 255, 255, 0.04);
+    --bg-input-focus: rgba(122, 164, 156, 0.08);
+    --bg-chip:     rgba(255, 255, 255, 0.035);
+    --bg-chip-hover: rgba(122, 164, 156, 0.12);
+    --bg-chip-selected: rgba(122, 164, 156, 0.2);
+    --bg-sidebar:  #18232a;
+    --bg-ai-bubble: rgba(255, 255, 255, 0.04);
+    --bg-user-bubble: rgba(122, 164, 156, 0.14);
+
+    --border:        rgba(237, 239, 232, 0.08);
+    --border-hover:  rgba(237, 239, 232, 0.16);
+    --border-strong: rgba(237, 239, 232, 0.22);
+
+    --text-primary:   #edefe8;
+    --text-secondary: rgba(237, 239, 232, 0.72);
+    --text-muted:     rgba(237, 239, 232, 0.48);
+    --text-faint:     rgba(237, 239, 232, 0.28);
+
+    --accent:         var(--turq);
+    --accent-soft:    rgba(122, 164, 156, 0.15);
+    --accent-text:    var(--turq-light);
+    --cta:            var(--orange);
+    --cta-hover:      var(--orange-soft);
+    --cta-text:       var(--azure-deep);
+
+    --gradient-bg: radial-gradient(ellipse at 20% 0%, rgba(122, 164, 156, 0.12) 0%, transparent 50%),
+                   radial-gradient(ellipse at 80% 100%, rgba(224, 155, 103, 0.08) 0%, transparent 50%),
+                   linear-gradient(160deg, #1e2a31 0%, #253540 60%, #243a37 100%);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 32px rgba(0, 0, 0, 0.25);
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  /* ── LIGHT THEME ────────────────────────────────── */
+  [data-theme="light"] {
+    --bg-body:     #f6f5f0;
+    --bg-surface:  #ffffff;
+    --bg-raised:   #ffffff;
+    --bg-input:    #ffffff;
+    --bg-input-focus: rgba(122, 164, 156, 0.08);
+    --bg-chip:     #ffffff;
+    --bg-chip-hover: rgba(122, 164, 156, 0.08);
+    --bg-chip-selected: rgba(122, 164, 156, 0.14);
+    --bg-sidebar:  #eceae2;
+    --bg-ai-bubble: #ffffff;
+    --bg-user-bubble: rgba(122, 164, 156, 0.18);
+
+    --border:        rgba(46, 60, 69, 0.1);
+    --border-hover:  rgba(46, 60, 69, 0.2);
+    --border-strong: rgba(46, 60, 69, 0.3);
+
+    --text-primary:   #2e3c45;
+    --text-secondary: rgba(46, 60, 69, 0.72);
+    --text-muted:     rgba(46, 60, 69, 0.5);
+    --text-faint:     rgba(46, 60, 69, 0.3);
+
+    --accent:         var(--turq-deep);
+    --accent-soft:    rgba(122, 164, 156, 0.15);
+    --accent-text:    var(--turq-deep);
+    --cta:            var(--orange);
+    --cta-hover:      #d88b52;
+    --cta-text:       #ffffff;
+
+    --gradient-bg: radial-gradient(ellipse at 15% 0%, rgba(122, 164, 156, 0.14) 0%, transparent 55%),
+                   radial-gradient(ellipse at 85% 100%, rgba(224, 155, 103, 0.1) 0%, transparent 55%),
+                   linear-gradient(160deg, #f6f5f0 0%, #eceae2 100%);
+    --shadow-card: 0 1px 3px rgba(46, 60, 69, 0.06), 0 12px 40px rgba(46, 60, 69, 0.08);
+    --shadow-soft: 0 2px 10px rgba(46, 60, 69, 0.06);
+  }
+
+  html, body {
+    font-family: var(--font-display);
+    background: var(--bg-body);
+    color: var(--text-primary);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background 0.4s var(--ease-out), color 0.4s var(--ease-out);
+  }
+
+  /* ═══════════════════════════════════════════════
+     APP FRAME — full-bleed PWA mode
+     ═══════════════════════════════════════════════ */
+  .demo-stage {
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
+    padding: 0;
+    display: flex;
+  }
+
+  .app-shell {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    height: 100svh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
+    border-radius: 0;
+    overflow: hidden;
+    position: relative;
+    box-shadow: none;
+    border: none;
+    background: var(--bg-surface);
+    display: flex;
+    flex-direction: column;
+    transition: background 0.4s var(--ease-out);
+  }
+
+  /* Theme toggle — sits at top-right of shell */
+  .theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 50;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-chip);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.2s var(--ease-out);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .theme-toggle:hover {
+    color: var(--accent-text);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .theme-toggle svg { width: 16px; height: 16px; }
+  [data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+  [data-theme="light"] .theme-toggle .icon-sun { display: none; }
+
+  /* ═══════════════════════════════════════════════
+     ONBOARDING
+     ═══════════════════════════════════════════════ */
+  #onboarding {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background: var(--gradient-bg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle grain overlay */
+  #onboarding::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 1px 1px, var(--text-faint) 0.5px, transparent 0);
+    background-size: 24px 24px;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .ob-header {
+    padding: 26px 36px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+  }
+
+  .ob-logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 19px;
+    color: var(--text-primary);
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: var(--accent);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-mark::before, .logo-mark::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid var(--azure-deep);
+  }
+  .logo-mark::before { width: 14px; height: 14px; }
+  .logo-mark::after { width: 7px; height: 7px; border-color: var(--ylg); }
+
+  .ob-logo em {
+    font-style: normal;
+    color: var(--accent-text);
+    font-weight: 700;
+  }
+
+  /* Wordmark — flat, single-color, tight tracking.
+     This is a placeholder; swap in an SVG logo later via:
+       <img src="align360-logo.svg" class="wordmark-img" alt="Align360" /> */
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1em;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+  }
+  .wordmark-img {
+    height: 22px;
+    width: auto;
+    display: block;
+  }
+
+  .ob-progress {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .prog-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border-strong);
+    transition: all 0.4s var(--ease-out);
+  }
+  .prog-dot.active { background: var(--accent); width: 22px; border-radius: 3px; }
+  .prog-dot.done   { background: var(--accent); opacity: 0.45; }
+
+  .ob-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    position: relative;
+    z-index: 2;
+    overflow-y: auto;
+  }
+
+  .ob-card {
+    width: 100%;
+    max-width: 720px;
+    animation: fadeUp 0.5s var(--ease-out);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .ob-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent-text);
+    letter-spacing: 2.4px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ob-eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .ob-question {
+    font-family: var(--font-serif);
+    font-size: 34px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+  }
+
+  .ob-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    font-weight: 400;
+    line-height: 1.65;
+  }
+
+  /* Name inputs */
+  .ob-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+    max-width: 480px;
+  }
+
+  .ob-input {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 15px 20px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    outline: none;
+    transition: all 0.2s var(--ease-out);
+    width: 100%;
+  }
+  .ob-input::placeholder { color: var(--text-muted); font-weight: 400; }
+  .ob-input:hover { border-color: var(--border-hover); }
+  .ob-input:focus {
+    border-color: var(--accent);
+    background: var(--bg-input-focus);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+
+  /* Netflix-style option cards */
+  .ob-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .ob-option {
+    position: relative;
+    background: var(--bg-raised);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 16px 16px;
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: transform 0.25s var(--ease-out),
+                border-color 0.2s var(--ease-out),
+                box-shadow 0.25s var(--ease-out),
+                background 0.2s var(--ease-out);
+    text-align: left;
+    min-height: 104px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    animation: cardIn 0.45s var(--ease-out) both;
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(14px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Tinted accent shape — the "thumbnail" area of each card */
+  .ob-option::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 44px;
+    background: var(--option-tint, var(--accent-soft));
+    transition: height 0.25s var(--ease-out), background 0.2s var(--ease-out);
+    opacity: 0.55;
+  }
+
+  /* Tiny geometric glyph sitting in the tint area */
+  .ob-option .opt-glyph {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    width: 20px;
+    height: 20px;
+    color: var(--option-accent, var(--accent));
+    opacity: 0.85;
+    transition: transform 0.3s var(--ease-out);
+  }
+  .ob-option .opt-glyph svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .ob-option:hover {
+    transform: translateY(-3px) scale(1.015);
+    border-color: var(--accent);
+    box-shadow: 0 14px 32px rgba(46, 60, 69, 0.12), 0 2px 6px rgba(46, 60, 69, 0.06);
+    z-index: 2;
+  }
+  [data-theme="dark"] .ob-option:hover {
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+  .ob-option:hover::before { height: 52px; }
+  .ob-option:hover .opt-glyph { transform: scale(1.1) rotate(-3deg); }
+
+  .ob-option.selected {
+    border-color: var(--accent);
+    background: var(--bg-raised);
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 10px 28px rgba(122, 164, 156, 0.2);
+  }
+  .ob-option.selected::before {
+    height: 52px;
+    opacity: 0.9;
+  }
+  .ob-option.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--cta-text);
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(122, 164, 156, 0.4);
+    animation: popIn 0.3s var(--ease-out);
+  }
+  @keyframes popIn {
+    from { transform: scale(0); }
+    to   { transform: scale(1); }
+  }
+
+  .ob-option .opt-label {
+    position: relative;
+    z-index: 1;
+    line-height: 1.3;
+  }
+
+  .ob-multi-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: -20px;
+    margin-bottom: 24px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ob-multi-hint::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    border: 1.5px solid var(--accent);
+    position: relative;
+    display: inline-block;
+  }
+
+  /* Compact variant for steps with many short options (feels less clunky) */
+  .ob-options.compact {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+  .ob-options.compact .ob-option {
+    min-height: 88px;
+    padding: 16px 14px 14px;
+    font-size: 13px;
+  }
+  .ob-options.compact .ob-option::before { height: 38px; }
+  .ob-options.compact .ob-option.selected::before { height: 46px; }
+
+  /* CTAs */
+  .ob-btn {
+    background: var(--cta);
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 14px 32px;
+    font-family: var(--font-display);
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--cta-text);
+    cursor: pointer;
+    transition: all 0.2s var(--ease-out);
+    letter-spacing: 0.2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ob-btn:hover { background: var(--cta-hover); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(224, 155, 103, 0.25); }
+  .ob-btn:active { transform: translateY(0); }
+  .ob-btn svg { width: 14px; height: 14px; }
+
+  .ob-btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 12px 22px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s var(--ease-out);
+  }
+  .ob-btn-ghost:hover { color: var(--text-primary); border-color: var(--border-hover); }
+
+  .ob-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  /* Synthesized summary / mini report */
+  .synth-block {
+    padding: 4px 2px 20px;
+    margin-bottom: 20px;
+  }
+  .synth-lead {
+    font-family: var(--font-serif);
+    font-size: 19px;
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1.55;
+    margin-bottom: 14px;
+    letter-spacing: -0.1px;
+  }
+  .synth-lead strong {
+    font-weight: 500;
+    color: var(--accent-text);
+    font-style: italic;
+  }
+  .synth-body {
+    font-size: 14.5px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    font-weight: 500;
+  }
+
+  .primary-gift-card {
+    position: relative;
+    padding: 20px 22px;
+    border-radius: var(--radius-lg);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .primary-gift-card::before {
+    content: '✦';
+    position: absolute;
+    right: 18px;
+    top: 16px;
+    font-size: 22px;
+    color: var(--accent);
+    opacity: 0.5;
+  }
+  .pg-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent-text);
+    margin-bottom: 6px;
+  }
+  .pg-name {
+    font-family: var(--font-serif);
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.15;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+  }
+  .pg-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    font-weight: 500;
+  }
+  .pg-desc strong {
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  .next-prompt {
+    padding: 16px 20px;
+    background: var(--bg-chip);
+    border-left: 3px solid var(--cta);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .next-prompt strong {
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  /* Summary screen */
+  .signals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .signal-card {
+    background: var(--bg-chip);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    transition: all 0.25s var(--ease-out);
+    position: relative;
+    overflow: hidden;
+  }
+  .signal-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0.6;
+  }
+  .signal-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .signal-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--accent-text);
+    margin-bottom: 8px;
+  }
+
+  .signal-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.35;
+  }
+
+  .summary-footer {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.65;
+    margin-top: 16px;
+    font-style: italic;
+    font-family: var(--font-serif);
+  }
+
+  /* ═══════════════════════════════════════════════
+     MAIN APP
+     ═══════════════════════════════════════════════ */
+  #main-app {
+    display: none;
+    flex: 1;
+    background: var(--bg-body);
+    overflow: hidden;
+  }
+  #main-app.active { display: flex; }
+
+  .app-layout {
+    display: grid;
+    grid-template-columns: var(--col-sidebar, 240px) 1fr var(--col-right, 260px);
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    transition: grid-template-columns 0.3s var(--ease-out);
+  }
+
+  /* Collapse states */
+  .app-layout.sidebar-collapsed { --col-sidebar: 64px; }
+  .app-layout.right-collapsed   { --col-right: 0px; }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: background 0.4s var(--ease-out);
+    position: relative;
+    min-width: 0;
+  }
+
+  .sidebar-logo {
+    padding: 22px 18px 20px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+  }
+  .sidebar-logo .logo-mark { width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0; }
+  .sidebar-logo em { font-style: normal; color: var(--accent-text); }
+  .sidebar-logo .logo-text {
+    white-space: nowrap;
+    overflow: hidden;
+    transition: opacity 0.2s var(--ease-out);
+  }
+
+  /* Collapse toggle button — lives in the sidebar */
+  .sidebar-collapse-btn {
+    position: absolute;
+    top: 22px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-chip);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s var(--ease-out);
+    flex-shrink: 0;
+    z-index: 2;
+  }
+  .sidebar-collapse-btn:hover {
+    color: var(--accent-text);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .sidebar-collapse-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.3s var(--ease-out);
+  }
+
+  /* ── Collapsed (rail) mode ── */
+  .app-layout.sidebar-collapsed .sidebar-logo {
+    padding: 22px 0 20px;
+    justify-content: center;
+  }
+  .app-layout.sidebar-collapsed .sidebar-logo .logo-text {
+    opacity: 0;
+    width: 0;
+    pointer-events: none;
+  }
+  .app-layout.sidebar-collapsed .sidebar-collapse-btn {
+    /* Move to below the logo when collapsed so it doesn't overlap */
+    position: static;
+    margin: -8px auto 14px;
+  }
+  .app-layout.sidebar-collapsed .sidebar-collapse-btn svg {
+    transform: rotate(180deg);
+  }
+  .app-layout.sidebar-collapsed .sidebar-section {
+    padding: 0 8px;
+  }
+  .app-layout.sidebar-collapsed .sidebar-label {
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .app-layout.sidebar-collapsed .sidebar-nav-item {
+    justify-content: center;
+    padding: 10px 6px;
+    position: relative;
+  }
+  .app-layout.sidebar-collapsed .sidebar-nav-item .nav-label {
+    display: none;
+  }
+  .app-layout.sidebar-collapsed .sidebar-section.history {
+    display: none;
+  }
+  .app-layout.sidebar-collapsed .user-pill {
+    justify-content: center;
+    padding: 10px;
+    margin: 8px 6px 4px;
+  }
+  .app-layout.sidebar-collapsed .user-pill .user-info {
+    display: none;
+  }
+  .app-layout.sidebar-collapsed .powered-by {
+    display: none;
+  }
+
+  /* Tooltip on rail icons (hover) */
+  .app-layout.sidebar-collapsed .sidebar-nav-item::after,
+  .app-layout.sidebar-collapsed .user-pill::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--text-primary);
+    color: var(--bg-body);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s var(--ease-out);
+    z-index: 100;
+  }
+  .app-layout.sidebar-collapsed .sidebar-nav-item:hover::after,
+  .app-layout.sidebar-collapsed .user-pill:hover::after {
+    opacity: 1;
+  }
+
+  .sidebar-section {
+    padding: 0 12px;
+  }
+
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 18px 10px 8px;
+  }
+
+  .sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s var(--ease-out);
+    margin-bottom: 2px;
+  }
+  .sidebar-nav-item:hover { background: var(--bg-chip-hover); color: var(--text-primary); }
+  .sidebar-nav-item.active {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    font-weight: 600;
+  }
+
+  .nav-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    border-radius: 7px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.15s var(--ease-out);
+  }
+  .sidebar-nav-item:hover .nav-icon { color: var(--text-primary); }
+  .sidebar-nav-item.active .nav-icon {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .nav-icon svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+  .sidebar-section.history {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+  .sidebar-section.history::-webkit-scrollbar { width: 4px; }
+  .sidebar-section.history::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+  .chat-history-item {
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.15s var(--ease-out);
+    margin-bottom: 2px;
+  }
+  .chat-history-item:hover { background: var(--bg-chip-hover); }
+
+  .chi-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 3px;
+  }
+  .chi-meta { font-size: 10.5px; color: var(--text-muted); font-weight: 500; }
+
+  /* User pill — clean, no container box */
+  .user-pill {
+    margin: 8px 10px 4px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: background 0.15s var(--ease-out);
+  }
+  .user-pill:hover { background: var(--bg-chip-hover); }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: rgba(224, 155, 103, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--orange);
+    flex-shrink: 0;
+  }
+  [data-theme="light"] .user-avatar { background: rgba(224, 155, 103, 0.2); color: #b9682f; }
+
+  .user-info { flex: 1; min-width: 0; }
+  .user-name-pill {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .user-plan {
+    font-size: 9.5px;
+    color: var(--accent-text);
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    margin-top: 1px;
+  }
+
+  .powered-by {
+    padding: 10px 22px 14px;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: left;
+    font-weight: 500;
+  }
+  .powered-by em { color: var(--accent-text); font-style: normal; font-weight: 700; }
+
+  /* Chat area */
+  .chat-area {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-body);
+    position: relative;
+    min-width: 0;
+  }
+
+  .chat-topbar {
+    padding: 18px 24px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .chat-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chat-title::before {
+    content: '✦';
+    color: var(--accent);
+    font-size: 13px;
+  }
+
+  .conn-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+  }
+  .conn-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.15);
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+  .chat-messages::-webkit-scrollbar { width: 6px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+  .chat-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .welcome-avatar {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    border: 1.5px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    font-size: 26px;
+    color: var(--accent);
+    position: relative;
+  }
+  .welcome-avatar::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    opacity: 0.3;
+  }
+
+  .welcome-name {
+    font-family: var(--font-serif);
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+  .welcome-name span { color: var(--cta); }
+
+  .welcome-sub {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 360px;
+    margin-bottom: 24px;
+  }
+
+  .suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 480px;
+  }
+
+  .chip {
+    background: var(--bg-chip);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 9px 16px;
+    font-size: 12px;
+    font-family: var(--font-display);
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s var(--ease-out);
+  }
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--accent-text);
+    background: var(--bg-chip-hover);
+    transform: translateY(-1px);
+  }
+
+  /* Chat input */
+  .chat-input-area {
+    padding: 10px 20px 16px;
+    flex-shrink: 0;
+  }
+
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-chip);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 12px 10px 16px;
+    transition: all 0.2s var(--ease-out);
+  }
+  .input-row:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+
+  .msg-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--font-display);
+    font-size: 13.5px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+  .msg-input::placeholder { color: var(--text-muted); font-weight: 400; }
+
+  .send-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s var(--ease-out);
+  }
+  .send-btn:hover { background: var(--turq-light); transform: scale(1.05); }
+  .send-btn svg { width: 15px; height: 15px; stroke: var(--azure-deep); fill: none; stroke-width: 2.2; }
+
+  .input-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+    padding: 0 4px;
+  }
+  .model-badge {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+  }
+  .model-badge::before {
+    content: '✦';
+    color: var(--accent);
+  }
+
+  .input-hint {
+    font-size: 10px;
+    color: var(--text-faint);
+    font-weight: 500;
+  }
+
+  /* Right panel */
+  .right-panel {
+    background: var(--bg-sidebar);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: background 0.4s var(--ease-out);
+    min-width: 0;
+    position: relative;
+  }
+
+  .rp-header {
+    padding: 22px 20px 14px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .rp-collapse-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-chip);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s var(--ease-out);
+    flex-shrink: 0;
+  }
+  .rp-collapse-btn:hover {
+    color: var(--accent-text);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .rp-collapse-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Floating re-open tab — appears on right edge of chat area when right panel is collapsed */
+  .rp-reopen-tab {
+    position: absolute;
+    top: 66px; /* sits below the theme toggle which is at top:20px */
+    right: 18px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-chip);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s var(--ease-out);
+    z-index: 10;
+  }
+  .rp-reopen-tab:hover {
+    color: var(--accent-text);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .rp-reopen-tab svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .app-layout.right-collapsed .rp-reopen-tab { display: flex; }
+  .app-layout.right-collapsed .right-panel {
+    border-left: none;
+    overflow: hidden;
+  }
+  /* When right panel is collapsed, the chat area extends to full width.
+     The theme toggle sits at top-right of app-shell; the re-open tab sits just below it
+     inside chat-area. Add top padding to chat-topbar so the title doesn't collide. */
+  .app-layout.right-collapsed .chat-topbar {
+    padding-top: 26px;
+  }
+
+  .rp-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .rp-sub { font-size: 11px; color: var(--text-muted); line-height: 1.5; font-weight: 500; }
+
+  .rp-scroll {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+  .rp-scroll::-webkit-scrollbar { width: 4px; }
+  .rp-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+  .rp-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent-text);
+    padding: 8px 22px 6px;
+  }
+
+  .rp-scroll-inner {
+    padding: 0 12px;
+  }
+
+  .tool-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s var(--ease-out);
+    margin-bottom: 2px;
+  }
+  .tool-item:hover { background: var(--bg-chip-hover); }
+
+  .tool-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: var(--accent-soft);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+  }
+  .tool-icon svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+  .tool-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    flex: 1;
+  }
+
+  .tool-new-badge {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--cta);
+    background: rgba(224, 155, 103, 0.15);
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .global-notes {
+    padding: 20px 20px 20px;
+  }
+
+  .gn-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .gn-placeholder {
+    padding: 14px;
+    border-radius: var(--radius-md);
+    background: var(--bg-chip);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  /* Messages */
+  .msg-bubble {
+    display: flex;
+    gap: 10px;
+    animation: fadeUp 0.35s var(--ease-out);
+    max-width: 85%;
+  }
+  .msg-bubble.user { align-self: flex-end; flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .msg-avatar.ai { background: var(--accent-soft); color: var(--accent); }
+  .msg-avatar.user-av { background: rgba(224, 155, 103, 0.2); color: var(--orange); }
+  [data-theme="light"] .msg-avatar.user-av { color: #b9682f; }
+
+  .msg-content {
+    background: var(--bg-ai-bubble);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px 15px;
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.65;
+    font-weight: 400;
+  }
+  .msg-bubble.user .msg-content {
+    background: var(--bg-user-bubble);
+    border-color: rgba(122, 164, 156, 0.25);
+  }
+  [data-theme="light"] .msg-content { box-shadow: var(--shadow-soft); }
+
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: inline-block;
+    animation: blink 1.4s infinite;
+    margin-right: 3px;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; margin-right: 0; }
+
+  @keyframes blink {
+    0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+    30%           { opacity: 1;    transform: translateY(-2px); }
+  }
+
+  /* Transition between onboarding & app */
+  .fade-out {
+    opacity: 0;
+    transform: scale(0.98);
+    transition: all 0.45s var(--ease-out);
+    pointer-events: none;
+  }
+  .fade-in {
+    animation: fadeInScale 0.5s var(--ease-out);
+  }
+  @keyframes fadeInScale {
+    from { opacity: 0; transform: scale(1.02); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* Mobile-only: show user avatar in chat topbar since sidebar is hidden */
+  .chat-topbar-mobile-user {
+    display: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: rgba(224, 155, 103, 0.2);
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--orange);
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  [data-theme="light"] .chat-topbar-mobile-user { color: #b9682f; }
+
+  @media (max-width: 640px) {
+    .chat-topbar-mobile-user { display: flex; }
+    .chat-topbar { gap: 6px; }
+    .chat-topbar .chat-title { flex: 1; min-width: 0; }
+  }
+
+  /* ═══════════════════════════════════════════════
+     RESPONSIVE — progressive tiers
+     Tiers: tablet ≤1024 | small-tablet ≤820 | phone ≤640 | small-phone ≤380
+     ═══════════════════════════════════════════════ */
+
+  /* Tablet — drop right panel */
+  @media (max-width: 1024px) {
+    .app-layout { grid-template-columns: 220px 1fr; }
+    .right-panel { display: none; }
+    .rp-reopen-tab { display: none !important; }
+    .app-layout.right-collapsed .chat-topbar { padding-top: 14px; }
+    .ob-card { max-width: 640px; }
+  }
+
+  /* Small tablet — narrower spacing */
+  @media (max-width: 820px) {
+    .app-layout { grid-template-columns: 200px 1fr; }
+    .ob-question { font-size: 28px; }
+    .ob-options { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  }
+
+  /* Phone — single column */
+  @media (max-width: 640px) {
+    /* Sidebar hidden, chat fills */
+    .app-layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+
+    /* Theme toggle — move inline with header to avoid overlap */
+    .theme-toggle {
+      top: max(14px, env(safe-area-inset-top));
+      right: 14px;
+      width: 34px;
+      height: 34px;
+    }
+
+    /* Onboarding header — tighter, account for safe area */
+    .ob-header {
+      padding: max(18px, env(safe-area-inset-top)) 20px 0;
+      /* leave room for theme toggle on the right */
+      padding-right: 62px;
+    }
+    .ob-logo { font-size: 17px; }
+    .ob-logo .logo-mark { width: 26px; height: 26px; }
+    .ob-progress { gap: 5px; }
+    .prog-dot { width: 5px; height: 5px; }
+    .prog-dot.active { width: 18px; }
+
+    .ob-body {
+      padding: 20px 20px max(20px, env(safe-area-inset-bottom));
+      justify-content: flex-start;
+      padding-top: 24px;
+    }
+
+    .ob-card { max-width: 100%; }
+
+    .ob-eyebrow {
+      font-size: 10.5px;
+      letter-spacing: 1.8px;
+      margin-bottom: 10px;
+    }
+    .ob-eyebrow::before { width: 18px; }
+
+    .ob-question {
+      font-size: 24px;
+      line-height: 1.22;
+      margin-bottom: 8px;
+    }
+
+    .ob-sub {
+      font-size: 13px;
+      margin-bottom: 22px;
+      line-height: 1.6;
+    }
+
+    /* Cards: 2-col grid at phone size, trimmed heights */
+    .ob-options {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .ob-options.compact { grid-template-columns: repeat(2, 1fr); }
+
+    .ob-option {
+      min-height: 90px;
+      padding: 14px 12px 12px;
+      font-size: 13px;
+      border-radius: var(--radius-md);
+    }
+    .ob-option::before { height: 38px; }
+    .ob-option.selected::before { height: 44px; }
+    .ob-option.selected::after {
+      top: 10px; right: 10px;
+      width: 20px; height: 20px;
+      font-size: 11px;
+    }
+    .ob-option .opt-glyph {
+      top: 10px; left: 12px;
+      width: 18px; height: 18px;
+    }
+    .ob-options.compact .ob-option {
+      min-height: 82px;
+      padding: 12px 11px 11px;
+      font-size: 12.5px;
+    }
+    .ob-options.compact .ob-option::before { height: 34px; }
+
+    /* Inputs */
+    .ob-inputs { max-width: 100%; }
+    .ob-input {
+      padding: 14px 16px;
+      font-size: 16px; /* prevents iOS zoom on focus */
+    }
+
+    /* Buttons — bigger touch targets */
+    .ob-actions { width: 100%; gap: 8px; }
+    .ob-btn {
+      padding: 14px 24px;
+      font-size: 14px;
+      flex: 1;
+      justify-content: center;
+      min-height: 48px;
+    }
+    .ob-btn-ghost {
+      padding: 13px 18px;
+      font-size: 13px;
+      min-height: 48px;
+    }
+
+    /* Summary screen — 2-col signals */
+    .signals-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .signal-card { padding: 13px 14px; }
+    .signal-label { font-size: 9.5px; margin-bottom: 6px; }
+    .signal-value { font-size: 13px; }
+
+    /* Synth report mobile */
+    .synth-lead { font-size: 16.5px; }
+    .synth-body { font-size: 13px; }
+    .pg-name { font-size: 22px; }
+    .primary-gift-card { padding: 18px 18px; }
+    .primary-gift-card::before { font-size: 18px; top: 14px; right: 14px; }
+    .next-prompt { padding: 14px 16px; font-size: 12.5px; }
+
+    /* Chat area — mobile layout */
+    .chat-topbar {
+      padding: max(14px, calc(env(safe-area-inset-top) + 6px)) 18px 14px;
+    }
+    .chat-title { font-size: 14px; }
+    .chat-messages {
+      padding: 16px;
+      gap: 14px;
+    }
+    .msg-bubble { max-width: 92%; }
+    .msg-content {
+      font-size: 13px;
+      padding: 11px 13px;
+    }
+
+    /* Chat welcome on mobile */
+    .welcome-avatar {
+      width: 56px;
+      height: 56px;
+      font-size: 22px;
+      margin-bottom: 14px;
+    }
+    .welcome-name { font-size: 22px; }
+    .welcome-sub {
+      font-size: 13px;
+      max-width: 300px;
+      margin-bottom: 18px;
+    }
+    .suggestion-chips { gap: 7px; padding: 0 8px; }
+    .chip { font-size: 11.5px; padding: 8px 14px; min-height: 36px; }
+
+    /* Chat input — bigger touch, safe area */
+    .chat-input-area {
+      padding: 12px 14px max(14px, calc(env(safe-area-inset-bottom) + 4px));
+    }
+    .input-row { padding: 10px 10px 10px 14px; }
+    .msg-input {
+      font-size: 16px; /* prevents iOS zoom */
+    }
+    .send-btn {
+      width: 36px;
+      height: 36px;
+    }
+    .input-meta { margin-top: 6px; }
+    .model-badge { font-size: 10px; }
+    .input-hint { display: none; } /* hide "Enter to send" — not relevant on mobile */
+  }
+
+  /* Small phone (iPhone SE, older Androids) */
+  @media (max-width: 380px) {
+    .ob-header { padding-left: 16px; padding-right: 56px; }
+    .ob-body { padding: 18px 16px; }
+    .ob-question { font-size: 22px; }
+    .ob-options { gap: 8px; }
+    .ob-option {
+      min-height: 84px;
+      padding: 12px 10px 10px;
+      font-size: 12.5px;
+    }
+    .signals-grid { gap: 8px; }
+    .signal-card { padding: 12px; }
+  }
+
+  /* Short phones in landscape — don't want chat welcome to feel vertically cramped */
+  @media (max-height: 560px) and (max-width: 900px) {
+    .welcome-avatar { width: 48px; height: 48px; margin-bottom: 10px; font-size: 18px; }
+    .welcome-name { font-size: 18px; margin-bottom: 4px; }
+    .welcome-sub { margin-bottom: 12px; font-size: 12px; }
+    .chat-welcome { padding: 12px; }
+    .ob-body { padding-top: 16px; padding-bottom: 16px; }
+  }
+
+  /* Touch devices: remove hover-driven lifts that feel sticky on tap */
+  @media (hover: none) {
+    .ob-option:hover {
+      transform: none;
+      box-shadow: var(--shadow-soft);
+    }
+    .ob-option:hover::before { height: 44px; }
+    .ob-option:hover .opt-glyph { transform: none; }
+    .ob-option:active {
+      transform: scale(0.98);
+      border-color: var(--accent);
+    }
+    .chip:hover { transform: none; }
+    .ob-btn:hover { transform: none; box-shadow: none; }
+    .signal-card:hover { transform: none; }
+    .sidebar-nav-item:hover,
+    .tool-item:hover,
+    .chat-history-item:hover {
+      background: transparent;
+    }
+  }
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-stage">
+  <div class="app-shell">
+
+    <!-- Theme toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+
+    <!-- ═══ ONBOARDING ═══ -->
+    <div id="onboarding">
+      <div class="ob-header">
+        <div class="ob-logo">
+          <div class="logo-mark"></div>
+          <span class="wordmark">Align360</span>
+        </div>
+        <div class="ob-progress" id="progress-dots"></div>
+      </div>
+      <div class="ob-body">
+        <div class="ob-card" id="ob-card-content"></div>
+      </div>
+    </div>
+
+    <!-- ═══ MAIN APP ═══ -->
+    <div id="main-app">
+      <div class="app-layout">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="sidebar-logo">
+            <div class="logo-mark"></div>
+            <span class="logo-text wordmark">Align360</span>
+            <button class="sidebar-collapse-btn" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+              <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-nav-item active" data-tooltip="Align360 AI">
+              <span class="nav-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9"/></svg>
+              </span>
+              <span class="nav-label">Align360 AI</span>
+            </div>
+            <div class="sidebar-nav-item" data-tooltip="Resource Library">
+              <span class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              </span>
+              <span class="nav-label">Resource Library</span>
+            </div>
+            <div class="sidebar-nav-item" data-tooltip="Tools">
+              <span class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+              </span>
+              <span class="nav-label">Tools</span>
+            </div>
+            <div class="sidebar-nav-item" data-tooltip="Journal &amp; Notes">
+              <span class="nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+              </span>
+              <span class="nav-label">Journal &amp; Notes</span>
+            </div>
+            <div class="sidebar-nav-item" data-tooltip="User Resource Gallery">
+              <span class="nav-icon">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              </span>
+              <span class="nav-label">User Resource Gallery</span>
+            </div>
+          </div>
+
+          <div class="sidebar-section history">
+            <div class="sidebar-label">Chat History</div>
+            <div id="chat-history-list"></div>
+          </div>
+
+          <div id="user-pill-area"></div>
+          <div class="powered-by">Powered by <em>MasteryMade</em></div>
+        </div>
+
+        <!-- Chat area -->
+        <div class="chat-area">
+          <button class="rp-reopen-tab" onclick="toggleRightPanel()" aria-label="Show insight engine">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="chat-topbar">
+            <div class="chat-topbar-mobile-user" id="chat-topbar-avatar"></div>
+            <div class="chat-title">Align360 AI</div>
+            <div class="conn-label"><span class="conn-dot"></span>Connected</div>
+          </div>
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-welcome" id="chat-welcome">
+              <div class="welcome-avatar">✦</div>
+              <div class="welcome-name">Welcome back, <span id="user-first-name">there</span></div>
+              <div class="welcome-sub">I'm here to help you think clearly, explore ideas, and move forward with alignment &mdash; at your pace, in your voice.</div>
+              <div class="suggestion-chips">
+                <div class="chip" onclick="sendSuggestion('Help me gain clarity on my next step')">Help me gain clarity on my next step</div>
+                <div class="chip" onclick="sendSuggestion('Start my Wiring for Impact assessment')">Start Wiring for Impact</div>
+                <div class="chip" onclick="sendSuggestion('Explore career direction')">Explore career direction</div>
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <div class="input-row">
+              <input class="msg-input" id="msg-input" type="text" placeholder="Ask Align360 anything…" onkeydown="handleKey(event)" />
+              <button class="send-btn" onclick="sendMessage()" aria-label="Send">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>
+              </button>
+            </div>
+            <div class="input-meta">
+              <div class="model-badge">claude-sonnet-4</div>
+              <div class="input-hint">Enter ↵ to send</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right panel -->
+        <div class="right-panel">
+          <div class="rp-header">
+            <div>
+              <div class="rp-title">Insight Engine</div>
+              <div class="rp-sub">Tools that power your personalized analysis.</div>
+            </div>
+            <button class="rp-collapse-btn" onclick="toggleRightPanel()" aria-label="Collapse panel">
+              <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+          <div class="rp-scroll">
+            <div class="rp-section-label">DesignSuite</div>
+            <div class="rp-scroll-inner">
+            <div class="tool-item">
+              <span class="tool-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6L19 19M5 19l1.4-1.4M17.6 6.4L19 5" stroke-linecap="round"/></svg></span>
+              <span class="tool-name">Wiring for Impact</span>
+              <span class="tool-new-badge">CORE</span>
+            </div>
+            <div class="tool-item">
+              <span class="tool-icon"><svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9"/></svg></span>
+              <span class="tool-name">Orientation for Impact</span>
+            </div>
+            <div class="tool-item">
+              <span class="tool-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+              <span class="tool-name">Rejection Gift Finder</span>
+            </div>
+            <div class="tool-item">
+              <span class="tool-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+              <span class="tool-name">Decision Simulation Lab</span>
+            </div>
+            <div class="tool-item">
+              <span class="tool-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="tool-name">Impact Pathways</span>
+            </div>
+            <div class="tool-item">
+              <span class="tool-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></span>
+              <span class="tool-name">Job &amp; Market Trends</span>
+            </div>
+            <div class="tool-item">
+              <span class="tool-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+              <span class="tool-name">Family Mechanics Simulator</span>
+            </div>
+            </div>
+          </div>
+          <div class="global-notes">
+            <div class="gn-label">Global Notes</div>
+            <div class="gn-placeholder">Start a chat to create notes</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   THEME TOGGLE
+   ═══════════════════════════════════════════════ */
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  try { localStorage.setItem('align360_theme', next); } catch(e) {}
+}
+(function initTheme() {
+  try {
+    const saved = localStorage.getItem('align360_theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch(e) {}
+})();
+
+/* ═══════════════════════════════════════════════
+   SIDEBAR COLLAPSE TOGGLES
+   ═══════════════════════════════════════════════ */
+function toggleSidebar() {
+  const layout = document.querySelector('.app-layout');
+  if (!layout) return;
+  layout.classList.toggle('sidebar-collapsed');
+  try { localStorage.setItem('align360_sidebar', layout.classList.contains('sidebar-collapsed') ? '1' : '0'); } catch(e) {}
+}
+
+function toggleRightPanel() {
+  const layout = document.querySelector('.app-layout');
+  if (!layout) return;
+  layout.classList.toggle('right-collapsed');
+  try { localStorage.setItem('align360_right', layout.classList.contains('right-collapsed') ? '1' : '0'); } catch(e) {}
+}
+
+function applyCollapseState() {
+  const layout = document.querySelector('.app-layout');
+  if (!layout) return;
+  try {
+    if (localStorage.getItem('align360_sidebar') === '1') layout.classList.add('sidebar-collapsed');
+    if (localStorage.getItem('align360_right')   === '1') layout.classList.add('right-collapsed');
+  } catch(e) {}
+  /* Auto-collapse right panel at narrower widths */
+  if (window.innerWidth < 1100 && window.innerWidth >= 640) {
+    layout.classList.add('right-collapsed');
+  }
+}
+window.addEventListener('resize', () => {
+  const layout = document.querySelector('.app-layout');
+  if (!layout) return;
+  /* Only auto-adjust when crossing thresholds — don't fight user intent */
+  if (window.innerWidth < 640) {
+    layout.classList.remove('sidebar-collapsed', 'right-collapsed');
+  }
+});
+
+/* ═══════════════════════════════════════════════
+   ONBOARDING FLOW
+   ═══════════════════════════════════════════════ */
+const steps = [
+  {
+    eyebrow: "Let's begin",
+    question: "First, what should we call you?",
+    sub: "Just a few things to make this feel like yours.",
+    type: "inputs",
+    inputs: [
+      { id: "inp-name", placeholder: "Full name", key: "name" },
+      { id: "inp-callname", placeholder: "Preferred name (optional)", key: "callName" }
+    ]
+  },
+  {
+    eyebrow: "Warm welcome",
+    question: "What brings you to Align360 today?",
+    sub: "Pick all that apply — this helps us prioritize your first experience.",
+    type: "multi",
+    options: ["Discover my strengths","Explore career direction","Align my life and priorities","Build something meaningful","Plan my next chapter","Just curious"],
+    key: "intent"
+  },
+  {
+    eyebrow: "Wiring signals · 1 of 3",
+    question: "When you're at your best, what are you usually doing?",
+    sub: "Pick what resonates most right now.",
+    type: "single",
+    options: ["Solving problems","Building systems","Helping people grow","Creating ideas","Organizing chaos","Leading initiatives","Learning and teaching"],
+    key: "wiring1"
+  },
+  {
+    eyebrow: "Wiring signals · 2 of 3",
+    question: "Which environments energize you most?",
+    type: "single",
+    options: ["Starting new things","Improving existing systems","Teaching or mentoring","Strategy and planning","Creative work","Building teams"],
+    key: "wiring2"
+  },
+  {
+    eyebrow: "Wiring signals · 3 of 3",
+    question: "What kind of impact excites you most?",
+    type: "single",
+    options: ["Helping people grow","Solving meaningful problems","Creating new opportunities","Building organizations","Bringing clarity to complexity","Leaving something lasting"],
+    key: "wiring3"
+  },
+  {
+    eyebrow: "Life rhythm",
+    question: "What helps you recharge?",
+    sub: "This shapes the pace of your experience.",
+    type: "single",
+    options: ["Music","Movies","Reading","Exercise","Nature","Time with friends","Quiet reflection"],
+    key: "recharge"
+  },
+  {
+    eyebrow: "Decision style",
+    question: "How do you usually make important decisions?",
+    sub: "Helps Align360 adapt how it communicates with you.",
+    type: "single",
+    options: ["Think deeply alone","Talk it through with others","Research and analyze","Follow intuition","Pray and reflect","A mix of these"],
+    key: "decisionStyle"
+  },
+  {
+    eyebrow: "Growth signals",
+    question: "Which challenge has shaped you the most?",
+    sub: "Every setback carries a gift. This helps us find yours.",
+    type: "single",
+    options: ["Being underestimated","High expectations","Having to figure things out alone","Failure or setbacks","Responsibility early in life","Being overlooked","Learning through hardship"],
+    key: "growthSignal"
+  },
+  {
+    eyebrow: "Connection style",
+    question: "What helps you feel most encouraged?",
+    type: "single",
+    options: ["Words of encouragement","Quality time","Acts of support","Recognition","Shared experiences"],
+    key: "connection"
+  },
+  {
+    eyebrow: "Faith & values · optional",
+    question: "Do spiritual or faith values play a role in how you approach life?",
+    sub: "We'll respect whatever you share — or don't.",
+    type: "single",
+    options: ["Yes, very important","Somewhat important","I'm exploring","Not really","Prefer not to say"],
+    key: "faith",
+    optional: true
+  },
+  {
+    eyebrow: "Curiosity",
+    question: "What are you most curious to discover about yourself?",
+    sub: "Let's explore that together.",
+    type: "single",
+    options: ["My strengths","My direction","My purpose","My next opportunity","My growth potential"],
+    key: "curiosity"
+  },
+  { type: "summary" }
+];
+
+let currentStep = 0;
+const answers = {};
+
+/* ── Refined Netflix-card tint palette ──────────
+   Two subtle tints alternating by position — accent (turq) and warm (orange).
+   Keeps the cards feeling distinct without rainbow noise.                    */
+const TINTS = [
+  { bg: 'rgba(122, 164, 156, 0.18)', accent: '#5d8880' },   // accent
+  { bg: 'rgba(224, 155, 103, 0.15)', accent: '#c77a42' },   // warm
+  { bg: 'rgba(122, 164, 156, 0.10)', accent: '#7aa49c' },   // accent-soft
+  { bg: 'rgba(224, 155, 103, 0.08)', accent: '#d88b52' }    // warm-soft
+];
+const TINTS_DARK = [
+  { bg: 'rgba(122, 164, 156, 0.22)', accent: '#9fc0ba' },
+  { bg: 'rgba(224, 155, 103, 0.18)', accent: '#e8b085' },
+  { bg: 'rgba(122, 164, 156, 0.12)', accent: '#bfd6d1' },
+  { bg: 'rgba(224, 155, 103, 0.10)', accent: '#e8b085' }
+];
+
+/* Compact icon library — one glyph per common concept.
+   Any option not matched falls back to a generic dot glyph.         */
+const GLYPHS = {
+  // intent
+  'Discover my strengths':          '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2"/>',
+  'Explore career direction':       '<path d="M5 3v18M19 3v18M5 12h14M9 7l3-4 3 4M9 17l3 4 3-4"/>',
+  'Align my life and priorities':   '<path d="M3 6h18M3 12h18M3 18h18"/><circle cx="7" cy="6" r="1.5"/><circle cx="13" cy="12" r="1.5"/><circle cx="17" cy="18" r="1.5"/>',
+  'Build something meaningful':     '<path d="M12 2l9 5v10l-9 5-9-5V7l9-5z"/>',
+  'Plan my next chapter':           '<path d="M4 4h12l4 4v12a0 0 0 0 1 0 0H4z"/><path d="M14 4v6h6"/>',
+  'Just curious':                   '<circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 2-3 4M12 17h.01"/>',
+  // wiring 1
+  'Solving problems':               '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  'Building systems':               '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  'Helping people grow':            '<path d="M12 14l-4 8M12 14l4 8M12 14V4M6 8l6-4 6 4"/>',
+  'Creating ideas':                 '<path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2zM9 22h6"/>',
+  'Organizing chaos':               '<path d="M4 7h16M4 12h10M4 17h16"/>',
+  'Leading initiatives':            '<path d="M4 20V8l8-5 8 5v12M9 20v-6h6v6"/>',
+  'Learning and teaching':          '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5z"/>',
+  // wiring 2
+  'Starting new things':            '<path d="M5 12h14M13 5l7 7-7 7"/>',
+  'Improving existing systems':     '<path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/>',
+  'Teaching or mentoring':          '<path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>',
+  'Strategy and planning':          '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  'Creative work':                  '<path d="M12 19l7-7 3 3-7 7-3-3zM18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5zM2 2l7.6 7.6"/><circle cx="11" cy="11" r="2"/>',
+  'Building teams':                 '<circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2M15 15h2a4 4 0 0 1 4 4v2"/>',
+  // wiring 3
+  'Solving meaningful problems':    '<path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+  'Creating new opportunities':     '<path d="M12 2L9 9l-7 .8 5.3 4.8L5.6 22 12 18l6.4 4-1.7-7.4L22 9.8 15 9z"/>',
+  'Building organizations':         '<rect x="3" y="11" width="18" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  'Bringing clarity to complexity': '<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/>',
+  'Leaving something lasting':      '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  // recharge
+  'Music':                          '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  'Movies':                         '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 12h18M3 7h4M3 17h4M17 7h4M17 17h4"/>',
+  'Reading':                        '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5z"/>',
+  'Exercise':                       '<path d="M6.5 6.5L17.5 17.5M21 21l-1-1M3 3l1 1M18 22l4-4M2 6l4-4M7 17l-5 5M17 7l5-5"/>',
+  'Nature':                         '<path d="M12 22V8M5 12l7-8 7 8M7 15l5-5 5 5"/>',
+  'Time with friends':              '<circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2M15 15h2a4 4 0 0 1 4 4v2"/>',
+  'Quiet reflection':               '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>',
+  // decision style
+  'Think deeply alone':             '<circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4 12H2M22 12h-2"/>',
+  'Talk it through with others':    '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  'Research and analyze':           '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/>',
+  'Follow intuition':               '<path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+  'Pray and reflect':               '<path d="M12 2v20M5 9h14"/>',
+  'A mix of these':                 '<path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/>',
+  // growth
+  'Being underestimated':           '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',
+  'High expectations':              '<path d="M18 20V10M12 20V4M6 20v-6"/>',
+  'Having to figure things out alone': '<path d="M12 22v-5M9 7V2h6v5M5 13l7-6 7 6v4H5z"/>',
+  'Failure or setbacks':            '<path d="M12 2v20M4 12l8 8 8-8"/>',
+  'Responsibility early in life':   '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  'Being overlooked':               '<path d="M2 12s4-8 10-8 10 8 10 8M4 4l16 16"/>',
+  'Learning through hardship':      '<path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2zM9 22h6"/>',
+  // connection
+  'Words of encouragement':         '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  'Quality time':                   '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  'Acts of support':                '<path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+  'Recognition':                    '<circle cx="12" cy="8" r="7"/><path d="M8.2 13.9L7 22l5-3 5 3-1.2-8.1"/>',
+  'Shared experiences':             '<circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2M15 15h2a4 4 0 0 1 4 4v2"/>',
+  // faith
+  'Yes, very important':            '<path d="M12 2v20M5 9h14"/>',
+  'Somewhat important':             '<path d="M12 6v12M6 12h12"/>',
+  "I'm exploring":                  '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 2-3 4M12 17h.01"/>',
+  'Not really':                     '<circle cx="12" cy="12" r="10"/><path d="M8 12h8"/>',
+  'Prefer not to say':              '<circle cx="12" cy="12" r="10"/>',
+  // curiosity
+  'My strengths':                   '<path d="M6 4l6 16 6-16"/>',
+  'My direction':                   '<path d="M5 12h14M13 5l7 7-7 7"/>',
+  'My purpose':                     '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  'My next opportunity':            '<path d="M12 2L9 9l-7 .8 5.3 4.8L5.6 22 12 18l6.4 4-1.7-7.4L22 9.8 15 9z"/>',
+  'My growth potential':            '<path d="M3 17l6-6 4 4 8-8M14 7h7v7"/>'
+};
+
+function glyphFor(option) {
+  const svg = GLYPHS[option] || '<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/>';
+  return `<span class="opt-glyph"><svg viewBox="0 0 24 24">${svg}</svg></span>`;
+}
+
+function tintFor(idx) {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const pool = isDark ? TINTS_DARK : TINTS;
+  return pool[idx % pool.length];
+}
+
+function renderDots() {
+  const dots = document.getElementById('progress-dots');
+  const total = steps.length - 1;
+  dots.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'prog-dot' + (i === currentStep ? ' active' : i < currentStep ? ' done' : '');
+    dots.appendChild(d);
+  }
+}
+
+function renderStep() {
+  renderDots();
+  const step = steps[currentStep];
+  const card = document.getElementById('ob-card-content');
+
+  if (step.type === 'summary') {
+    renderSummary(card);
+    return;
+  }
+
+  let optionHTML = '';
+  if (step.type === 'inputs') {
+    optionHTML = '<div class="ob-inputs">' +
+      step.inputs.map(inp => `<input class="ob-input" id="${inp.id}" placeholder="${inp.placeholder}" type="text" value="${answers[inp.key] || ''}" />`).join('') +
+      '</div>';
+  } else {
+    const compactClass = step.options.length >= 6 ? ' compact' : '';
+    const isMulti = step.type === 'multi';
+    const currentVal = answers[step.key];
+    optionHTML = `<div class="ob-options${compactClass}">` +
+      step.options.map((o, i) => {
+        let sel = '';
+        if (isMulti) {
+          sel = Array.isArray(currentVal) && currentVal.includes(o) ? ' selected' : '';
+        } else {
+          sel = currentVal === o ? ' selected' : '';
+        }
+        const tint = tintFor(i);
+        const styleVars = `--option-tint: ${tint.bg}; --option-accent: ${tint.accent}; animation-delay: ${i * 40}ms;`;
+        const handler = isMulti ? 'toggleOption' : 'selectOption';
+        return `<button class="ob-option${sel}" style="${styleVars}" onclick="${handler}(this, '${step.key}', \`${o}\`)">
+          ${glyphFor(o)}
+          <span class="opt-label">${o}</span>
+        </button>`;
+      }).join('') +
+      '</div>';
+    if (isMulti) {
+      optionHTML += `<div class="ob-multi-hint">You can pick more than one</div>`;
+    }
+  }
+
+  const isLast = currentStep === steps.length - 2;
+  card.innerHTML = `
+    <div class="ob-eyebrow">${step.eyebrow}</div>
+    <div class="ob-question">${step.question}</div>
+    ${step.sub ? `<div class="ob-sub">${step.sub}</div>` : ''}
+    ${optionHTML}
+    <div class="ob-actions">
+      <button class="ob-btn" id="next-btn" onclick="nextStep()">
+        ${isLast ? 'See my signals' : 'Continue'}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </button>
+      ${step.optional ? '<button class="ob-btn-ghost" onclick="skipStep()">Skip</button>' : ''}
+      ${currentStep > 0 ? '<button class="ob-btn-ghost" onclick="prevStep()">Back</button>' : ''}
+    </div>
+  `;
+
+  if (step.type === 'inputs') {
+    const first = document.getElementById(step.inputs[0].id);
+    if (first) setTimeout(() => first.focus(), 120);
+  }
+}
+
+function selectOption(el, key, value) {
+  document.querySelectorAll('.ob-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[key] = value;
+}
+
+function toggleOption(el, key, value) {
+  if (!Array.isArray(answers[key])) answers[key] = [];
+  const idx = answers[key].indexOf(value);
+  if (idx >= 0) {
+    answers[key].splice(idx, 1);
+    el.classList.remove('selected');
+  } else {
+    answers[key].push(value);
+    el.classList.add('selected');
+  }
+}
+
+function nextStep() {
+  const step = steps[currentStep];
+  if (step.type === 'inputs') {
+    step.inputs.forEach(inp => {
+      const el = document.getElementById(inp.id);
+      if (el && el.value.trim()) answers[inp.key] = el.value.trim();
+    });
+    if (!answers.name) {
+      const f = document.getElementById(step.inputs[0].id);
+      if (f) { f.focus(); f.style.borderColor = 'var(--red)'; }
+      return;
+    }
+  } else if (step.type === 'multi') {
+    if (!step.optional && (!Array.isArray(answers[step.key]) || answers[step.key].length === 0)) return;
+  } else if (step.type !== 'summary' && !step.optional && !answers[step.key]) {
+    return;
+  }
+  currentStep++;
+  renderStep();
+}
+
+function skipStep() { currentStep++; renderStep(); }
+function prevStep() { if (currentStep > 0) { currentStep--; renderStep(); } }
+
+function renderSummary(card) {
+  const name = answers.callName || (answers.name ? answers.name.split(' ')[0] : 'there');
+
+  /* ───── SYNTHESIS LOGIC ──────────────────────────
+     Map the raw answers to a primary wiring hypothesis + a short read.
+     This is NOT the real 36Q assessment — it's a lightweight heuristic
+     that points toward one of the 9 gifts based on onboarding signals.
+     The final Wiring for Impact tool does the confirmation.           */
+
+  /* Map wiring answers → gift hypothesis weights */
+  const GIFT_HINTS = {
+    'Solving problems':              ['Realist'],
+    'Building systems':              ['Organizer', 'Enterpriser'],
+    'Helping people grow':           ['Encourager', 'Supporter'],
+    'Creating ideas':                ['Explainer', 'Integrator'],
+    'Organizing chaos':              ['Organizer', 'Realist'],
+    'Leading initiatives':           ['Enterpriser', 'Doer'],
+    'Learning and teaching':         ['Explainer', 'Wise Observer'],
+    'Starting new things':           ['Enterpriser', 'Doer'],
+    'Improving existing systems':    ['Organizer', 'Integrator'],
+    'Teaching or mentoring':         ['Explainer', 'Encourager'],
+    'Strategy and planning':         ['Wise Observer', 'Integrator'],
+    'Creative work':                 ['Integrator', 'Explainer'],
+    'Building teams':                ['Enterpriser', 'Encourager'],
+    'Helping people grow ':          ['Encourager', 'Supporter'],
+    'Solving meaningful problems':   ['Realist', 'Wise Observer'],
+    'Creating new opportunities':    ['Enterpriser', 'Doer'],
+    'Building organizations':        ['Enterpriser', 'Organizer'],
+    'Bringing clarity to complexity':['Wise Observer', 'Explainer'],
+    'Leaving something lasting':     ['Wise Observer', 'Enterpriser']
+  };
+
+  const GIFT_BLURBS = {
+    'Realist':        'see reality clearly and cut through confusion',
+    'Supporter':      'show up steady for the people around you',
+    'Doer':           'move things forward when others hesitate',
+    'Organizer':      'create order where there was chaos',
+    'Explainer':      'make complex things land clearly for others',
+    'Integrator':     'connect ideas and people across boundaries',
+    'Enterpriser':    'see the opportunity and build toward it',
+    'Encourager':     'draw out the best in others',
+    'Wise Observer':  'hold the long view when others are in the weeds'
+  };
+
+  /* Tally gift hits across wiring signals */
+  const giftScores = {};
+  ['wiring1', 'wiring2', 'wiring3'].forEach(k => {
+    const ans = answers[k];
+    if (ans && GIFT_HINTS[ans]) {
+      GIFT_HINTS[ans].forEach(g => { giftScores[g] = (giftScores[g] || 0) + 1; });
+    }
+  });
+  const sortedGifts = Object.entries(giftScores).sort((a,b) => b[1] - a[1]);
+  const primaryGift = sortedGifts[0] ? sortedGifts[0][0] : 'Integrator';
+  const secondaryGift = sortedGifts[1] ? sortedGifts[1][0] : 'Explainer';
+  const primaryBlurb = GIFT_BLURBS[primaryGift];
+  const secondaryBlurb = GIFT_BLURBS[secondaryGift];
+
+  /* Intent framing (multi-select array) */
+  const intents = Array.isArray(answers.intent) ? answers.intent : [answers.intent].filter(Boolean);
+  const intentBlurbs = {
+    'Discover my strengths':           'understand how you\'re wired',
+    'Explore career direction':        'find work that fits who you are',
+    'Align my life and priorities':    'get rhythm and priorities into sync',
+    'Build something meaningful':      'build something that lasts',
+    'Plan my next chapter':            'plan the next chapter with clarity',
+    'Just curious':                    'explore what\'s possible'
+  };
+  const intentPhrase = intents.length === 0 ? 'explore what\'s possible'
+    : intents.length === 1 ? (intentBlurbs[intents[0]] || 'get clarity')
+    : intents.slice(0, 2).map(i => intentBlurbs[i] || '').filter(Boolean).join(', and ');
+
+  /* Growth read from rejection signal */
+  const growthReads = {
+    'Being underestimated':           'The pattern of being underestimated often sharpens a quiet kind of conviction',
+    'High expectations':              'Carrying high expectations tends to build an unusually strong internal compass',
+    'Having to figure things out alone': 'Figuring things out alone builds resourcefulness most people never develop',
+    'Failure or setbacks':            'Moving through real setbacks builds the kind of resilience you can\'t fake',
+    'Responsibility early in life':   'Carrying responsibility early tends to produce maturity and steadiness others sense',
+    'Being overlooked':               'Being overlooked early often sharpens perception — you see what others miss',
+    'Learning through hardship':      'Learning through hardship tends to create depth and a truer sense of what matters'
+  };
+  const growthRead = growthReads[answers.growthSignal] || 'What you\'ve come through already shapes how you show up now';
+
+  /* Decision style → communication adaptation */
+  const decisionStyleRead = {
+    'Think deeply alone':             'I\'ll give you space to think, and offer frameworks you can process solo.',
+    'Talk it through with others':    'I\'ll engage with you conversationally — we\'ll think out loud together.',
+    'Research and analyze':           'I\'ll bring data and structure — you can test my reasoning against your own.',
+    'Follow intuition':               'I\'ll ask questions that help you trust what you already sense.',
+    'Pray and reflect':               'I\'ll leave space for reflection, and respect the deeper layer in how you decide.',
+    'A mix of these':                 'I\'ll adapt — sometimes structured, sometimes open-ended, always following your lead.'
+  };
+  const commsRead = decisionStyleRead[answers.decisionStyle] || 'I\'ll adapt my style as we go.';
+
+  card.innerHTML = `
+    <div class="ob-eyebrow">Your first read</div>
+    <div class="ob-question">Here's what I'm sensing, ${name}.</div>
+
+    <div class="synth-block">
+      <p class="synth-lead">
+        You came in wanting to <strong>${intentPhrase}</strong>. Based on how you described your best work, your wiring leans toward the kind of person who can <strong>${primaryBlurb}</strong>${secondaryBlurb && primaryGift !== secondaryGift ? `, with a strong undercurrent of how you ${secondaryBlurb}` : ''}.
+      </p>
+      <p class="synth-body">
+        ${growthRead} — and it's already shaping how you show up. ${commsRead}
+      </p>
+    </div>
+
+    <div class="primary-gift-card">
+      <div class="pg-label">Likely primary wiring</div>
+      <div class="pg-name">The ${primaryGift}</div>
+      <div class="pg-desc">One of nine wiring signatures in the Align360 framework. The full <strong>Wiring for Impact</strong> assessment confirms this with 36 questions and maps your full profile across all nine.</div>
+    </div>
+
+    <div class="next-prompt">
+      Ready to go deeper? <strong>Wiring for Impact</strong> is the foundation — once we run it, every other tool in Align360 gets personalized to you.
+    </div>
+
+    <div class="ob-actions" style="margin-top: 20px;">
+      <button class="ob-btn" onclick="enterApp()">
+        Start Wiring for Impact
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </button>
+      <button class="ob-btn-ghost" onclick="enterApp()">Skip — just chat</button>
+    </div>
+  `;
+  document.getElementById('progress-dots').innerHTML = '';
+
+  /* Store the primary gift hypothesis so the chat can reference it */
+  answers._primaryGift = primaryGift;
+  answers._secondaryGift = secondaryGift;
+  answers._primaryBlurb = primaryBlurb;
+}
+
+function enterApp() {
+  const name = answers.callName || (answers.name ? answers.name.split(' ')[0] : 'there');
+  const initials = (answers.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+  document.getElementById('user-first-name').textContent = name;
+  const topbarAvatar = document.getElementById('chat-topbar-avatar');
+  if (topbarAvatar) topbarAvatar.textContent = initials;
+
+  document.getElementById('user-pill-area').innerHTML = `
+    <div class="user-pill" data-tooltip="${answers.name || name}">
+      <div class="user-avatar">${initials}</div>
+      <div class="user-info">
+        <div class="user-name-pill">${answers.name || name}</div>
+        <div class="user-plan">FREE PLAN</div>
+      </div>
+    </div>
+  `;
+
+  const histItems = [
+    { title: "Your Orientation for Impact Reading", meta: "Just now" },
+    { title: "Wiring for Impact Results", meta: "1m ago" },
+    { title: "Exploring next steps", meta: "2m ago" }
+  ];
+  document.getElementById('chat-history-list').innerHTML = histItems.map(h => `
+    <div class="chat-history-item">
+      <div class="chi-title">${h.title}</div>
+      <div class="chi-meta">${h.meta}</div>
+    </div>
+  `).join('');
+
+  const ob = document.getElementById('onboarding');
+  const app = document.getElementById('main-app');
+  ob.classList.add('fade-out');
+  setTimeout(() => {
+    ob.style.display = 'none';
+    app.classList.add('active', 'fade-in');
+    applyCollapseState();
+  }, 380);
+
+  /* Let Claude generate the opening message grounded in user signals.
+     Falls back to a templated version if the API fails.              */
+  setTimeout(async () => {
+    showTyping();
+    const primaryGift = answers._primaryGift || 'Integrator';
+    const openingPrompt = `This is the very first message in our conversation. Greet ${name} warmly, briefly reflect back ONE specific thing from their onboarding signals that you noticed, acknowledge the hypothesis that they might be wired as a "${primaryGift}" (framing it as a working read, not a label), and offer ONE clear next move — either starting Wiring for Impact or just talking through what's on their mind. Keep it under 80 words. Don't list their answers back to them. Don't be saccharine. Be a trusted friend, not a salesperson.`;
+
+    chatHistory.push({ role: 'user', content: openingPrompt });
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 400,
+          system: buildSystemPrompt(),
+          messages: chatHistory
+        })
+      });
+      const data = await res.json();
+      const text = (data.content || [])
+        .filter(b => b.type === 'text')
+        .map(b => b.text)
+        .join('\n').trim();
+      removeTyping();
+      if (text) {
+        /* Replace the "seed prompt" in history with a neutral opener so the
+           user's real first message isn't blocked by it.                     */
+        chatHistory.pop();
+        chatHistory.push({ role: 'assistant', content: text });
+        addMessage('ai', text);
+      } else {
+        const impactStyle = (answers.wiring1 || 'doing your best work').toLowerCase();
+        addMessage('ai', `Welcome, ${name}. From what you shared, you sound like someone who comes alive when **${impactStyle}**. I've got a working read on how you might be wired — want to dig into that, or is there something else on your mind?`);
+      }
+    } catch (err) {
+      removeTyping();
+      const impactStyle = (answers.wiring1 || 'doing your best work').toLowerCase();
+      addMessage('ai', `Welcome, ${name}. From what you shared, you sound like someone who comes alive when **${impactStyle}**. I've got a working read on how you might be wired — want to dig into that, or is there something else on your mind?`);
+    }
+  }, 950);
+}
+
+/* ═══════════════════════════════════════════════
+   CHAT — powered by Claude API
+   Uses the user's onboarding signals to personalize every response.
+   ═══════════════════════════════════════════════ */
+
+function buildSystemPrompt() {
+  const name = answers.callName || (answers.name ? answers.name.split(' ')[0] : 'friend');
+  const intents = Array.isArray(answers.intent) ? answers.intent.join(', ') : (answers.intent || 'exploring');
+  const primaryGift = answers._primaryGift || 'Integrator';
+  const secondaryGift = answers._secondaryGift || 'Explainer';
+
+  return `You are Align360 AI, a personal development companion. You help users gain clarity, understand how they're wired, and move forward with alignment — at their pace, in their voice.
+
+The user you're talking to is ${name}. Here's what they shared during onboarding:
+
+- Why they came: ${intents}
+- At their best: ${answers.wiring1 || 'unspecified'}
+- Energized in environments: ${answers.wiring2 || 'unspecified'}
+- Impact that excites them: ${answers.wiring3 || 'unspecified'}
+- Recharges through: ${answers.recharge || 'unspecified'}
+- Decision style: ${answers.decisionStyle || 'unspecified'}
+- Shaping challenge: ${answers.growthSignal || 'unspecified'}
+- Connection language: ${answers.connection || 'unspecified'}
+- Faith/values: ${answers.faith || 'unspecified'}
+- Most curious about: ${answers.curiosity || 'unspecified'}
+
+Based on these signals, our preliminary hypothesis is that their primary wiring leans toward "${primaryGift}" with undertones of "${secondaryGift}". This is NOT confirmed — the full Wiring for Impact 36-question assessment is what actually confirms a gift profile. Treat this as a working hypothesis, not a label.
+
+Guidance for how to show up:
+
+1. You are NOT here to perform intelligence or give lectures. You're here to help them think. Default to short, warm, conversational responses — 2-4 sentences unless they ask for depth.
+
+2. Use their name sparingly — once in a while, not every message. Never over-affirm ("great question!") — just engage.
+
+3. When they share something vague or open-ended, reflect it back and ask ONE clarifying question. Don't stack three questions at once.
+
+4. Reference their signals naturally when it helps — e.g., "given that you recharge through ${answers.recharge || 'your preferred rhythm'}..." — but don't parrot their answers. Apply them.
+
+5. If they ask to start Wiring for Impact, explain it plainly: it's a 36-question assessment mapping 9 wiring gifts (Realist, Supporter, Doer, Organizer, Explainer, Integrator, Enterpriser, Encourager, Wise Observer), takes ~7 min, produces a full profile. Offer the option of a 10-question conversational version instead.
+
+6. If they're in distress, slow down. Don't jump to frameworks. Just be present.
+
+7. Tone: direct, grounded, warm. Think trusted mentor, not therapist, not coach-bro. Avoid motivational language and corporate-speak.
+
+8. You MAY adapt your communication style based on their decision style. ${answers.decisionStyle === 'Think deeply alone' ? 'They process solo — give them space and frameworks they can sit with.' : answers.decisionStyle === 'Talk it through with others' ? 'They process out loud — engage conversationally, think with them.' : answers.decisionStyle === 'Research and analyze' ? 'They want data and logic — bring structure, show your reasoning.' : answers.decisionStyle === 'Follow intuition' ? 'They trust their gut — ask questions that help them hear what they already know.' : answers.decisionStyle === 'Pray and reflect' ? 'They process with a deeper layer — leave space, respect silence, don\'t rush.' : 'Adapt fluidly — sometimes structured, sometimes open.'}
+
+9. Never use em dashes — use a comma, period, or colon instead. Use plain language.
+
+10. Keep responses under 120 words unless they explicitly ask for more depth.`;
+}
+
+const chatHistory = []; // array of {role, content}
+
+async function callClaudeAPI(userMessage) {
+  chatHistory.push({ role: 'user', content: userMessage });
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: buildSystemPrompt(),
+        messages: chatHistory
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const text = (data.content || [])
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('\n')
+      .trim();
+
+    if (text) {
+      chatHistory.push({ role: 'assistant', content: text });
+      return text;
+    }
+    return 'I hit a pause there. Can you say more about what you\'re thinking?';
+  } catch (err) {
+    console.error('Claude API error:', err);
+    return 'Something got in the way on my end. Try that again?';
+  }
+}
+
+function addMessage(role, text) {
+  const container = document.getElementById('chat-messages');
+  const welcome = document.getElementById('chat-welcome');
+  if (welcome) welcome.remove();
+
+  const bubble = document.createElement('div');
+  bubble.className = `msg-bubble${role === 'user' ? ' user' : ''}`;
+  const initials = role === 'user'
+    ? ((answers.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2))
+    : '✦';
+
+  /* Basic markdown-ish rendering: **bold**, line breaks */
+  const rendered = text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br>');
+
+  bubble.innerHTML = `
+    <div class="msg-avatar ${role === 'user' ? 'user-av' : 'ai'}">${initials}</div>
+    <div class="msg-content">${rendered}</div>
+  `;
+  container.appendChild(bubble);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showTyping() {
+  const container = document.getElementById('chat-messages');
+  const welcome = document.getElementById('chat-welcome');
+  if (welcome) welcome.remove();
+  const t = document.createElement('div');
+  t.className = 'msg-bubble';
+  t.id = 'typing-indicator';
+  t.innerHTML = `<div class="msg-avatar ai">✦</div><div class="msg-content"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>`;
+  container.appendChild(t);
+  container.scrollTop = container.scrollHeight;
+}
+function removeTyping() { const t = document.getElementById('typing-indicator'); if (t) t.remove(); }
+
+function handleKey(e) { if (e.key === 'Enter') sendMessage(); }
+function sendSuggestion(text) { document.getElementById('msg-input').value = text; sendMessage(); }
+
+async function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.disabled = true;
+  addMessage('user', text);
+  showTyping();
+
+  const reply = await callClaudeAPI(text);
+
+  removeTyping();
+  addMessage('ai', reply);
+  input.disabled = false;
+  input.focus();
+}
+
+renderStep();
+</script>
+
+<!-- IP Notice (added 2026-05-24 per Will/Samuel governance) -->
+<style>
+  .a360-ip-notice {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 9999;
+    padding: 6px 14px;
+    font: 11px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif;
+    color: rgba(255,255,255,0.55);
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    pointer-events: none;
+    user-select: text;
+  }
+  body { padding-bottom: 28px; }
+</style>
+<div class="a360-ip-notice">
+  &copy; <span id="a360-ip-year"></span> Align360. All rights reserved. Reproduction or use of these assessments without written permission is prohibited.
+</div>
+<script>
+  document.getElementById('a360-ip-year').textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>

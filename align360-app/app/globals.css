@@ -1,0 +1,247 @@
+/* ═══════════════════════════════════════════════
+   Align360 — brand tokens (ported from Demo)
+   ═══════════════════════════════════════════════ */
+:root {
+  --azure:        #2e3c45;
+  --azure-deep:   #1e2a31;
+  --azure-shade:  #18232a;
+  --ylg:          #edefe8;
+  --turq:         #7aa49c;
+  --turq-light:   #9fc0ba;
+  --turq-deep:    #5d8880;
+  --orange:       #e09b67;
+  --orange-soft:  #e8b085;
+
+  --font-display: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif:   'Fraunces', Georgia, serif;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+/* Light theme — DEFAULT (fix: app no longer comes up dark) */
+[data-theme='light'] {
+  --bg-body:       #f6f5f0;
+  --bg-surface:    #ffffff;
+  --bg-input:      #ffffff;
+  --bg-ai-bubble:  #ffffff;
+  --bg-user-bubble: rgba(122, 164, 156, 0.18);
+  --border:        rgba(46, 60, 69, 0.1);
+  --border-strong: rgba(46, 60, 69, 0.3);
+  --text-primary:   #2e3c45;
+  --text-secondary: rgba(46, 60, 69, 0.72);
+  --text-muted:     rgba(46, 60, 69, 0.48);
+  --accent:         var(--turq-deep);
+  --cta:            var(--orange);
+}
+
+[data-theme='dark'] {
+  --bg-body:       #18232a;
+  --bg-surface:    #1f2a31;
+  --bg-input:      rgba(255, 255, 255, 0.04);
+  --bg-ai-bubble:  rgba(255, 255, 255, 0.04);
+  --bg-user-bubble: rgba(122, 164, 156, 0.14);
+  --border:        rgba(237, 239, 232, 0.08);
+  --border-strong: rgba(237, 239, 232, 0.22);
+  --text-primary:   #edefe8;
+  --text-secondary: rgba(237, 239, 232, 0.72);
+  --text-muted:     rgba(237, 239, 232, 0.48);
+  --accent:         var(--turq);
+  --cta:            var(--orange);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg-body);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar on the WINDOW, not inside the message column (fix). */
+body { overflow-y: auto; }
+
+button { font: inherit; cursor: pointer; }
+input, textarea { font: inherit; color: inherit; }
+
+/* ═══════════════════════════════════════════════
+   App shell
+   ═══════════════════════════════════════════════ */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* Reserve room for the fixed footer (IP notice) + the sticky input. */
+  padding-bottom: 0;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg-body);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wordmark {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--text-primary);
+}
+
+.status {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.status::before {
+  content: '';
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+}
+
+/* ═══════════════════════════════════════════════
+   Reading pane — WIDER, like Claude/ChatGPT (fix)
+   ═══════════════════════════════════════════════ */
+.messages {
+  flex: 1;
+  width: 100%;
+  max-width: 768px;       /* like ChatGPT's main column */
+  margin: 0 auto;
+  padding: 32px 24px 160px; /* bottom space so last msg isn't covered by input */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 1280px) {
+  .messages { max-width: 880px; }
+}
+
+.bubble {
+  padding: 14px 18px;
+  border-radius: var(--radius-lg);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+.bubble.user {
+  align-self: flex-end;
+  background: var(--bg-user-bubble);
+  color: var(--text-primary);
+  border-radius: var(--radius-lg) var(--radius-lg) 4px var(--radius-lg);
+  max-width: 80%;
+}
+
+.bubble.ai {
+  align-self: flex-start;
+  background: var(--bg-ai-bubble);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) 4px;
+  max-width: 92%;
+}
+
+.typing {
+  align-self: flex-start;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 4px 8px;
+}
+
+/* ═══════════════════════════════════════════════
+   Input bar — STATIC at bottom, especially on mobile (fix)
+   ═══════════════════════════════════════════════ */
+.input-wrap {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, transparent 0%, var(--bg-body) 20%);
+  padding: 16px 16px 56px;
+  z-index: 5;
+}
+
+.input-inner {
+  max-width: 768px;
+  margin: 0 auto;
+  display: flex;
+  gap: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-strong);
+  border-radius: 24px;
+  padding: 8px 8px 8px 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+@media (min-width: 1280px) {
+  .input-inner { max-width: 880px; }
+}
+
+.input-inner textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  max-height: 200px;
+  padding: 8px 4px;
+  font-size: 16px; /* 16px prevents iOS auto-zoom */
+}
+
+.send-btn {
+  background: var(--cta);
+  color: #1e2a31;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+.send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ═══════════════════════════════════════════════
+   IP notice — persistent footer (Standing Rules)
+   ═══════════════════════════════════════════════ */
+.ip-notice {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-body);
+  border-top: 1px solid var(--border);
+  padding: 8px 16px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  z-index: 6;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════
+   Mobile — compact input, wordmark area clean
+   ═══════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .header { padding: 10px 16px; }
+  .wordmark { font-size: 18px; }
+  .messages { padding: 20px 16px 140px; }
+  .input-wrap { padding: 12px 12px 48px; }
+  .input-inner textarea { font-size: 16px; padding: 6px 4px; }
+}
