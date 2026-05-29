@@ -24,6 +24,32 @@ The alpha-sprint docs landed in the repo. Current state:
 
 ---
 
+## 0.1 Scope revision — 2026-05-29 (Will)
+
+This revision **supersedes the lean cuts in §4** where they conflict. The alpha is no longer "auth → Q1 → result → done." It is a small but real app with a persistent shell. Where §4 below says "no chat in UI," "no chat-with-your-profile," "no multi-step navigation" — those are **reversed** by this section. Everything else in §4 still stands (no payment, no B3/Onboarding runners, no admin panel, no notification emails, light-mode only).
+
+**App shell — two tabs (persistent left nav or top tabs):**
+
+1. **Align** — the assessments + the user's profile. Lists each quiz (Wiring for Impact, Orientation for Impact, Rejection Gift). Click a quiz → Typeform-style click-through runner → on completion, AI processing → renders the combined profile result page (matching the reference HTMLs) → result is saved to the user's account and reachable here anytime.
+2. **AI Chat** — Align360 AI (the existing `/api/chat`). Once a user has a profile, **their profile is injected into the assistant's context** so the chat is personalized. (Tab name is provisional — Will said "call it Align or something, like AI Chat / Align." Using **Align** + **AI Chat** unless told otherwise.)
+
+**On signup:** route the user straight into the Align tab with Wiring for Impact as the first call-to-action (per Samuel: Wiring is the mandatory first experience). They land in the product *doing the thing*, not on a dashboard.
+
+**Quizzes are FULL-LENGTH (resolves §0 / prior 36-vs-15 conflict).** Will's decision: use the complete question banks, not the short extracts. v6.4 prompt §12/§13 ("full 36-question Wiring, Q1–Q36, never shorten") is **correct and stays**. Each assessment runs its full set sourced from the Knowledge File.
+
+> **⚠ NEW HARD BLOCKER (was hidden by the old "match Assessments/*.md exactly" criterion):** the full banks are **not in the repo**. `Assessments/Wiring for Impact.md` is a 19-question extract (header says 15); `AI Model/Knowledge File — Part 1.md` is a **placeholder**. The full 36-Q Wiring set (and the full Orientation / Rejection Gift sets) live in the Knowledge File Samuel says he sent to Will + posted on Slack — they have not landed here. **Build cannot satisfy "full-length quizzes" until those banks are dropped into `Assessments/` (or the Knowledge File).** This replaces criterion #1's "match the .md exactly" with "match the *full* banks once supplied." Structure/runner/result-page/PDF/persistence/chat-injection can all be built now against the current short files as placeholders (the loader reads `.md` at request time, so swapping in the full banks is a content drop, no rebuild).
+
+**Result delivery — additions:**
+
+- **PDF download** of the combined profile result, with IP notice per `AI Model/Standing Rules.md` (Standing Rules already mandate the notice on PDF exports). Server-rendered from the same result component.
+- Result **persists to the user's account** (already planned via `profile_snapshots`) and is re-openable from the Align tab.
+
+**The integration loop (new, important):** after AI processing generates the profile, that profile becomes part of the assistant's knowledge base. Mechanism: extend the chat route to pull the signed-in user's latest `profile_snapshots.payload_json` (and optionally their raw `assessment_responses`) and append it as personalization context on top of `buildSystemPrompt()`. Reuses the existing loader pattern — no new infra. This is the payoff: the assessments don't just produce a page, they make Align360 AI *know you*.
+
+**Build-order impact:** add an app-shell/nav step before the runner, a PDF-export step after the result page, and a chat-personalization step after snapshot generation. I'll renumber §5/§ brief build order in the same pass once you confirm this section captures it.
+
+---
+
 ## 1. Where we are — the honest read
 
 **The frameworks are validated.** Drew, Amber, Samuel, and the B3 team have all confirmed the assessments produce real signal. Miriam asked to sign the LOI on the basis of her result. Jason's bucket 02 (manual IP validation) is effectively green from a content standpoint — what isn't proven is the *delivery*.
@@ -131,13 +157,15 @@ Color palette per profile: use the gift-type primary as accent. Drew (The Steady
 
 ## 4. Explicitly out of scope (do not build)
 
+> **⚠ Read §0.1 first — it reverses three items below.** The 2026-05-29 revision puts the **AI Chat tab IN scope** and personalizes it with the user's profile, and replaces "auth → Q1 only" with a two-tab app shell (**Align** + **AI Chat**). The struck items below are kept for provenance but no longer bind.
+
 The following will be tempting to bundle in. Don't. Each one falls in a later primitive bucket and will burn the sprint:
 
 - **No B3 assessment runner**, no Onboarding assessment runner. Those collect data for Phase 1+ which doesn't exist yet. The .md files stay where they are; we will add their runners post-alpha.
-- **No Daily Check-In, no journaling, no chat-with-your-profile.** That's the 28-day OS loop. Don't promise it in the alpha and don't build it.
+- ~~**No chat-with-your-profile.**~~ **REVERSED by §0.1** — the AI Chat tab is in, and the profile is injected into its context. (Still no Daily Check-In, no journaling — that's the 28-day OS loop.)
 - **No credit gate, no Stripe in-product, no paywall.** $47 collection is manual + out-of-band.
 - **No theme toggle, no dark mode option.** Light only.
-- **No multi-step onboarding (name → intent → wiring).** Auth → directly into Wiring Q1. Anything else is friction.
+- ~~**No multi-step onboarding / auth → directly into Wiring Q1.**~~ **AMENDED by §0.1** — still no name/intent onboarding questions, but signup now lands in the **Align** tab with Wiring as the first CTA, not a bare Q1 screen. The two-tab shell is in scope.
 - **No Career Navigator, DesignSuite workspace, 627 Figures, LegacyLab.** Phase 1+.
 - **No admin panel.** Will and Sumit can read Supabase directly for the alpha.
 - **No notification emails ("your profile is ready", "come back tomorrow")** — there's nothing to come back to.
