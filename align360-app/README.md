@@ -52,20 +52,27 @@ Edit those files and the change takes effect on the next message — no rebuild.
 - **Persistent IP notice footer** — per `AI Model/Standing Rules.md`. Year auto-resolves.
 - **Mobile-tight header** — wordmark sits cleanly, no menu overlap.
 
-## What's NOT here yet (Phase 2)
+## Roadmap — Alpha Sprint (current)
 
-- Multi-step onboarding (the demo's name/intent/wiring flow)
-- 3-panel chat shell (sidebar + Insight Engine panel)
-- Theme toggle UI
-- Assessment runners (Wiring for Impact, Orientation, Rejection Gift Finder, B3)
-- Auth + session persistence
-- Streaming responses
+**The authoritative plan is `../DEV PLAN — Alpha Sprint 2026-05-28.md` and `../CODING AGENT BRIEF — Alpha Sprint 2026-05-28.md` at the repo root. Read those before building. They override the roadmap notes here.**
 
-These were intentionally deferred so Phase 1 is small, reviewable, and shippable.
+What Phase 1 (this commit) delivers: a minimal chat shell — light-mode default, wide pane, static input, OpenAI wired via `/api/chat`, system prompt loaded live from `AI Model/*.md`.
+
+What the alpha sprint adds, in build order (per the dev plan §5 / brief):
+
+1. **Supabase** auth (magic-link only) + persistence (`assessment_responses`, `profile_snapshots`).
+2. **Typeform-style assessment runners** — `/assessment/[slug]` for `wiring`, `orientation`, `rejection-gift`. One question per screen, parsed from `Assessments/*.md` at request time. Reference feel: `../align360 lead gen inline.html`.
+3. **Combined profile result page** — `/result` + `/result/[share_id]`. Converts the reference HTMLs to a React component; sections per dev plan §3.4 (incl. the AI-Era Intelligence block).
+4. **AI narrative generation** — `app/api/profile/generate/route.ts`, server-side, cached to `profile_snapshots.payload_json`.
+5. **Private share links**.
+
+### Explicitly OUT of scope for the alpha (do not build — superseded my earlier Phase-2 notes)
+
+Onboarding flow (auth → straight into Wiring Q1), 3-panel chat shell, theme toggle / dark mode, streaming, chat-with-your-profile, in-product payment/credit gate, B3 + Onboarding + Daily Check-In runners, admin panel, notification emails. See dev plan §4 and the brief's "say no to all of them" list.
 
 ## Deploy
 
-1. Push the repo to GitHub (private).
+1. Repo is on GitHub (private): `wpreble/align360`.
 2. In Vercel: import the repo. Set **Root Directory** to `align360-app`. Framework auto-detects as Next.js.
-3. Env vars: `OPENAI_API_KEY`, optionally `OPENAI_MODEL`.
-4. Deploy.
+3. Env vars: `OPENAI_API_KEY`, `OPENAI_MODEL` (use `gpt-4o` for the alpha — quality over cost; snapshots are cached), plus the Supabase + Resend vars once auth lands (see the brief's Environment section).
+4. Domain target: `alpha.align360.io` once DNS is added.

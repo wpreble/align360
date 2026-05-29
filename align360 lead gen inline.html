@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Align360 — Discover Your Wiring</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600;1,700&family=Cinzel:wght@400;500;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#060609;--obsidian:#0C0C15;--midnight:#111122;--dusk:#181830;
+  --gold:#C8A96E;--gold2:#E8C97E;--goldd:#8A6E3A;--goldg:rgba(200,169,110,.10);
+  --silver:#B8B4A8;--silverd:#6A6660;--ivory:#F2EDE4;--ivoryd:#C8C4BC;
+  --border:rgba(200,169,110,.14);--borderm:rgba(200,169,110,.30);
+  --teal:#2ABAAA;--crimson:#C04040;--plum:#9A5AC8;
+}
+body{font-family:'Crimson Pro',Georgia,serif;background:var(--void);color:var(--ivoryd);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.8}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:var(--void)}::-webkit-scrollbar-thumb{background:var(--goldd)}
+
+/* ── VIEWS ── */
+.view{display:none}
+.view.active{display:block}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:5rem 2rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 65% at 50% 40%,rgba(58,26,74,.32),transparent 65%),radial-gradient(ellipse 40% 40% at 15% 80%,rgba(10,50,50,.18),transparent 55%)}
+.rings{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.ring{position:absolute;border-radius:50%;border:1px solid var(--border);transform:translate(-50%,-50%);animation:breathe 9s ease-in-out infinite}
+.ring:nth-child(1){width:180px;height:180px}
+.ring:nth-child(2){width:360px;height:360px;animation-delay:.6s;border-color:rgba(200,169,110,.08)}
+.ring:nth-child(3){width:560px;height:560px;animation-delay:1.2s;border-color:rgba(200,169,110,.05)}
+.ring:nth-child(4){width:800px;height:800px;animation-delay:1.8s;border-color:rgba(200,169,110,.025)}
+@keyframes breathe{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.025)}}
+.hero-inner{position:relative;z-index:2;max-width:700px;margin:0 auto}
+.hero-kicker{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--goldd);margin-bottom:2rem;display:flex;align-items:center;justify-content:center;gap:1.5rem}
+.hero-kicker::before,.hero-kicker::after{content:'';width:36px;height:1px;background:var(--goldd)}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,10vw,88px);font-weight:300;font-style:italic;color:var(--ivory);line-height:.92;margin-bottom:.25em;text-shadow:0 0 80px rgba(200,169,110,.1)}
+.hero-title em{color:var(--gold2);font-style:italic;display:block}
+.gold-rule{width:64px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:1.75rem auto}
+.hero-desc{font-size:18px;font-weight:300;color:var(--silverd);line-height:1.8;max-width:480px;margin:0 auto 1.5rem}
+.hero-meta{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;color:rgba(200,169,110,.35);margin-bottom:2.5rem}
+.btn-primary{display:inline-flex;align-items:center;gap:12px;background:transparent;border:1px solid var(--borderm);color:var(--gold2);font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;padding:1rem 2.5rem;cursor:pointer;transition:all .35s;position:relative;overflow:hidden}
+.btn-primary::before{content:'';position:absolute;inset:0;background:var(--goldg);transform:translateX(-100%);transition:transform .35s}
+.btn-primary:hover::before{transform:translateX(0)}
+.btn-primary:hover{border-color:var(--gold)}
+.btn-primary span{position:relative;z-index:1}
+.hero-note{margin-top:1.5rem;font-size:13px;color:var(--silverd);font-style:italic}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.hero-inner>*{animation:fadeUp 1.1s cubic-bezier(.16,1,.3,1) both}
+.hero-inner>*:nth-child(1){animation-delay:.1s}.hero-inner>*:nth-child(2){animation-delay:.25s}
+.hero-inner>*:nth-child(3){animation-delay:.4s}.hero-inner>*:nth-child(4){animation-delay:.55s}
+.hero-inner>*:nth-child(5){animation-delay:.7s}.hero-inner>*:nth-child(6){animation-delay:.85s}
+.hero-inner>*:nth-child(7){animation-delay:1s}
+
+/* ── ASSESSMENT ── */
+.assess-view{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:3rem 2rem}
+.assess-wrap{max-width:660px;width:100%;margin:0 auto}
+.progress-bar{height:1px;background:rgba(200,169,110,.1);margin-bottom:3rem;position:relative}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--goldd),var(--gold));transition:width .6s cubic-bezier(.16,1,.3,1);width:0%}
+.progress-label{position:absolute;right:0;top:-22px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.14em;color:var(--goldd)}
+.q-kicker{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--goldd);margin-bottom:1rem;opacity:.7}
+.q-text{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,4vw,38px);font-weight:300;font-style:italic;color:var(--ivory);line-height:1.15;margin-bottom:2.25rem}
+.options{display:flex;flex-direction:column;gap:8px;margin-bottom:2rem}
+.opt{background:var(--obsidian);border:1px solid var(--border);padding:1rem 1.25rem;cursor:pointer;display:flex;align-items:center;gap:.875rem;transition:all .22s;position:relative;overflow:hidden;text-align:left;width:100%}
+.opt::before{content:'';position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--goldg),transparent);transition:width .3s}
+.opt:hover{border-color:rgba(200,169,110,.38)}
+.opt:hover::before{width:100%}
+.opt.selected{border-color:var(--gold);background:rgba(200,169,110,.05)}
+.opt.selected::before{width:100%}
+.opt-letter{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--goldd);flex-shrink:0;width:18px;position:relative;z-index:1}
+.opt-text{font-size:15px;font-weight:300;color:var(--ivoryd);line-height:1.4;position:relative;z-index:1}
+.opt.selected .opt-text{color:var(--ivory)}
+.opt-check{margin-left:auto;width:14px;height:14px;border-radius:50%;border:1px solid var(--border);flex-shrink:0;transition:all .22s;position:relative;z-index:1}
+.opt.selected .opt-check{background:var(--gold);border-color:var(--gold)}
+.q-nav{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.btn-nav{background:transparent;border:1px solid var(--border);color:var(--silverd);font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:.7rem 1.5rem;cursor:pointer;transition:all .25s}
+.btn-nav:hover:not(:disabled){border-color:var(--borderm);color:var(--ivoryd)}
+.btn-nav.gold{border-color:var(--borderm);color:var(--gold2)}
+.btn-nav.gold:hover{background:var(--goldg)}
+.btn-nav:disabled{opacity:.2;cursor:not-allowed}
+.q-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:160px}
+.q-dot{width:5px;height:5px;border-radius:50%;background:rgba(200,169,110,.12);transition:background .3s;flex-shrink:0}
+.q-dot.done{background:var(--goldd)}
+.q-dot.current{background:var(--gold)}
+.skip-hint{text-align:center;margin-top:1.5rem;font-size:12px;color:var(--silverd);font-style:italic;opacity:.6}
+
+/* ── RESULT ── */
+.result-view{min-height:100vh;padding:4rem 2rem;position:relative;overflow:hidden}
+.result-bg{position:absolute;inset:0;background:radial-gradient(ellipse 55% 60% at 50% 35%,rgba(58,26,74,.22),transparent 65%);pointer-events:none}
+.result-inner{max-width:680px;margin:0 auto;position:relative;z-index:2}
+
+.r-kicker{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--goldd);margin-bottom:1.25rem;margin-top:3rem;opacity:0;animation:fadeUp .8s .1s cubic-bezier(.16,1,.3,1) forwards}
+.r-name{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,8vw,74px);font-weight:300;font-style:italic;color:var(--ivory);line-height:.93;text-shadow:0 0 60px rgba(200,169,110,.12);opacity:0;animation:fadeUp .9s .25s cubic-bezier(.16,1,.3,1) forwards}
+.r-name em{color:var(--gold2);display:block}
+.r-rule{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:.5rem 0 1.5rem;opacity:0;animation:fadeUp .7s .35s forwards}
+.r-sub{font-size:16px;font-weight:300;color:var(--silverd);line-height:1.75;max-width:560px;margin-bottom:2.5rem;opacity:0;animation:fadeUp .9s .45s cubic-bezier(.16,1,.3,1) forwards}
+
+/* Signal section */
+.signal-section{background:var(--obsidian);border:1px solid var(--border);padding:2rem;margin-bottom:1rem;position:relative;overflow:hidden;opacity:0;animation:fadeUp .9s .55s cubic-bezier(.16,1,.3,1) forwards}
+.signal-section::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,169,110,.28),transparent)}
+.ss-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--goldd);margin-bottom:1.5rem;opacity:.75}
+.sig-rows{display:flex;flex-direction:column;gap:13px}
+.sig-row{display:flex;align-items:center;gap:1rem}
+.sig-name{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--silverd);min-width:130px}
+.sig-track{flex:1;height:1px;background:rgba(200,169,110,.08);position:relative}
+.sig-fill{position:absolute;top:0;left:0;height:100%;width:0;transition:width 1.4s cubic-bezier(.16,1,.3,1)}
+.sig-dot{width:7px;height:7px;border-radius:50%;position:absolute;right:-3.5px;top:50%;transform:translateY(-50%)}
+.sig-pct{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:200;color:var(--gold);min-width:44px;text-align:right}
+
+/* Completion ring */
+.completion-ring{display:flex;align-items:center;gap:1.75rem;background:var(--obsidian);border:1px solid var(--border);padding:1.5rem 2rem;margin-bottom:1rem;opacity:0;animation:fadeUp .9s .65s cubic-bezier(.16,1,.3,1) forwards}
+.ring-svg{flex-shrink:0}
+.ring-pct{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:200;color:var(--gold);line-height:1}
+.ring-lbl{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--goldd);margin-top:4px;opacity:.7}
+.ring-desc{font-size:13px;color:var(--silverd);margin-top:.6rem;line-height:1.6;font-style:italic}
+
+/* Locked */
+.locked-section{background:var(--obsidian);border:1px solid var(--border);border-style:dashed;padding:2rem;margin-bottom:1rem;opacity:0;animation:fadeUp .9s .75s cubic-bezier(.16,1,.3,1) forwards;position:relative}
+.ls-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--silverd);margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.ls-lock{font-size:8px;letter-spacing:.1em;padding:2px 8px;border:1px solid rgba(200,169,110,.18);color:rgba(200,169,110,.35)}
+.locked-rows{display:flex;flex-direction:column;gap:13px}
+.locked-row{display:flex;align-items:center;gap:1rem}
+.locked-name{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(110,110,100,.4);min-width:130px}
+.locked-track{flex:1;height:1px;background:rgba(100,100,100,.07);position:relative;overflow:hidden}
+.locked-fill{position:absolute;top:0;left:0;height:100%;background:rgba(100,100,100,.2)}
+.locked-blur{position:absolute;inset:-4px;backdrop-filter:blur(4px);background:rgba(6,6,9,.35)}
+.lock-svg{flex-shrink:0;opacity:.2}
+
+/* Insight */
+.insight-card{background:linear-gradient(145deg,var(--obsidian),rgba(58,26,74,.14));border:1px solid var(--borderm);padding:2rem;margin-bottom:1rem;position:relative;overflow:hidden;opacity:0;animation:fadeUp .9s .85s cubic-bezier(.16,1,.3,1) forwards}
+.insight-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.ic-badge{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--goldd);margin-bottom:.875rem;opacity:.8}
+.ic-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;font-style:italic;color:var(--ivory);margin-bottom:.75rem;line-height:1.2}
+.ic-body{font-size:15px;font-weight:300;color:var(--silverd);line-height:1.8}
+
+/* Unlock */
+.unlock-card{background:var(--dusk);border:1px solid var(--border);padding:2rem;margin-bottom:2rem;position:relative;overflow:hidden;opacity:0;animation:fadeUp .9s .95s cubic-bezier(.16,1,.3,1) forwards}
+.unlock-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.45}
+.uc-badge{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--goldd);margin-bottom:.75rem;opacity:.7}
+.uc-hook{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;font-style:italic;color:var(--ivory);margin-bottom:.75rem;line-height:1.25}
+.uc-body{font-size:15px;font-weight:300;color:var(--silverd);line-height:1.8}
+.uc-body em{color:var(--gold);font-style:normal;font-weight:400}
+
+/* CTA */
+.cta-block{text-align:center;padding:2.5rem 0 4rem;opacity:0;animation:fadeUp .9s 1.05s cubic-bezier(.16,1,.3,1) forwards}
+.cta-headline{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;font-style:italic;color:var(--ivory);margin-bottom:.4rem}
+.cta-sub{font-size:14px;color:var(--silverd);font-style:italic;margin-bottom:2rem;line-height:1.65}
+.btn-cta{display:inline-flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--goldd),var(--gold2));border:none;color:var(--void);font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;padding:1.125rem 3rem;cursor:pointer;transition:all .3s;font-weight:600}
+.btn-cta:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(200,169,110,.22)}
+.cta-note{margin-top:.875rem;font-size:12px;color:var(--silverd);font-style:italic}
+.cta-divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:2rem auto}
+.cta-restart{background:none;border:none;color:var(--silverd);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:color .3s}
+.cta-restart:hover{color:var(--ivoryd)}
+.cta-tagline{margin-top:2rem;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.18em;color:rgba(200,169,110,.25)}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="view active" id="view-hero">
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="rings">
+      <div class="ring"></div><div class="ring"></div>
+      <div class="ring"></div><div class="ring"></div>
+    </div>
+    <div class="hero-inner">
+      <div class="hero-kicker">Align360 · Wiring Discovery</div>
+      <h1 class="hero-title">How are you<em>wired?</em></h1>
+      <div class="gold-rule"></div>
+      <p class="hero-desc">12 questions. 3 minutes. A first look at the pattern through which you most naturally create impact — at work, in relationships, and in life.</p>
+      <div class="hero-meta">No email required to start · Results appear instantly</div>
+      <button class="btn-primary" onclick="startAssessment()">
+        <span>Begin the assessment</span>
+        <span style="font-size:18px;line-height:1">→</span>
+      </button>
+      <p class="hero-note">This is a teaser — your full wiring profile requires the complete DesignSuite</p>
+    </div>
+  </div>
+</div>
+
+<!-- ASSESSMENT -->
+<div class="view" id="view-assess">
+  <div class="assess-view">
+    <div class="assess-wrap">
+      <div class="progress-bar">
+        <div class="progress-fill" id="prog-fill"></div>
+        <span class="progress-label" id="prog-label"></span>
+      </div>
+      <div class="q-kicker" id="q-kicker"></div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="options"></div>
+      <div class="q-nav">
+        <button class="btn-nav" id="btn-back" onclick="goBack()">← Back</button>
+        <div class="q-dots" id="q-dots"></div>
+        <button class="btn-nav gold" id="btn-next" onclick="goNext()">Next →</button>
+      </div>
+      <div class="skip-hint">Select an answer to continue</div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="view" id="view-result">
+  <div class="result-bg"></div>
+  <div class="result-inner">
+
+    <div class="r-kicker">Your wiring pattern · Partial result</div>
+    <div class="r-name" id="r-name"></div>
+    <div class="r-rule"></div>
+    <div class="r-sub" id="r-sub"></div>
+
+    <div class="signal-section">
+      <div class="ss-label">Wiring signals — partial view</div>
+      <div class="sig-rows" id="sig-rows"></div>
+    </div>
+
+    <div class="completion-ring">
+      <svg class="ring-svg" width="68" height="68" viewBox="0 0 68 68">
+        <circle cx="34" cy="34" r="28" fill="none" stroke="rgba(200,169,110,.1)" stroke-width="3"/>
+        <circle id="ring-arc" cx="34" cy="34" r="28" fill="none" stroke="var(--gold)" stroke-width="3"
+          stroke-dasharray="175.93" stroke-dashoffset="175.93"
+          stroke-linecap="round" transform="rotate(-90 34 34)"
+          style="transition:stroke-dashoffset 1.5s cubic-bezier(.16,1,.3,1) .8s"/>
+        <text x="34" y="40" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="15" fill="var(--gold)" font-weight="300">35%</text>
+      </svg>
+      <div>
+        <div class="ring-pct">35%</div>
+        <div class="ring-lbl">Profile revealed</div>
+        <div class="ring-desc">Your full wiring profile — all nine gift patterns, behavioral intelligence, life positioning, and strategic edge — unlocks inside the complete DesignSuite.</div>
+      </div>
+    </div>
+
+    <div class="locked-section">
+      <div class="ls-label">Full wiring pattern <span class="ls-lock">LOCKED</span></div>
+      <div class="locked-rows">
+        <div class="locked-row">
+          <span class="locked-name">Rejection Gift</span>
+          <div class="locked-track"><div class="locked-fill" style="width:72%"></div><div class="locked-blur"></div></div>
+          <svg class="lock-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="locked-row">
+          <span class="locked-name">Orientation</span>
+          <div class="locked-track"><div class="locked-fill" style="width:58%"></div><div class="locked-blur"></div></div>
+          <svg class="lock-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="locked-row">
+          <span class="locked-name">Shadow Pattern</span>
+          <div class="locked-track"><div class="locked-fill" style="width:44%"></div><div class="locked-blur"></div></div>
+          <svg class="lock-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="locked-row">
+          <span class="locked-name">Currency Map</span>
+          <div class="locked-track"><div class="locked-fill" style="width:85%"></div><div class="locked-blur"></div></div>
+          <svg class="lock-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="locked-row">
+          <span class="locked-name">Strategic Edge</span>
+          <div class="locked-track"><div class="locked-fill" style="width:91%"></div><div class="locked-blur"></div></div>
+          <svg class="lock-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="ic-badge">What this wiring means</div>
+      <div class="ic-title" id="ic-title"></div>
+      <div class="ic-body" id="ic-body"></div>
+    </div>
+
+    <div class="unlock-card">
+      <div class="uc-badge">What people with your wiring often don't realize</div>
+      <div class="uc-hook" id="uc-hook"></div>
+      <div class="uc-body" id="uc-body"></div>
+    </div>
+
+    <div class="cta-block">
+      <div class="cta-headline">Your full profile is waiting</div>
+      <p class="cta-sub">The complete DesignSuite reveals all nine wiring gifts, your purpose orientation, your rejection gift, and your strategic edge — calibrated for the world you're actually entering.</p>
+      <button class="btn-cta" onclick="alert('→ Connect to Align360 sign-up flow here')">
+        Unlock my full profile →
+      </button>
+      <p class="cta-note">Free to start · No credit card required</p>
+      <div class="cta-divider"></div>
+      <button class="cta-restart" onclick="restart()">Retake the assessment</button>
+      <div class="cta-tagline">Align360 · DesignSuite · Know what you're built for</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    kicker:"Signal 1 of 12 · Impact",
+    text:"When do you feel most alive in your work?",
+    opts:[
+      {text:"Solving a complex problem others couldn't crack",tags:["realist","doer"]},
+      {text:"Helping someone grow, develop, or find clarity",tags:["supporter","encourager"]},
+      {text:"Building or creating something that didn't exist before",tags:["enterpriser","organizer"]},
+      {text:"Bringing structure and direction to something scattered",tags:["organizer","doer"]},
+      {text:"Seeing the big picture when everyone else sees pieces",tags:["wise_observer","realist"]},
+    ]
+  },
+  {
+    kicker:"Signal 2 of 12 · Energy",
+    text:"What gives you energy — even when you're running on empty?",
+    opts:[
+      {text:"Thinking through a big, complex idea",tags:["wise_observer","realist"]},
+      {text:"Encouraging or mentoring someone through a hard season",tags:["encourager","supporter"]},
+      {text:"Starting something new — that first-draft energy",tags:["enterpriser","doer"]},
+      {text:"Diagnosing and fixing something that's broken",tags:["realist","organizer"]},
+      {text:"Explaining something complicated in a way that finally clicks",tags:["explainer","supporter"]},
+    ]
+  },
+  {
+    kicker:"Signal 3 of 12 · Challenge",
+    text:"A hard problem lands in your lap. What's your first honest move?",
+    opts:[
+      {text:"Analyze the root cause before touching anything",tags:["realist","wise_observer"]},
+      {text:"Talk it through with someone I trust",tags:["supporter","integrator"]},
+      {text:"Start testing solutions — I learn by doing",tags:["doer","enterpriser"]},
+      {text:"Step back to see where this fits the larger picture",tags:["wise_observer","organizer"]},
+      {text:"Research until I understand it well enough to move",tags:["explainer","realist"]},
+    ]
+  },
+  {
+    kicker:"Signal 4 of 12 · Contribution",
+    text:"What do people consistently come to you for?",
+    opts:[
+      {text:"Making sense of something complicated",tags:["explainer","realist"]},
+      {text:"Encouragement when they're losing confidence",tags:["encourager","supporter"]},
+      {text:"Fixing a problem or improving how something works",tags:["doer","organizer"]},
+      {text:"Direction when things feel unclear or undefined",tags:["organizer","wise_observer"]},
+      {text:"A fresh perspective — seeing it in a way they hadn't",tags:["wise_observer","enterpriser"]},
+    ]
+  },
+  {
+    kicker:"Signal 5 of 12 · Environment",
+    text:"Where do you consistently do your best work?",
+    opts:[
+      {text:"Somewhere I can think deeply without interruption",tags:["wise_observer","realist"]},
+      {text:"In the middle of a team working toward something together",tags:["integrator","supporter"]},
+      {text:"Early-stage environments — when things are still being built",tags:["enterpriser","doer"]},
+      {text:"Environments with clear standards and room to do things right",tags:["realist","organizer"]},
+      {text:"Teaching, training, or passing what I know to others",tags:["explainer","encourager"]},
+    ]
+  },
+  {
+    kicker:"Signal 6 of 12 · Pressure",
+    text:"When things get genuinely hard, what do you honestly tend to do?",
+    opts:[
+      {text:"Go quiet and think through solutions before speaking",tags:["wise_observer","realist"]},
+      {text:"Reach out — I process better in honest dialogue",tags:["supporter","integrator"]},
+      {text:"Push forward — action helps me find my footing",tags:["doer","enterpriser"]},
+      {text:"Re-examine the whole picture — maybe the premise is wrong",tags:["wise_observer","organizer"]},
+      {text:"Give myself space to reflect before re-engaging",tags:["wise_observer","realist"]},
+    ]
+  },
+  {
+    kicker:"Signal 7 of 12 · Influence",
+    text:"How do you usually move people toward something?",
+    opts:[
+      {text:"Through clear logic and well-reasoned argument",tags:["realist","explainer"]},
+      {text:"By inspiring belief — pulling on what they already want",tags:["encourager","enterpriser"]},
+      {text:"By demonstrating — showing the solution, not just describing it",tags:["doer","organizer"]},
+      {text:"By painting a vivid picture of what's possible",tags:["enterpriser","wise_observer"]},
+      {text:"By asking questions that lead them to see it themselves",tags:["explainer","wise_observer"]},
+    ]
+  },
+  {
+    kicker:"Signal 8 of 12 · Learning",
+    text:"How do you learn best?",
+    opts:[
+      {text:"Going deep — I want to understand the underlying structure",tags:["realist","wise_observer"]},
+      {text:"Seeing it in context — real examples, not just theory",tags:["doer","explainer"]},
+      {text:"Doing it — I learn fastest when I can get my hands on it",tags:["doer","enterpriser"]},
+      {text:"Discussing it — conversation produces clarity I can't reach alone",tags:["integrator","supporter"]},
+      {text:"Observing patterns across different situations over time",tags:["wise_observer","organizer"]},
+    ]
+  },
+  {
+    kicker:"Signal 9 of 12 · Formation",
+    text:"What experience has shaped you most significantly?",
+    opts:[
+      {text:"Being underestimated — having to prove myself to people who didn't see it",tags:["wise_observer","realist"]},
+      {text:"High expectations placed on me early — before I felt fully ready",tags:["organizer","doer"]},
+      {text:"Responsibility without a roadmap — figuring it out alone",tags:["realist","enterpriser"]},
+      {text:"Being misunderstood — knowing something others didn't yet see",tags:["wise_observer","encourager"]},
+      {text:"Navigating real failure and having to rebuild from it",tags:["doer","supporter"]},
+    ]
+  },
+  {
+    kicker:"Signal 10 of 12 · Value",
+    text:"What kind of impact genuinely excites you?",
+    opts:[
+      {text:"Solving a problem that was previously unsolvable",tags:["realist","doer"]},
+      {text:"Watching someone become who they were built to be",tags:["encourager","supporter"]},
+      {text:"Building something that outlasts the moment",tags:["enterpriser","organizer"]},
+      {text:"Fixing a system that was producing the wrong outcome",tags:["organizer","realist"]},
+      {text:"Opening a door for someone who couldn't see it before",tags:["wise_observer","explainer"]},
+    ]
+  },
+  {
+    kicker:"Signal 11 of 12 · Decision",
+    text:"When a significant decision lands in front of you, what do you actually do?",
+    opts:[
+      {text:"Think deeply before I speak to anyone about it",tags:["wise_observer","realist"]},
+      {text:"Talk it through — dialogue helps me decide",tags:["supporter","integrator"]},
+      {text:"Research until I feel informed enough to move",tags:["realist","explainer"]},
+      {text:"Trust my instincts — I've learned to read the pattern",tags:["wise_observer","enterpriser"]},
+      {text:"Sit with it — clarity usually comes in the quiet",tags:["wise_observer","organizer"]},
+    ]
+  },
+  {
+    kicker:"Signal 12 of 12 · Curiosity",
+    text:"What are you most curious to discover about yourself?",
+    opts:[
+      {text:"The specific pattern through which I create impact",tags:["realist","organizer"]},
+      {text:"The direction I'm actually wired to move toward",tags:["wise_observer","enterpriser"]},
+      {text:"How I show up when things are hard — the real version",tags:["realist","doer"]},
+      {text:"What I've been given specifically to offer the world",tags:["encourager","supporter"]},
+      {text:"What I'm capable of that I haven't yet reached",tags:["enterpriser","doer"]},
+    ]
+  },
+];
+
+const PROFILES = {
+  organizer:{
+    name:"The Principled<em>Organizer</em>",
+    sub:"You bring direction and structure where there is chaos — and you won't build until you've diagnosed the real problem first.",
+    signals:[{name:"Impact Mode",val:78,c:"var(--gold)"},{name:"Energy Source",val:65,c:"rgba(200,169,110,.72)"},{name:"Challenge Style",val:72,c:"rgba(200,169,110,.55)"}],
+    insight_title:"You are at your best when clarity is needed and no one else is stepping up to create it.",
+    insight_body:"People with your wiring naturally become the person who holds things together — who builds the plan, coordinates the people, and drives toward completion. You feel the friction of disorder viscerally. Structure isn't just a preference. It's how you think.",
+    hook:"Your organizing instinct is your greatest gift — and your biggest tension.",
+    unlock:"You're wired to build systems that work. But the Organizer's shadow is the impulse to take over when chaos persists — to stop trusting others and carry everything yourself. Your unlock: learning to organize through people, not around them."
+  },
+  realist:{
+    name:"The Principled<em>Realist</em>",
+    sub:"You diagnose before you build. You see what is actually true — not what people want to be true — and you won't let systems rest on faulty foundations.",
+    signals:[{name:"Impact Mode",val:72,c:"var(--gold)"},{name:"Energy Source",val:68,c:"rgba(200,169,110,.72)"},{name:"Challenge Style",val:80,c:"rgba(200,169,110,.55)"}],
+    insight_title:"You are most valuable when the truth needs to be said and no one else is willing to say it.",
+    insight_body:"People with your wiring carry a burden for accuracy and alignment. You notice inconsistencies before others do. You protect integrity even when it's inconvenient. You are the reason things don't drift — the reason the system stays anchored in what is real.",
+    hook:"Your honesty is your greatest asset — and your most misunderstood one.",
+    unlock:"The Realist's gift is truth. But truth delivered without warmth reads as criticism, not care. Your unlock: learning to speak what you see in a way that invites people toward it — rather than making them feel exposed by it."
+  },
+  wise_observer:{
+    name:"The Wise<em>Observer</em>",
+    sub:"You read what others miss — the timing, the subtext, the pattern beneath the surface. You move when you understand. And you usually understand first.",
+    signals:[{name:"Impact Mode",val:68,c:"var(--gold)"},{name:"Energy Source",val:74,c:"rgba(200,169,110,.72)"},{name:"Challenge Style",val:62,c:"rgba(200,169,110,.55)"}],
+    insight_title:"You are most valuable when the stakes are high and the right move isn't obvious to anyone else.",
+    insight_body:"People with your wiring carry a weight for discernment — for knowing when to move, when to wait, and when the whole premise needs questioning. You are the person in the room who sees what others don't yet see. That is not a small thing.",
+    hook:"Your depth of perception is rare — and often invisible to the people around you.",
+    unlock:"The Wise Observer's shadow is over-waiting. You can see so far ahead that moving feels premature. But the people around you need you to call it — not just see it. Your unlock: translating your perception into a decision others can follow."
+  },
+  enterpriser:{
+    name:"The Principled<em>Enterpriser</em>",
+    sub:"You see opportunity where others see obstacles. You are wired to build, scale, and move — and you carry a natural instinct for what could exist that doesn't yet.",
+    signals:[{name:"Impact Mode",val:62,c:"var(--gold)"},{name:"Energy Source",val:80,c:"rgba(200,169,110,.72)"},{name:"Challenge Style",val:70,c:"rgba(200,169,110,.55)"}],
+    insight_title:"You are most valuable when something needs to be created that has never existed before.",
+    insight_body:"People with your wiring carry a burden for possibility. You think in futures — in what could be, what needs to be built, what resources need to be mobilized. The world needs people who can see the vision and build toward it. You are one of them.",
+    hook:"Your capacity to see and seize opportunity is extraordinary — and it moves faster than the people around you.",
+    unlock:"The Enterpriser's shadow is impatience — moving so fast toward the next thing that the current thing never quite lands. Your unlock: learning to complete before you begin. The thing you finish builds the credibility that makes the next thing possible."
+  },
+  encourager:{
+    name:"The Principled<em>Encourager</em>",
+    sub:"You move people forward — not by pushing, but by awakening something in them that was already there. You are often the reason people don't quit.",
+    signals:[{name:"Impact Mode",val:70,c:"var(--gold)"},{name:"Energy Source",val:76,c:"rgba(200,169,110,.72)"},{name:"Challenge Style",val:58,c:"rgba(200,169,110,.55)"}],
+    insight_title:"You are most valuable when someone is on the edge of giving up — and you're the reason they don't.",
+    insight_body:"People with your wiring carry a natural instinct for what people need to hear to keep going. You don't just encourage — you identify what's real and true about someone and reflect it back in a way they can receive. That is a profound and rare capability.",
+    hook:"Your gift for seeing the best in people is one of the most powerful things you carry — and one of the costliest.",
+    unlock:"The Encourager's shadow is absorbing too much. You feel what others feel — sometimes before they do — and that empathy is your strength. But it has a cost. Your unlock: learning to encourage without carrying what doesn't belong to you."
+  },
+  supporter:{
+    name:"The Principled<em>Supporter</em>",
+    sub:"You create environments where people feel genuinely safe, seen, and able to function. You are often the reason teams hold together when things get hard.",
+    signals:[{name:"Impact Mode",val:66,c:"var(--gold)"},{name:"Energy Source",val:72,c:"rgba(200,169,110,.72)"},{name:"Challenge Style",val:54,c:"rgba(200,169,110,.55)"}],
+    insight_title:"You are most valuable when the human layer of a situation is breaking down and no one else is addressing it.",
+    insight_body:"People with your wiring carry a consistent burden for the wellbeing of those around them. You notice when someone is struggling before they say a word. You create safety without being asked. You are the reason people stay — the reason morale doesn't collapse.",
+    hook:"Your care for people is one of the rarest things in any room you enter.",
+    unlock:"The Supporter's shadow is over-giving — absorbing stress that doesn't belong to you, protecting people from consequences that would help them grow. Your unlock: learning to give from fullness, not from depletion."
+  },
+  explainer:{
+    name:"The Principled<em>Explainer</em>",
+    sub:"You make the complex clear. You translate what is abstract into what is accessible — in ways that produce genuine understanding, not just information transfer.",
+    signals:[{name:"Impact Mode",val:64,c:"var(--gold)"},{name:"Energy Source",val:70,c:"rgba(200,169,110,.72)"},{name:"Challenge Style",val:76,c:"rgba(200,169,110,.55)"}],
+    insight_title:"You are most valuable when confusion is the actual problem — and someone needs to make it stop.",
+    insight_body:"People with your wiring carry a burden for understanding. You can't let complexity stay unexplained. You find the analogy, the model, the reframe that makes everything click. This is not just a communication skill — it is a form of intelligence.",
+    hook:"Your ability to clarify what confuses others is more rare than you know.",
+    unlock:"The Explainer's shadow is over-explaining. You see the full picture so clearly that you want to share all of it — but the person you're talking to only needs part of it right now. Your unlock: learning to calibrate depth to the moment, not to your understanding."
+  },
+  doer:{
+    name:"The Principled<em>Doer</em>",
+    sub:"You turn ideas into reality. You are the person who actually gets it done — with a consistency and reliability that most people genuinely cannot match.",
+    signals:[{name:"Impact Mode",val:74,c:"var(--gold)"},{name:"Energy Source",val:66,c:"rgba(200,169,110,.72)"},{name:"Challenge Style",val:78,c:"rgba(200,169,110,.55)"}],
+    insight_title:"You are most valuable when something that should be done is not getting done.",
+    insight_body:"People with your wiring carry a burden for execution. You finish things. You follow through. You show up when others don't. In a world full of intentions, the person who actually delivers is one of the rarest and most valuable things a team can have.",
+    hook:"Your reliability is one of the most powerful things you bring to any environment.",
+    unlock:"The Doer's shadow is over-executing — carrying the weight of an entire team's execution because you can see it needs to happen. Your unlock: learning that your job is not to execute everything, but to model what execution actually looks like."
+  },
+  integrator:{
+    name:"The Principled<em>Integrator</em>",
+    sub:"You connect what others keep separate. You see how systems, people, and ideas can work together — and you build the bridges that make that possible.",
+    signals:[{name:"Impact Mode",val:60,c:"var(--gold)"},{name:"Energy Source",val:68,c:"rgba(200,169,110,.72)"},{name:"Challenge Style",val:72,c:"rgba(200,169,110,.55)"}],
+    insight_title:"You are most valuable when different parts of a system need to work together and no one has figured out how.",
+    insight_body:"People with your wiring carry a burden for coherence. You notice gaps between systems before they cause friction. You build bridges across teams, tools, and ideas that others didn't even realize needed connecting.",
+    hook:"Your instinct for connection and coherence is both your signature and your complexity.",
+    unlock:"The Integrator's shadow is over-connecting — building bridges that create complexity instead of reducing it. Your unlock: learning to integrate selectively. Connect what needs to be connected. Leave the rest."
+  },
+};
+
+let current = 0;
+const answers = new Array(QUESTIONS.length).fill(null);
+const letters = ['A','B','C','D','E'];
+
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function startAssessment(){
+  showView('view-assess');
+  renderQ();
+}
+
+function renderQ(){
+  const q = QUESTIONS[current];
+  const total = QUESTIONS.length;
+  const pct = (current / total) * 100;
+
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `${current + 1} / ${total}`;
+  document.getElementById('q-kicker').textContent = q.kicker;
+  document.getElementById('q-text').textContent = q.text;
+
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  q.opts.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt' + (answers[current] === i ? ' selected' : '');
+    btn.innerHTML = `
+      <span class="opt-letter">${letters[i]}</span>
+      <span class="opt-text">${o.text}</span>
+      <div class="opt-check"></div>`;
+    btn.onclick = () => selectOpt(i);
+    opts.appendChild(btn);
+  });
+
+  const dots = document.getElementById('q-dots');
+  dots.innerHTML = '';
+  QUESTIONS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'q-dot' + (i < current ? ' done' : i === current ? ' current' : '');
+    dots.appendChild(d);
+  });
+
+  document.getElementById('btn-back').disabled = current === 0;
+  const nextBtn = document.getElementById('btn-next');
+  nextBtn.textContent = current === total - 1 ? 'See my results →' : 'Next →';
+}
+
+function selectOpt(i){
+  answers[current] = i;
+  document.querySelectorAll('.opt').forEach((el, idx) => {
+    el.classList.toggle('selected', idx === i);
+  });
+}
+
+function goNext(){
+  if(answers[current] === null){
+    const firstOpt = document.querySelector('.opt');
+    if(firstOpt){
+      firstOpt.style.borderColor = 'rgba(200,169,110,.5)';
+      setTimeout(() => firstOpt.style.borderColor = '', 1400);
+    }
+    return;
+  }
+  if(current < QUESTIONS.length - 1){ current++; renderQ(); }
+  else { showResults(); }
+}
+
+function goBack(){
+  if(current > 0){ current--; renderQ(); }
+}
+
+function showResults(){
+  // Score
+  const scores = {};
+  QUESTIONS.forEach((q, qi) => {
+    if(answers[qi] === null) return;
+    q.opts[answers[qi]].tags.forEach(t => { scores[t] = (scores[t] || 0) + 1; });
+  });
+  const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+  const topKey = sorted[0]?.[0] || 'organizer';
+  const p = PROFILES[topKey] || PROFILES.organizer;
+
+  // Fill result
+  document.getElementById('r-name').innerHTML = p.name;
+  document.getElementById('r-sub').textContent = p.sub;
+  document.getElementById('ic-title').textContent = p.insight_title;
+  document.getElementById('ic-body').textContent = p.insight_body;
+  document.getElementById('uc-hook').textContent = p.hook;
+  document.getElementById('uc-body').innerHTML = p.unlock.replace('Your unlock:', '<em>Your unlock:</em>');
+
+  const rows = document.getElementById('sig-rows');
+  rows.innerHTML = '';
+  p.signals.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'sig-row';
+    div.innerHTML = `
+      <span class="sig-name">${s.name}</span>
+      <div class="sig-track">
+        <div class="sig-fill" style="background:${s.c}" data-w="${s.val}">
+          <div class="sig-dot" style="background:${s.c}"></div>
+        </div>
+      </div>
+      <span class="sig-pct">${s.val}%</span>`;
+    rows.appendChild(div);
+  });
+
+  showView('view-result');
+
+  // Animate after render
+  setTimeout(() => {
+    document.querySelectorAll('.sig-fill').forEach(b => { b.style.width = b.dataset.w + '%'; });
+    document.getElementById('ring-arc').style.strokeDashoffset = (175.93 * 0.65).toString();
+  }, 700);
+}
+
+function restart(){
+  current = 0;
+  answers.fill(null);
+  showView('view-hero');
+}
+</script>
+</body>
+</html>

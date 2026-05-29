@@ -10,7 +10,12 @@ The folder is organized into three top-level buckets, each with its own rules.
 
 ```
 Samuel NGU/
-├── align360-app/      ← NEW: Next.js app (Vercel-ready). Replaces Demo HTML over time.
+├── DEV PLAN — Alpha Sprint 2026-05-28.md       ← ★ ACTIVE GROUND TRUTH for the build
+├── CODING AGENT BRIEF — Alpha Sprint 2026-05-28.md  ← operational layer on the dev plan
+├── Align__Alpha Sprint Brief for Dev Team.docx ← Samuel's offer/pricing/P0 decisions
+├── *.html                                      ← tracked build-references (lead-gen, result samples)
+│
+├── align360-app/      ← Next.js app (Vercel-ready). The alpha ships HERE, not MasteryOS.
 │
 ├── AI Model/          ← what actually feeds the live AI (current state only)
 │   ├── Standing Rules.md    ← global rules every output must honor (e.g. IP notice)
@@ -32,9 +37,13 @@ Samuel NGU/
 
 ## Repo scope
 
-This folder is a private git repo. **What's tracked:** `align360-app/`, `AI Model/`, `Assessments/`, `Demo/`. **What's not** (per `.gitignore`): `Project Log/` (contains PII), `R&D/` (large .docx, Samuel's IP — may add later via a versioned subset), and any `.env*`.
+This folder is a private git repo. **What's tracked:** the alpha-sprint docs (root `.md` + Samuel's `.docx`), the build-reference `.html` files at root, `align360-app/`, `AI Model/`, `Assessments/`, `Demo/`. **What's not** (per `.gitignore`): `Project Log/` (PII), `R&D/` (large .docx, Samuel's IP — note the reference-HTML originals live here and are gitignored; tracked copies sit at repo root for the coding agent), `*.MOV` screen recordings, and any `.env*`.
 
 The live system prompt is read by `align360-app/lib/system-prompt.ts` directly from `AI Model/*.md` at request time, so editing those files updates the running app on the next message.
+
+## Active work
+
+The current sprint is the **Align360 Alpha** — auth + three Typeform-style assessment runners + AI-generated combined profile result page + persistence + private share links, shipped through `align360-app/` and deployed to `alpha.align360.io`. **`DEV PLAN — Alpha Sprint 2026-05-28.md` is the ground truth** (see its §0 intake status for what's tracked, what's missing, and the open decisions). The coding agent reads the dev plan + brief before building.
 
 ---
 
