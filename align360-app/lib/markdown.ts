@@ -26,7 +26,7 @@ function inline(s: string): string {
     .replace(/__([^_]+)__/g, '<strong>$1</strong>')
     .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
   // Restore code spans (content was already HTML-escaped upstream).
-  return out.replace(/@@CODE(\d+)@@/g, (_m, i) => `<code>${codes[Number(i)]}</code>`);
+  return out.replace(/@@CODE(\d+)@@/g, (_m, i) => (codes[Number(i)] !== undefined ? `<code>${codes[Number(i)]}</code>` : _m));
 }
 
 export function renderMarkdown(md: string): string {

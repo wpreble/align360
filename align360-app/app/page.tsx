@@ -92,6 +92,7 @@ function ChatInner() {
 
     if (!idRef.current) idRef.current = newChatId();
     const id = idRef.current; // capture: user may switch chats mid-request
+    persist(next, id); // show the session in the sidebar immediately (don't wait for the reply)
     const profileContext = buildProfileContext(getProfile());
 
     try {
