@@ -28,10 +28,13 @@ The alpha-sprint docs landed in the repo. Current state:
 
 This revision **supersedes the lean cuts in §4** where they conflict. The alpha is no longer "auth → Q1 → result → done." It is a small but real app with a persistent shell. Where §4 below says "no chat in UI," "no chat-with-your-profile," "no multi-step navigation" — those are **reversed** by this section. Everything else in §4 still stands (no payment, no B3/Onboarding runners, no admin panel, no notification emails, light-mode only).
 
-**App shell — two tabs (persistent left nav or top tabs):**
+**App shell — three-panel chat-centric layout (revised 2026-05-31, per Will + the MasteryOS reference).** Supersedes the earlier "two tabs" idea. CSS grid: collapsible left sidebar · center chat · collapsible right "Insight Engine" panel — ported from `Demo/align360-demo.html`.
 
-1. **Align** — the assessments + the user's profile. Lists each quiz (Wiring for Impact, Orientation for Impact, Rejection Gift). Click a quiz → Typeform-style click-through runner → on completion, AI processing → renders the combined profile result page (matching the reference HTMLs) → result is saved to the user's account and reachable here anytime.
-2. **AI Chat** — Align360 AI (the existing `/api/chat`). Once a user has a profile, **their profile is injected into the assistant's context** so the chat is personalized. (Tab name is provisional — Will said "call it Align or something, like AI Chat / Align." Using **Align** + **AI Chat** unless told otherwise.)
+1. **Left sidebar (collapsible)** — brand, primary nav (Align360 AI, Resource Library, Tools, Journal & Notes, User Resource Gallery — only Align360 AI/chat is live; the rest are "soon" stubs), Chat History (stub until persistence), theme toggle + settings + IP notice at the foot.
+2. **Center — Align360 AI chat** (`/`, the existing `/api/chat`). Welcome screen + suggestion chips; the assessment runner and result page render here too. Once a user has a profile, **it's injected into the chat context** so the assistant is personalized.
+3. **Right — Insight Engine (collapsible)** — "DesignSuite" group listing the seven tools. The three active assessments (Wiring, Orientation, Rejection Gift) launch the Typeform runner in the center; the other four are "soon". Global Notes stub. Plus a "Preview a sample profile" link.
+
+On completion the runner → AI processing → combined profile result page (reference-HTML format) → PDF + (once Supabase lands) saved to the account.
 
 **On signup:** route the user straight into the Align tab with Wiring for Impact as the first call-to-action (per Samuel: Wiring is the mandatory first experience). They land in the product *doing the thing*, not on a dashboard.
 

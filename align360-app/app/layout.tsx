@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Nav from './_components/Nav';
+import Shell from './_components/Shell';
 
 export const metadata: Metadata = {
   title: 'Align360',
@@ -8,7 +8,6 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const year = new Date().getFullYear();
   return (
     <html lang="en" data-theme="light">
       <head>
@@ -20,12 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <Nav />
-        <div className="app-main">{children}</div>
-        <div className="ip-notice">
-          © {year} Align360. All rights reserved. Reproduction or use of these assessments without
-          written permission is prohibited.
-        </div>
+        <Shell>{children}</Shell>
       </body>
     </html>
   );
