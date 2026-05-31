@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { renderMarkdown } from '@/lib/markdown';
 
 type Attachment = { name: string; dataUrl: string; isImage: boolean };
 type Msg = { role: 'user' | 'assistant'; text: string; images?: string[] };
@@ -110,13 +111,23 @@ export default function ChatHome() {
           </div>
         ) : (
           <div className="messages">
-            {messages.map((m, i) => (
-              <div key={i} className={`bubble ${m.role === 'user' ? 'user' : 'ai'}`}>
-                {m.images?.map((src, j) => <img key={j} className="attach-thumb" src={src} alt="attachment" />)}
-                {m.text}
+            {messages.map((m, i) =>
+              m.role === 'assistant' ? (
+                <div key={i} className="bubble ai md" dangerouslySetInnerHTML={{ __html: renderMarkdown(m.text) }} />
+              ) : (
+                <div key={i} className="bubble user">
+                  {m.images?.map((src, j) => <img key={j} className="attach-thumb" src={src} alt="attachment" />)}
+                  {m.text}
+                </div>
+              ),
+            )}
+            {sending && (
+              <div className="typing-bubble">
+                <span className="tdot" />
+                <span className="tdot" />
+                <span className="tdot" />
               </div>
-            ))}
-            {sending && <div className="typing">Align360 is thinking…</div>}
+            )}
             <div ref={endRef} />
           </div>
         )}
