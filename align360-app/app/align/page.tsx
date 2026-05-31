@@ -14,6 +14,11 @@ export default function AlignPage() {
           everything else builds on it. Each takes a few minutes. Your results live here and make the AI
           Chat personal to you.
         </p>
+        <p style={{ marginTop: 10, fontSize: 14 }}>
+          <Link href="/result?demo=1" className="quiz-go">
+            Preview a sample profile →
+          </Link>
+        </p>
       </div>
 
       <div className="quiz-grid">
