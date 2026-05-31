@@ -3,12 +3,13 @@
    (Samuel — Combined in an AI-Era v2.html). */
 
 .profile-doc {
-  --void:#050508;--obsidian:#0C0C14;--midnight:#111120;
-  --gold:#C8A96E;--gold2:#E8C97E;--goldd:#8A6E3A;
-  --silver:#B8B4A8;--silverd:#6A6660;--ivory:#F2EDE4;--ivoryd:#C8C4BC;
-  --border:rgba(200,169,110,.14);--borderm:rgba(200,169,110,.28);
-  --teal:#2ABAAA;--crimson:#C04040;--plum:#9A5AC8;--amber:#D4901A;--blue:#3A7ADD;--green:#27AE60;
-  --ai:#1A4A7A;--ai2:#2E6ECC;--legacy:#4A1A1A;
+  /* Black Cherry Fig system — accents are fig/plum tints on Rich Obsidian. */
+  --void:#0D0A14;--obsidian:#15101B;--midnight:#1B1422;
+  --gold:#B98FA8;--gold2:#D9BBCB;--goldd:#6E3F5F;
+  --silver:#B8B4A8;--silverd:#8A7E86;--ivory:#F4EEF2;--ivoryd:#D6CDD3;
+  --border:rgba(185,143,168,.16);--borderm:rgba(185,143,168,.32);
+  --teal:#7FB5AC;--crimson:#B5566A;--plum:#9A5AC8;--amber:#C99A6E;--blue:#6E7FCC;--green:#5FAE8E;
+  --ai:#3A2A5A;--ai2:#7A6ECC;--legacy:#3A1326;
   font-family:'Crimson Pro',Georgia,serif;
   background:var(--void);
   color:var(--ivoryd);
@@ -164,12 +165,12 @@
 }
 
 /* Toolbar (screen only) */
-.result-toolbar{position:sticky;top:0;z-index:30;display:flex;gap:10px;justify-content:flex-end;align-items:center;padding:10px 20px;background:#050508;border-bottom:1px solid rgba(200,169,110,.14)}
-.result-toolbar .rt-btn{font-family:var(--font-display);font-size:13px;font-weight:600;padding:8px 16px;border-radius:999px;border:1px solid rgba(200,169,110,.4);color:#E8C97E;background:transparent;transition:all .15s}
-.result-toolbar .rt-btn:hover{background:rgba(200,169,110,.12)}
-.result-toolbar .rt-btn.primary{background:#C8A96E;color:#0C0C14;border-color:#C8A96E}
-.result-gen{min-height:70vh;display:grid;place-items:center;text-align:center;color:#C8C4BC;background:#050508;font-family:'Crimson Pro',serif}
-.result-gen .gen-pulse{width:54px;height:54px;border-radius:50%;margin:0 auto 24px;background:radial-gradient(circle,#C8A96E,#8A6E3A);animation:genpulse 1.7s ease-in-out infinite}
+.result-toolbar{position:sticky;top:0;z-index:30;display:flex;gap:10px;justify-content:flex-end;align-items:center;padding:10px 20px;background:#0D0A14;border-bottom:1px solid rgba(185,143,168,.16)}
+.result-toolbar .rt-btn{font-family:var(--font-display,serif);font-size:13px;font-weight:600;padding:8px 16px;border-radius:999px;border:1px solid rgba(185,143,168,.4);color:#D9BBCB;background:transparent;transition:all .15s}
+.result-toolbar .rt-btn:hover{background:rgba(185,143,168,.14)}
+.result-toolbar .rt-btn.primary{background:#B98FA8;color:#15101B;border-color:#B98FA8}
+.result-gen{min-height:70vh;display:grid;place-items:center;text-align:center;color:#D6CDD3;background:#0D0A14;font-family:'Crimson Pro',serif}
+.result-gen .gen-pulse{width:54px;height:54px;border-radius:50%;margin:0 auto 24px;background:radial-gradient(circle,#B98FA8,#6E3F5F);animation:genpulse 1.7s ease-in-out infinite}
 @keyframes genpulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.18);opacity:.5}}
 
 /* Print → PDF: hide app chrome + toolbar, preserve dark colors */

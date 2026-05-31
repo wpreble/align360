@@ -8,7 +8,8 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-type ChatMessage = { role: 'user' | 'assistant'; content: string };
+// content is a string, or a vision array ([{type:'text'...},{type:'image_url'...}]).
+type ChatMessage = { role: 'user' | 'assistant'; content: unknown };
 
 export async function POST(req: NextRequest) {
   if (!process.env.OPENAI_API_KEY) {
@@ -36,7 +37,8 @@ export async function POST(req: NextRequest) {
   try {
     const completion = await client.chat.completions.create({
       model,
-      messages: [{ role: 'system', content: systemPrompt }, ...messages],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      messages: [{ role: 'system', content: systemPrompt }, ...messages] as any,
       // gpt-5.5 reasoning tokens share this budget — keep headroom for the reply.
       max_completion_tokens: 3000,
     });
