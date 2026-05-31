@@ -82,14 +82,15 @@ export async function POST(req: NextRequest) {
     .join('\n\n');
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+  const model = process.env.OPENAI_MODEL || 'gpt-5.5';
 
   try {
     const completion = await client.chat.completions.create({
       model,
       response_format: { type: 'json_object' },
-      temperature: 0.7,
-      max_tokens: 4000,
+      // gpt-5.5 is a reasoning model: completion budget covers reasoning +
+      // visible output, so this must be generous or the JSON gets truncated.
+      max_completion_tokens: 16000,
       messages: [
         { role: 'system', content: buildSystemPrompt() },
         {
@@ -99,10 +100,14 @@ export async function POST(req: NextRequest) {
       ],
     });
     const text = completion.choices[0]?.message?.content || '{}';
+    const finishReason = completion.choices[0]?.finish_reason;
     const parsed = JSON.parse(text) as Partial<Profile>;
     // Merge over fallback so any missing field still renders.
     const profile = { ...fallbackProfile(scores, name), ...parsed } as Profile;
-    return NextResponse.json({ scores, profile, generated: true });
+    const debug = req.nextUrl.searchParams.has('debug')
+      ? { finishReason, rawLen: text.length, keys: Object.keys(parsed), rawHead: text.slice(0, 300) }
+      : undefined;
+    return NextResponse.json({ scores, profile, generated: true, debug });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'generation failed';
     console.error('profile generate error:', message);

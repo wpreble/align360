@@ -30,15 +30,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'messages array is required.' }, { status: 400 });
   }
 
-  const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+  const model = process.env.OPENAI_MODEL || 'gpt-5.5';
   const systemPrompt = buildSystemPrompt();
 
   try {
     const completion = await client.chat.completions.create({
       model,
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
-      temperature: 0.7,
-      max_tokens: 1000,
+      // gpt-5.5 reasoning tokens share this budget — keep headroom for the reply.
+      max_completion_tokens: 3000,
     });
 
     const text = completion.choices[0]?.message?.content ?? '';

@@ -27,7 +27,7 @@ Open http://localhost:3000.
 | Var | Default | Notes |
 |---|---|---|
 | `OPENAI_API_KEY` | — | Required. Set in `.env.local` (gitignored). |
-| `OPENAI_MODEL` | `gpt-4o-mini` | Swap to `gpt-4o` for better quality, higher cost. |
+| `OPENAI_MODEL` | `gpt-5.5` | Reasoning model — calls use `max_completion_tokens` (not `max_tokens`) and default temperature. |
 
 ## How the system prompt works
 
@@ -74,5 +74,5 @@ Onboarding flow (auth → straight into Wiring Q1), 3-panel chat shell, theme to
 
 1. Repo is on GitHub (private): `wpreble/align360`.
 2. In Vercel: import the repo. Set **Root Directory** to `align360-app`. Framework auto-detects as Next.js.
-3. Env vars: `OPENAI_API_KEY`, `OPENAI_MODEL` (use `gpt-4o` for the alpha — quality over cost; snapshots are cached), plus the Supabase + Resend vars once auth lands (see the brief's Environment section).
+3. Env vars: `OPENAI_API_KEY`, `OPENAI_MODEL` (`gpt-5.5` — used for both chat and profile generation), plus the Supabase + Resend vars once auth lands (see the brief's Environment section).
 4. Domain target: `alpha.align360.io` once DNS is added.
