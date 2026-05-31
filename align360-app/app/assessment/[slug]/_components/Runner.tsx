@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { clearProfile } from '@/lib/storage';
 
 type Option = { letter: string; text: string; giftTag?: string };
 type Q = { id: string; number: number; label: string; prompt: string; options: Option[]; section: string };
@@ -55,7 +56,10 @@ export default function Runner({ title, slug, questions }: { title: string; slug
     } catch {
       /* ignore */
     }
-    router.push(`/result?from=${slug}`);
+    // New answers invalidate any prior profile so Insights regenerates fresh
+    // (and the chat picks up the updated profile).
+    clearProfile();
+    router.push('/insights');
   }
 
   if (done) return null;

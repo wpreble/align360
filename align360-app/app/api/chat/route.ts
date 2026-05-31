@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: { messages?: ChatMessage[] };
+  let body: { messages?: ChatMessage[]; profileContext?: string };
   try {
     body = await req.json();
   } catch {
@@ -32,7 +32,13 @@ export async function POST(req: NextRequest) {
   }
 
   const model = process.env.OPENAI_MODEL || 'gpt-5.5';
-  const systemPrompt = buildSystemPrompt();
+  let systemPrompt = buildSystemPrompt();
+
+  // Make the user's assessment results instantly referenceable by the AI.
+  const ctx = (body.profileContext || '').trim();
+  if (ctx) {
+    systemPrompt += `\n\n---\n\n# THE USER'S ALIGN360 PROFILE (from their completed assessments)\n\nReference this naturally to personalize guidance. It reflects the user's Foundational Self — do not re-administer assessments they have already completed.\n\n${ctx}`;
+  }
 
   try {
     const completion = await client.chat.completions.create({
