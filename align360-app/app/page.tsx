@@ -5,13 +5,25 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { renderMarkdown } from '@/lib/markdown';
 import { buildProfileContext, getProfile, getChat, saveChat, newChatId, type ChatMsg } from '@/lib/storage';
 
-type Attachment = { name: string; kind: 'image' | 'text' | 'file'; dataUrl?: string; text?: string };
+type Attachment = {
+  id: string;
+  name: string;
+  kind: 'image' | 'text' | 'file';
+  status: 'ready' | 'uploading' | 'error';
+  dataUrl?: string;
+  text?: string;
+  fileId?: string;
+  error?: string;
+};
 
 const SUGGESTIONS = [
   'Help me gain clarity on my next step',
   'Start my Wiring for Impact assessment',
   'Explore my career direction',
 ];
+
+const uid = () => Math.random().toString(36).slice(2, 10);
+const isTextName = (n: string) => /\.(txt|md|markdown|csv|json|log)$/i.test(n);
 
 function ChatInner() {
   const router = useRouter();
@@ -28,7 +40,6 @@ function ChatInner() {
   const fileRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
-  // Load a past session, or start fresh, when the URL query changes.
   useEffect(() => {
     if (chatParam) {
       const s = getChat(chatParam);
@@ -46,44 +57,79 @@ function ChatInner() {
 
   function onPickFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
-    files.forEach((f) => {
+    for (const f of files) {
+      const id = uid();
       const isImage = f.type.startsWith('image/');
-      const isText = f.type.startsWith('text/') || /\.(txt|md|markdown|csv|json|log)$/i.test(f.name);
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (isImage) setAttachments((p) => [...p, { name: f.name, kind: 'image', dataUrl: String(reader.result) }]);
-        else if (isText) setAttachments((p) => [...p, { name: f.name, kind: 'text', text: String(reader.result).slice(0, 6000) }]);
-        else setAttachments((p) => [...p, { name: f.name, kind: 'file' }]);
-      };
-      if (isImage) reader.readAsDataURL(f);
-      else if (isText) reader.readAsText(f);
-      else { setAttachments((p) => [...p, { name: f.name, kind: 'file' }]); }
-    });
+      const isText = f.type.startsWith('text/') || isTextName(f.name);
+      if (isImage || isText) {
+        const r = new FileReader();
+        r.onload = () =>
+          setAttachments((p) => [
+            ...p,
+            {
+              id, name: f.name, kind: isImage ? 'image' : 'text', status: 'ready',
+              dataUrl: isImage ? String(r.result) : undefined,
+              text: isText ? String(r.result).slice(0, 12000) : undefined,
+            },
+          ]);
+        isImage ? r.readAsDataURL(f) : r.readAsText(f);
+      } else {
+        // PDF / DOCX / other → server upload (Files API or docx extraction)
+        setAttachments((p) => [...p, { id, name: f.name, kind: 'file', status: 'uploading' }]);
+        const fd = new FormData();
+        fd.append('file', f);
+        fetch('/api/upload', { method: 'POST', body: fd })
+          .then((r) => r.json())
+          .then((d) =>
+            setAttachments((p) =>
+              p.map((a) =>
+                a.id !== id ? a
+                  : d.error ? { ...a, status: 'error', error: d.error }
+                  : d.kind === 'file' ? { ...a, kind: 'file', status: 'ready', fileId: d.fileId }
+                  : { ...a, kind: 'text', status: 'ready', text: d.text },
+              ),
+            ),
+          )
+          .catch((err) => setAttachments((p) => p.map((a) => (a.id === id ? { ...a, status: 'error', error: String(err) } : a))));
+      }
+    }
     if (fileRef.current) fileRef.current.value = '';
   }
 
   const buildApiMessages = useCallback((msgs: ChatMsg[]) => {
     return msgs.map((m) => {
-      if (m.role === 'user' && m.images && m.images.length) {
-        return { role: m.role, content: [{ type: 'text', text: m.text }, ...m.images.map((url) => ({ type: 'image_url', image_url: { url } }))] };
+      const parts: any[] = [];
+      if (m.role === 'user' && ((m.images && m.images.length) || (m.files && m.files.length))) {
+        parts.push({ type: 'text', text: m.text });
+        for (const url of m.images || []) parts.push({ type: 'image_url', image_url: { url } });
+        for (const f of m.files || []) parts.push({ type: 'file', file: { file_id: f.fileId } });
+        return { role: m.role, content: parts };
       }
       return { role: m.role, content: m.text };
     });
   }, []);
 
+  const uploading = attachments.some((a) => a.status === 'uploading');
+
   async function sendText(text: string) {
     const trimmed = text.trim();
-    if ((!trimmed && attachments.length === 0) || sending) return;
+    const ready = attachments.filter((a) => a.status === 'ready');
+    if ((!trimmed && ready.length === 0) || sending || uploading) return;
     if (/start.*wiring/i.test(trimmed)) { router.push('/assessment/wiring'); return; }
 
-    const images = attachments.filter((a) => a.kind === 'image' && a.dataUrl).map((a) => a.dataUrl!) as string[];
-    const textFiles = attachments.filter((a) => a.kind === 'text');
-    const fileNames = attachments.filter((a) => a.kind === 'file').map((a) => a.name);
+    const images = ready.filter((a) => a.kind === 'image' && a.dataUrl).map((a) => a.dataUrl!) as string[];
+    const fileRefs = ready.filter((a) => a.kind === 'file' && a.fileId).map((a) => ({ fileId: a.fileId!, name: a.name }));
+    const textFiles = ready.filter((a) => a.kind === 'text');
+
     let bodyText = trimmed;
     for (const tf of textFiles) bodyText += `\n\n[file: ${tf.name}]\n${tf.text}`;
-    if (fileNames.length) bodyText += `\n\n[attached: ${fileNames.join(', ')}]`;
 
-    const userMsg: ChatMsg = { role: 'user', text: bodyText || '(image)', images: images.length ? images : undefined };
+    const userMsg: ChatMsg = {
+      role: 'user',
+      text: bodyText || (images.length || fileRefs.length ? '(see attachment)' : ''),
+      images: images.length ? images : undefined,
+      files: fileRefs.length ? fileRefs : undefined,
+    };
     const next = [...messages, userMsg];
     setMessages(next);
     setInput('');
@@ -91,8 +137,8 @@ function ChatInner() {
     setSending(true);
 
     if (!idRef.current) idRef.current = newChatId();
-    const id = idRef.current; // capture: user may switch chats mid-request
-    persist(next, id); // show the session in the sidebar immediately (don't wait for the reply)
+    const id = idRef.current;
+    persist(next, id);
     const profileContext = buildProfileContext(getProfile());
 
     try {
@@ -103,13 +149,11 @@ function ChatInner() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Request failed');
-      const reply: ChatMsg = { role: 'assistant', text: data.text || '...' };
-      const finalMsgs = [...next, reply];
+      const finalMsgs = [...next, { role: 'assistant', text: data.text || '...' } as ChatMsg];
       persist(finalMsgs, id);
       if (idRef.current === id) setMessages(finalMsgs);
     } catch (err) {
-      const reply: ChatMsg = { role: 'assistant', text: `Sorry, something went wrong. ${err instanceof Error ? err.message : 'Unknown error'}` };
-      const finalMsgs = [...next, reply];
+      const finalMsgs = [...next, { role: 'assistant', text: `Sorry, something went wrong. ${err instanceof Error ? err.message : 'Unknown error'}` } as ChatMsg];
       persist(finalMsgs, id);
       if (idRef.current === id) setMessages(finalMsgs);
     } finally {
@@ -119,9 +163,9 @@ function ChatInner() {
 
   function persist(msgs: ChatMsg[], id: string) {
     const firstUser = msgs.find((m) => m.role === 'user');
-    const title = (firstUser?.text || 'New chat').replace(/\n[\s\S]*/, '').slice(0, 42);
-    // Don't persist images (data URLs) to localStorage — too large.
-    const slim = msgs.map((m) => ({ role: m.role, text: m.text }));
+    const title = (firstUser?.text || 'New chat').replace(/\n[\s\S]*/, '').slice(0, 42) || 'New chat';
+    // Keep file refs (small) but drop image data URLs (too large for localStorage).
+    const slim = msgs.map((m) => ({ role: m.role, text: m.text, files: m.files }));
     saveChat({ id, title, messages: slim, updatedAt: Date.now() });
   }
 
@@ -154,6 +198,7 @@ function ChatInner() {
               ) : (
                 <div key={i} className="bubble user">
                   {m.images?.map((src, j) => <img key={j} className="attach-thumb" src={src} alt="attachment" />)}
+                  {m.files?.map((f, j) => <span key={j} className="msg-file">📄 {f.name}</span>)}
                   {m.text}
                 </div>
               ),
@@ -167,23 +212,24 @@ function ChatInner() {
       <div className="chat-input-area">
         {attachments.length > 0 && (
           <div className="attach-row">
-            {attachments.map((a, i) => (
-              <span className="attach-pill" key={i}>
-                {a.kind === 'image' && a.dataUrl ? <img src={a.dataUrl} alt={a.name} /> : <span>{a.kind === 'text' ? '📄' : '📎'}</span>}
+            {attachments.map((a) => (
+              <span className={`attach-pill${a.status === 'error' ? ' err' : ''}`} key={a.id} title={a.error || a.name}>
+                {a.kind === 'image' && a.dataUrl ? <img src={a.dataUrl} alt={a.name} /> : <span>{a.status === 'uploading' ? '⏳' : a.status === 'error' ? '⚠️' : a.kind === 'file' ? '📄' : '📝'}</span>}
                 <span>{a.name.length > 18 ? a.name.slice(0, 16) + '...' : a.name}</span>
-                <button className="x" onClick={() => setAttachments((p) => p.filter((_, k) => k !== i))} aria-label={`Remove ${a.name}`}>✕</button>
+                <button className="x" onClick={() => setAttachments((p) => p.filter((x) => x.id !== a.id))} aria-label={`Remove ${a.name}`}>✕</button>
               </span>
             ))}
           </div>
         )}
         <div className="input-inner">
-          <input ref={fileRef} type="file" accept="image/*,.txt,.md,.csv,.json,.log" multiple hidden onChange={onPickFiles} />
-          <button className="attach-btn" onClick={() => fileRef.current?.click()} aria-label="Attach image or file" title="Attach image or file">
+          <input ref={fileRef} type="file" accept="image/*,.pdf,.docx,.txt,.md,.csv,.json,.log" multiple hidden onChange={onPickFiles} />
+          <button className="attach-btn" onClick={() => fileRef.current?.click()} aria-label="Attach image or file" title="Attach image, PDF, DOCX, or text">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
           </button>
           <textarea ref={taRef} rows={1} placeholder="Ask anything" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={onKey} disabled={sending} />
-          <button className="send-btn" onClick={() => sendText(input)} disabled={(!input.trim() && attachments.length === 0) || sending} aria-label="Send">↑</button>
+          <button className="send-btn" onClick={() => sendText(input)} disabled={(!input.trim() && attachments.filter((a) => a.status === 'ready').length === 0) || sending || uploading} aria-label="Send">↑</button>
         </div>
+        {uploading && <div className="upload-hint">Uploading attachment…</div>}
       </div>
     </div>
   );

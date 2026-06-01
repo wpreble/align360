@@ -13,7 +13,8 @@ export const ASSESSMENT_SLUGS = ['wiring', 'orientation', 'rejection-gift'] as c
 
 export type StoredProfile = { profile: any; scores: any; generatedAt: string };
 export type ChatImage = string;
-export type ChatMsg = { role: 'user' | 'assistant'; text: string; images?: ChatImage[] };
+export type ChatFileRef = { fileId: string; name: string };
+export type ChatMsg = { role: 'user' | 'assistant'; text: string; images?: ChatImage[]; files?: ChatFileRef[] };
 export type ChatSession = { id: string; title: string; messages: ChatMsg[]; updatedAt: number };
 
 function read<T>(key: string, fallback: T): T {
