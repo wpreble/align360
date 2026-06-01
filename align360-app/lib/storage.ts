@@ -8,6 +8,7 @@ export const PROFILE_KEY = 'align360:profile';
 export const CHATS_KEY = 'align360:chats';
 export const ANSWER_PREFIX = 'align360:answers:';
 export const NAME_KEY = 'align360:name';
+export const ONBOARDING_KEY = 'align360:onboarding';
 export const STORE_EVENT = 'align360:store-changed';
 
 export const ASSESSMENT_SLUGS = ['wiring', 'orientation', 'rejection-gift'] as const;
@@ -58,6 +59,17 @@ export function getName(): string {
 export function setName(n: string) {
   if (typeof window === 'undefined') return;
   try { localStorage.setItem(NAME_KEY, n); window.dispatchEvent(new Event(STORE_EVENT)); } catch {}
+}
+
+/* ── Onboarding ── */
+export function getOnboarding(): Record<string, string | string[]> | null {
+  return read<Record<string, string | string[]> | null>(ONBOARDING_KEY, null);
+}
+export function setOnboarding(answers: Record<string, string | string[]>) {
+  write(ONBOARDING_KEY, answers);
+}
+export function isOnboarded(): boolean {
+  return getOnboarding() !== null;
 }
 
 /* ── Answers ── */

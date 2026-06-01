@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { getChats, deleteChat, getName, setName, STORE_EVENT, type ChatSession } from '@/lib/storage';
+import { getChats, deleteChat, getName, setName, isOnboarded, STORE_EVENT, type ChatSession } from '@/lib/storage';
 
 const NAV = [
   { key: 'chat', label: 'Chat', href: '/', icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
@@ -68,6 +68,14 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
+
+  // Gate: first-time users go through onboarding before reaching the app.
+  useEffect(() => {
+    if (pathname !== '/onboarding' && !isOnboarded()) router.replace('/onboarding');
+  }, [pathname, router]);
+
+  // Onboarding renders full-bleed — no sidebar/chrome.
+  if (pathname === '/onboarding') return <>{children}</>;
 
   const toggleLeft = () => setLeftCollapsed((v) => { const n = !v; try { localStorage.setItem('align360:leftCollapsed', n ? '1' : '0'); } catch {} return n; });
   const toggleTheme = () => {

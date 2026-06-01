@@ -3,7 +3,8 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { renderMarkdown } from '@/lib/markdown';
-import { buildProfileContext, getProfile, getChat, getName, saveChat, newChatId, type ChatMsg } from '@/lib/storage';
+import { buildProfileContext, getProfile, getChat, getName, getOnboarding, saveChat, newChatId, type ChatMsg } from '@/lib/storage';
+import { buildOnboardingContext } from '@/lib/onboarding';
 
 type Attachment = {
   id: string;
@@ -145,7 +146,11 @@ function ChatInner() {
     const id = idRef.current;
     persist(next, id);
     const nm = getName();
-    const profileContext = [nm ? `The user's preferred name is ${nm}.` : '', buildProfileContext(getProfile())].filter(Boolean).join('\n');
+    const profileContext = [
+      nm ? `The user's preferred name is ${nm}.` : '',
+      buildOnboardingContext(getOnboarding() || {}),
+      buildProfileContext(getProfile()),
+    ].filter(Boolean).join('\n\n');
 
     try {
       const res = await fetch('/api/chat', {
