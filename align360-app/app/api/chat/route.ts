@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
   const full = [{ role: 'system', content: systemPrompt }, ...messages];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const run = (msgs: any) =>
-    client.chat.completions.create({ model, messages: msgs, max_completion_tokens: 3000 });
+    client.chat.completions.create({ model, messages: msgs, max_completion_tokens: 3000, reasoning_effort: 'low' } as any);
 
   // Drop {type:'file'} parts when a referenced file is gone (expired/deleted),
   // so an old session with a stale file_id stays usable instead of 400ing forever.

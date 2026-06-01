@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "align360", "runtimeExecutable": "bash", "runtimeArgs": ["-c", "cd align360-app && npm run dev"], "port": 3000 }
+  ]
+}

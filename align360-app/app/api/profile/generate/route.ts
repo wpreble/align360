@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import { buildSystemPrompt } from '@/lib/system-prompt';
 import { getAssessment } from '@/lib/assessments';
 import { computeScores, type AnswerSet } from '@/lib/scoring';
-import { PROFILE_SCHEMA_INSTRUCTION, fallbackProfile, type Profile } from '@/lib/profile';
+import { PROFILE_SCHEMA_A, PROFILE_SCHEMA_B, fallbackProfile, type Profile } from '@/lib/profile';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -83,31 +83,37 @@ export async function POST(req: NextRequest) {
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const model = process.env.OPENAI_MODEL || 'gpt-5.5';
+  const sys = buildSystemPrompt();
 
-  try {
-    const completion = await client.chat.completions.create({
+  // Generate the profile as two PARALLEL halves (identity + market/AI-era) so
+  // wall-clock is the slower half, not the sum. Each half parses defensively,
+  // so one malformed half still leaves the rest (over the deterministic fallback).
+  const gen = async (schema: string) => {
+    const c = await client.chat.completions.create({
       model,
       response_format: { type: 'json_object' },
-      // gpt-5.5 is a reasoning model: completion budget covers reasoning +
-      // visible output, so this must be generous or the JSON gets truncated.
-      max_completion_tokens: 16000,
+      max_completion_tokens: 9000,
+      reasoning_effort: 'low',
       messages: [
-        { role: 'system', content: buildSystemPrompt() },
-        {
-          role: 'user',
-          content: `You are generating a combined Align360 identity profile (the "Combined in an AI-Era" format). Here is the participant's assessment data:\n\n${summary}\n\n${PROFILE_SCHEMA_INSTRUCTION}`,
-        },
+        { role: 'system', content: sys },
+        { role: 'user', content: `You are generating part of a combined Align360 identity profile ("Combined in an AI-Era" format). Participant assessment data:\n\n${summary}\n\n${schema}` },
       ],
-    });
-    const text = completion.choices[0]?.message?.content || '{}';
-    const finishReason = completion.choices[0]?.finish_reason;
-    const parsed = JSON.parse(text) as Partial<Profile>;
-    // Merge over fallback so any missing field still renders.
-    const profile = { ...fallbackProfile(scores, name), ...parsed } as Profile;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
+    const text = c.choices[0]?.message?.content || '{}';
+    let parsed: Partial<Profile> = {};
+    try { parsed = JSON.parse(text); } catch {}
+    return { parsed, finish: c.choices[0]?.finish_reason, len: text.length };
+  };
+
+  try {
+    const [a, b] = await Promise.all([gen(PROFILE_SCHEMA_A), gen(PROFILE_SCHEMA_B)]);
+    const profile = { ...fallbackProfile(scores, name), ...a.parsed, ...b.parsed } as Profile;
+    const ok = Object.keys(a.parsed).length > 0 || Object.keys(b.parsed).length > 0;
     const debug = req.nextUrl.searchParams.has('debug')
-      ? { finishReason, rawLen: text.length, keys: Object.keys(parsed), rawHead: text.slice(0, 300) }
+      ? { finishA: a.finish, finishB: b.finish, lenA: a.len, lenB: b.len, keysA: Object.keys(a.parsed), keysB: Object.keys(b.parsed) }
       : undefined;
-    return NextResponse.json({ scores, profile, generated: true, debug });
+    return NextResponse.json({ scores, profile, generated: ok, debug });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'generation failed';
     console.error('profile generate error:', message);
