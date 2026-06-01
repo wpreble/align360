@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { getChats, deleteChat, STORE_EVENT, type ChatSession } from '@/lib/storage';
+import { getChats, deleteChat, getName, setName, STORE_EVENT, type ChatSession } from '@/lib/storage';
 
 const NAV = [
   { key: 'chat', label: 'Chat', href: '/', icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
@@ -41,6 +41,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(true);
   const [chats, setChats] = useState<ChatSession[]>([]);
+  const [name, setNameState] = useState('');
   const year = new Date().getFullYear();
 
   const refreshChats = useCallback(() => setChats(getChats()), []);
@@ -53,6 +54,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     } catch {}
     // Chat history collapsed by default on mobile.
     setHistoryOpen(typeof window !== 'undefined' ? window.innerWidth > 900 : true);
+    setNameState(getName());
     refreshChats();
     window.addEventListener(STORE_EVENT, refreshChats);
     return () => window.removeEventListener(STORE_EVENT, refreshChats);
@@ -129,6 +131,14 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="sidebar-foot">
+          <input
+            className="name-field"
+            value={name}
+            onChange={(e) => { setNameState(e.target.value); setName(e.target.value); }}
+            placeholder="Set your name"
+            aria-label="Your name"
+            maxLength={40}
+          />
           <div className="foot-controls">
             <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle theme" title="Toggle light / dark">
               <Icon d="M12 3v2M12 19v2M5 5l1.5 1.5M17.5 17.5L19 19M3 12h2M19 12h2M5 19l1.5-1.5M17.5 6.5L19 5M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />

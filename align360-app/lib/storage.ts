@@ -7,6 +7,7 @@
 export const PROFILE_KEY = 'align360:profile';
 export const CHATS_KEY = 'align360:chats';
 export const ANSWER_PREFIX = 'align360:answers:';
+export const NAME_KEY = 'align360:name';
 export const STORE_EVENT = 'align360:store-changed';
 
 export const ASSESSMENT_SLUGS = ['wiring', 'orientation', 'rejection-gift'] as const;
@@ -47,6 +48,16 @@ export function clearProfile() {
   if (typeof window !== 'undefined') {
     try { localStorage.removeItem(PROFILE_KEY); window.dispatchEvent(new Event(STORE_EVENT)); } catch {}
   }
+}
+
+/* ── Name (personalization) ── */
+export function getName(): string {
+  if (typeof window === 'undefined') return '';
+  try { return localStorage.getItem(NAME_KEY) || ''; } catch { return ''; }
+}
+export function setName(n: string) {
+  if (typeof window === 'undefined') return;
+  try { localStorage.setItem(NAME_KEY, n); window.dispatchEvent(new Event(STORE_EVENT)); } catch {}
 }
 
 /* ── Answers ── */

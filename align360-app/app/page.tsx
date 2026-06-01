@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { renderMarkdown } from '@/lib/markdown';
-import { buildProfileContext, getProfile, getChat, saveChat, newChatId, type ChatMsg } from '@/lib/storage';
+import { buildProfileContext, getProfile, getChat, getName, saveChat, newChatId, type ChatMsg } from '@/lib/storage';
 
 type Attachment = {
   id: string;
@@ -35,6 +35,7 @@ function ChatInner() {
   const [input, setInput] = useState('');
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [sending, setSending] = useState(false);
+  const [name, setName] = useState('');
   const idRef = useRef<string | null>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -48,6 +49,8 @@ function ChatInner() {
     idRef.current = null;
     setMessages([]);
   }, [chatParam, newParam]);
+
+  useEffect(() => { setName(getName()); }, []);
 
   useEffect(() => {
     const ta = taRef.current;
@@ -141,7 +144,8 @@ function ChatInner() {
     if (!idRef.current) idRef.current = newChatId();
     const id = idRef.current;
     persist(next, id);
-    const profileContext = buildProfileContext(getProfile());
+    const nm = getName();
+    const profileContext = [nm ? `The user's preferred name is ${nm}.` : '', buildProfileContext(getProfile())].filter(Boolean).join('\n');
 
     try {
       const res = await fetch('/api/chat', {
@@ -187,7 +191,7 @@ function ChatInner() {
               <line x1="3" y1="25" x2="8" y2="25" /><line x1="32" y1="25" x2="37" y2="25" />
               <circle cx="20" cy="25" r="4.2" fill="currentColor" stroke="none" /><circle cx="20" cy="14" r="2" fill="currentColor" stroke="none" /><circle cx="20" cy="36" r="2" fill="currentColor" stroke="none" />
             </svg>
-            <h1 className="welcome-name">How can I help you align?</h1>
+            <h1 className="welcome-name">How can I help you align{name ? `, ${name.split(' ')[0]}` : ''}?</h1>
             <div className="suggestion-chips">
               {SUGGESTIONS.map((s) => (<button key={s} className="chip" onClick={() => sendText(s)}>{s}</button>))}
             </div>
