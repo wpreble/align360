@@ -40,20 +40,40 @@ export async function POST(req: NextRequest) {
     systemPrompt += `\n\n---\n\n# THE USER'S ALIGN360 PROFILE (from their completed assessments)\n\nReference this naturally to personalize guidance. It reflects the user's Foundational Self — do not re-administer assessments they have already completed.\n\n${ctx}`;
   }
 
-  try {
-    const completion = await client.chat.completions.create({
-      model,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      messages: [{ role: 'system', content: systemPrompt }, ...messages] as any,
-      // gpt-5.5 reasoning tokens share this budget — keep headroom for the reply.
-      max_completion_tokens: 3000,
+  const full = [{ role: 'system', content: systemPrompt }, ...messages];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const run = (msgs: any) =>
+    client.chat.completions.create({ model, messages: msgs, max_completion_tokens: 3000 });
+
+  // Drop {type:'file'} parts when a referenced file is gone (expired/deleted),
+  // so an old session with a stale file_id stays usable instead of 400ing forever.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const stripFiles = (msgs: any[]) =>
+    msgs.map((m) => {
+      if (!Array.isArray(m.content)) return m;
+      const kept = m.content.filter((p: any) => p?.type !== 'file');
+      if (kept.length === m.content.length) return m;
+      const textPart = m.content.find((p: any) => p?.type === 'text')?.text;
+      return { ...m, content: kept.length ? kept : (textPart || '[an attached file is no longer available]') };
     });
 
+  try {
+    let completion;
+    try {
+      completion = await run(full);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : '';
+      if (/file/i.test(msg) && /(no such|not found|expired|invalid|cannot)/i.test(msg)) {
+        completion = await run(stripFiles(full)); // retry without the dead file
+      } else {
+        throw e;
+      }
+    }
     const text = completion.choices[0]?.message?.content ?? '';
     return NextResponse.json({ text });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     console.error('OpenAI error:', message);
-    return NextResponse.json({ error: message }, { status: 502 });
+    return NextResponse.json({ error: 'The assistant could not complete that request. Please try again.' }, { status: 502 });
   }
 }

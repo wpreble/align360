@@ -63,15 +63,17 @@ function ChatInner() {
       const isText = f.type.startsWith('text/') || isTextName(f.name);
       if (isImage || isText) {
         const r = new FileReader();
-        r.onload = () =>
+        r.onload = () => {
+          let text: string | undefined;
+          if (isText) {
+            const raw = String(r.result);
+            text = raw.length > 12000 ? raw.slice(0, 12000) + '\n\n[file truncated]' : raw;
+          }
           setAttachments((p) => [
             ...p,
-            {
-              id, name: f.name, kind: isImage ? 'image' : 'text', status: 'ready',
-              dataUrl: isImage ? String(r.result) : undefined,
-              text: isText ? String(r.result).slice(0, 12000) : undefined,
-            },
+            { id, name: f.name, kind: isImage ? 'image' : 'text', status: 'ready', dataUrl: isImage ? String(r.result) : undefined, text },
           ]);
+        };
         isImage ? r.readAsDataURL(f) : r.readAsText(f);
       } else {
         // PDF / DOCX / other → server upload (Files API or docx extraction)
@@ -79,7 +81,7 @@ function ChatInner() {
         const fd = new FormData();
         fd.append('file', f);
         fetch('/api/upload', { method: 'POST', body: fd })
-          .then((r) => r.json())
+          .then(async (r) => { try { return await r.json(); } catch { return { error: `Upload failed (${r.status})` }; } })
           .then((d) =>
             setAttachments((p) =>
               p.map((a) =>
@@ -100,7 +102,7 @@ function ChatInner() {
     return msgs.map((m) => {
       const parts: any[] = [];
       if (m.role === 'user' && ((m.images && m.images.length) || (m.files && m.files.length))) {
-        parts.push({ type: 'text', text: m.text });
+        if (m.text) parts.push({ type: 'text', text: m.text });
         for (const url of m.images || []) parts.push({ type: 'image_url', image_url: { url } });
         for (const f of m.files || []) parts.push({ type: 'file', file: { file_id: f.fileId } });
         return { role: m.role, content: parts };

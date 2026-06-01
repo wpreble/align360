@@ -38,15 +38,28 @@ export async function POST(req: NextRequest) {
   const lower = name.toLowerCase();
   const buf = Buffer.from(await file.arrayBuffer());
 
+  const head = buf.subarray(0, 5).toString('latin1');
+  const isPdf = lower.endsWith('.pdf') || file.type === 'application/pdf';
+  const isDocx = lower.endsWith('.docx');
+
   try {
-    if (lower.endsWith('.docx')) {
+    if (isDocx) {
+      // DOCX is a zip — verify the PK signature so a renamed binary can't sneak through.
+      if (!head.startsWith('PK')) {
+        return NextResponse.json({ error: 'That does not look like a valid .docx file.' }, { status: 415 });
+      }
       const { value } = await mammoth.extractRawText({ buffer: buf });
-      const text = (value || '').trim().slice(0, 12000);
-      if (!text) return NextResponse.json({ error: 'Could not extract any text from this document.' }, { status: 422 });
+      const raw = (value || '').trim();
+      if (!raw) return NextResponse.json({ error: 'Could not extract any text from this document.' }, { status: 422 });
+      const text = raw.length > 12000 ? raw.slice(0, 12000) + '\n\n[document truncated]' : raw;
       return NextResponse.json({ kind: 'text', filename: name, text });
     }
 
-    if (lower.endsWith('.pdf') || file.type === 'application/pdf') {
+    if (isPdf) {
+      // Verify the %PDF- magic before tagging it application/pdf for the model.
+      if (!head.startsWith('%PDF-')) {
+        return NextResponse.json({ error: 'That does not look like a valid PDF file.' }, { status: 415 });
+      }
       const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
       const uploaded = await client.files.create({
         file: await toFile(buf, name, { type: 'application/pdf' }),
