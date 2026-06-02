@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { renderMarkdown } from '@/lib/markdown';
 import { buildProfileContext, getProfile, getChat, getName, getOnboarding, saveChat, newChatId, type ChatMsg } from '@/lib/storage';
-import { buildOnboardingContext } from '@/lib/onboarding';
+import { buildOnboardingContext, synthesize } from '@/lib/onboarding';
 
 type Attachment = {
   id: string;
@@ -37,6 +37,7 @@ function ChatInner() {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [sending, setSending] = useState(false);
   const [name, setName] = useState('');
+  const [welcomeLine, setWelcomeLine] = useState('');
   const idRef = useRef<string | null>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -51,7 +52,14 @@ function ChatInner() {
     setMessages([]);
   }, [chatParam, newParam]);
 
-  useEffect(() => { setName(getName()); }, []);
+  useEffect(() => {
+    setName(getName());
+    const ob = getOnboarding();
+    if (ob) {
+      const s = synthesize(ob);
+      setWelcomeLine(`You came in wanting to ${s.intentPhrase}. Your wiring leans toward someone who can ${s.primaryBlurb} — let's build on that.`);
+    }
+  }, []);
 
   useEffect(() => {
     const ta = taRef.current;
@@ -197,6 +205,7 @@ function ChatInner() {
               <circle cx="20" cy="25" r="4.2" fill="currentColor" stroke="none" /><circle cx="20" cy="14" r="2" fill="currentColor" stroke="none" /><circle cx="20" cy="36" r="2" fill="currentColor" stroke="none" />
             </svg>
             <h1 className="welcome-name">How can I help you align{name ? `, ${name.split(' ')[0]}` : ''}?</h1>
+            {welcomeLine && <p className="welcome-sub">{welcomeLine}</p>}
             <div className="suggestion-chips">
               {SUGGESTIONS.map((s) => (<button key={s} className="chip" onClick={() => sendText(s)}>{s}</button>))}
             </div>

@@ -7,7 +7,8 @@ import { useSearchParams } from 'next/navigation';
 import CombinedProfile from '../result/_components/CombinedProfile';
 import type { Profile } from '@/lib/profile';
 import type { Scores } from '@/lib/scoring';
-import { getAnswers, getProfile, setProfile } from '@/lib/storage';
+import { getAnswers, getProfile, setProfile, getOnboarding } from '@/lib/storage';
+import { synthesize } from '@/lib/onboarding';
 
 type State =
   | { phase: 'loading' }
@@ -50,11 +51,27 @@ function InsightsInner() {
   useEffect(() => { generate({ demo }); }, [generate, demo]);
 
   if (state.phase === 'empty') {
+    const ob = getOnboarding();
+    const s = ob ? synthesize(ob) : null;
     return (
       <div className="result-placeholder">
-        <h1>No insights yet</h1>
-        <p>Take an assessment and your combined profile will generate here — and your AI will instantly know how you&apos;re wired. Start with Wiring for Impact.</p>
-        <Link href="/resources" className="quiz-go">→ Browse frameworks</Link>
+        {s ? (
+          <>
+            <h1>Your preliminary read</h1>
+            <div className="pg-card" style={{ textAlign: 'left', maxWidth: 480, margin: '0 auto 24px' }}>
+              <div className="pg-label">Likely primary wiring</div>
+              <div className="pg-name">The {s.primaryGift}</div>
+              <div className="pg-note">A working read from your onboarding signals. Take <strong>Wiring for Impact</strong> to confirm your full profile and unlock your combined Insights.</div>
+            </div>
+            <Link href="/assessment/wiring" className="quiz-go">→ Take Wiring for Impact</Link>
+          </>
+        ) : (
+          <>
+            <h1>No insights yet</h1>
+            <p>Take an assessment and your combined profile will generate here — and your AI will instantly know how you&apos;re wired. Start with Wiring for Impact.</p>
+            <Link href="/resources" className="quiz-go">→ Browse frameworks</Link>
+          </>
+        )}
       </div>
     );
   }
