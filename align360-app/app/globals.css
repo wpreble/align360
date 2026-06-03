@@ -205,20 +205,25 @@ a { color:inherit; text-decoration:none; }
 .attach-pill.err { border-color:#c0626e; color:#c0626e; }
 .msg-file { display:inline-flex; align-items:center; gap:4px; font-size:13px; padding:4px 10px; margin:0 6px 6px 0; border:1px solid var(--border); border-radius:8px; background:var(--bg-chip); }
 .upload-hint { max-width:860px; margin:6px auto 0; font-size:12px; color:var(--text-muted); font-style:italic; }
-.input-inner { max-width:860px; margin:0 auto; display:flex; align-items:flex-end; gap:6px; background:var(--bg-input); border:1px solid var(--border-strong); border-radius:24px; padding:6px 6px 6px 8px; box-shadow:0 4px 20px rgba(0,0,0,.05); }
+/* Composer: textarea on top, controls row below (stacked — works full-width on mobile). */
+.composer { max-width:860px; margin:0 auto; display:flex; flex-direction:column; gap:4px; background:var(--bg-input); border:1px solid var(--border-strong); border-radius:16px; padding:10px 12px 8px; box-shadow:0 4px 20px rgba(0,0,0,.05); }
+.composer-input { width:100%; background:transparent; border:none; outline:none; resize:none; max-height:200px; padding:4px 2px; font-size:16px; line-height:1.5; }
+.composer-bar { display:flex; align-items:center; justify-content:space-between; }
+.composer-left, .composer-right { display:flex; align-items:center; gap:6px; }
+.composer-btn { width:34px; height:34px; flex-shrink:0; display:grid; place-items:center; border-radius:9px; color:var(--text-muted); transition:all .15s; }
+.composer-btn:hover:not(:disabled) { background:var(--fig-wash); color:var(--accent); }
+[data-theme='dark'] .composer-btn:hover:not(:disabled) { background:rgba(185,143,168,.12); }
+.composer-btn:disabled { opacity:.4; cursor:not-allowed; }
+.composer-btn svg { width:19px; height:19px; }
+.char-count { font-size:11px; color:var(--text-muted); margin-right:4px; font-variant-numeric:tabular-nums; }
+.send-btn { background:var(--cta); color:var(--cta-text); border-radius:50%; width:34px; height:34px; display:grid; place-items:center; font-size:17px; font-weight:600; transition:opacity .15s; flex-shrink:0; }
+.send-btn:disabled { opacity:.4; cursor:not-allowed; }
 
 /* Widescreen: let the chat column breathe — wider still when the sidebar is collapsed. */
 @media (min-width:1500px) {
-  .messages, .input-inner, .attach-row { max-width:980px; }
+  .messages, .composer, .attach-row { max-width:980px; }
 }
-.app-layout.left-collapsed .messages, .app-layout.left-collapsed .input-inner, .app-layout.left-collapsed .attach-row { max-width:1040px; }
-.attach-btn { width:38px; height:38px; flex-shrink:0; display:grid; place-items:center; border-radius:50%; color:var(--text-muted); transition:all .15s; }
-.attach-btn:hover { background:var(--fig-wash); color:var(--accent); }
-[data-theme='dark'] .attach-btn:hover { background:rgba(185,143,168,.12); }
-.attach-btn svg { width:20px; height:20px; }
-.input-inner textarea { flex:1; background:transparent; border:none; outline:none; resize:none; max-height:200px; padding:9px 4px; font-size:16px; }
-.send-btn { background:var(--cta); color:var(--cta-text); border-radius:50%; width:38px; height:38px; display:grid; place-items:center; font-size:18px; font-weight:600; transition:opacity .15s; flex-shrink:0; }
-.send-btn:disabled { opacity:.4; cursor:not-allowed; }
+.app-layout.left-collapsed .messages, .app-layout.left-collapsed .composer, .app-layout.left-collapsed .attach-row { max-width:1040px; }
 
 /* ── Right panel: Insight Engine ── */
 .right-panel { background:var(--bg-panel); border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; white-space:nowrap; min-width:0; }
