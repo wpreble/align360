@@ -88,42 +88,40 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           {NAV.map((item) => {
             const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
             return (
-              <div key={item.key}>
-                <Link href={item.href} className={`sidebar-nav-item${active ? ' active' : ''}`} title={item.label}>
-                  <span className="nav-icon"><Icon d={item.icon} /></span>
-                  <span className="nav-label">{item.label}</span>
-                </Link>
-
-                {item.key === 'chat' && (
-                  <div className="chat-history">
-                    <div className="ch-toggle">
-                      <button className="ch-toggle-btn" onClick={() => setHistoryOpen((v) => !v)} aria-expanded={historyOpen} aria-controls="ch-list">
-                        <svg className={`ch-caret${historyOpen ? ' open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
-                        <span>Chat History</span>
-                      </button>
-                      <button className="ch-new" onClick={() => router.push('/?new=' + Date.now())} title="New chat" aria-label="New chat">+</button>
-                    </div>
-                    {historyOpen && (
-                      <div className="ch-list" id="ch-list">
-                        {chats.length === 0 ? (
-                          <div className="ch-empty">No conversations yet.</div>
-                        ) : (
-                          chats.map((c) => (
-                            <div key={c.id} className="ch-item">
-                              <Link href={`/?chat=${c.id}`} className="ch-item-link" title={c.title}>{c.title || 'Untitled'}</Link>
-                              <button className="ch-del" onClick={() => deleteChat(c.id)} aria-label="Delete chat">✕</button>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+              <Link key={item.key} href={item.href} className={`sidebar-nav-item${active ? ' active' : ''}`} title={item.label}>
+                <span className="nav-icon"><Icon d={item.icon} /></span>
+                <span className="nav-label">{item.label}</span>
+              </Link>
             );
           })}
         </nav>
 
+        {/* Chat History — its own section, scrolls when the list outgrows the view. */}
+        <div className="sidebar-history">
+          <div className="ch-toggle">
+            <button className="ch-toggle-btn" onClick={() => setHistoryOpen((v) => !v)} aria-expanded={historyOpen} aria-controls="ch-list">
+              <svg className={`ch-caret${historyOpen ? ' open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
+              <span>Chat History</span>
+            </button>
+            <button className="ch-new" onClick={() => router.push('/?new=' + Date.now())} title="New chat" aria-label="New chat">+</button>
+          </div>
+          {historyOpen && (
+            <div className="ch-list" id="ch-list">
+              {chats.length === 0 ? (
+                <div className="ch-empty">No conversations yet.</div>
+              ) : (
+                chats.map((c) => (
+                  <div key={c.id} className="ch-item">
+                    <Link href={`/?chat=${c.id}`} className="ch-item-link" title={c.title}>{c.title || 'Untitled'}</Link>
+                    <button className="ch-del" onClick={() => deleteChat(c.id)} aria-label="Delete chat">✕</button>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Account / settings + copyright pinned to the bottom. */}
         <div className="sidebar-foot">
           <input
             className="name-field"
@@ -136,6 +134,9 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           <div className="foot-controls">
             <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle theme" title="Toggle light / dark">
               <Icon d="M12 3v2M12 19v2M5 5l1.5 1.5M17.5 17.5L19 19M3 12h2M19 12h2M5 19l1.5-1.5M17.5 6.5L19 5M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />
+            </button>
+            <button className="icon-btn" aria-label="Account & settings" title="Account & settings (coming soon)" disabled>
+              <Icon d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15H4a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 5.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6h.09A1.65 1.65 0 0 0 11 3.09V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 21 9v.09a1.65 1.65 0 0 0 0 4z" />
             </button>
           </div>
           <div className="sidebar-ip">© {year} Align360. All rights reserved.</div>

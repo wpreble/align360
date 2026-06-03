@@ -6,7 +6,7 @@
   /* Black Cherry Fig system — accents are fig/plum tints on Rich Obsidian. */
   --void:#110319;--obsidian:#1B0A24;--midnight:#261230;
   --gold:#B98FA8;--gold2:#D9BBCB;--goldd:#6E3F5F;
-  --silver:#B8B4A8;--silverd:#8A7E86;--ivory:#F4EEF2;--ivoryd:#D6CDD3;
+  --silver:#CFC6CC;--silverd:#B7A6B2;--ivory:#F7F2F5;--ivoryd:#ECE2EA;
   --border:rgba(185,143,168,.16);--borderm:rgba(185,143,168,.32);
   --teal:#7FB5AC;--crimson:#B5566A;--plum:#9A5AC8;--amber:#C99A6E;--blue:#6E7FCC;--green:#5FAE8E;
   --ai:#3A2A5A;--ai2:#7A6ECC;--legacy:#3A1326;
@@ -184,3 +184,26 @@
   .profile-doc .hero { min-height:auto; padding:3rem 2rem; page-break-after:avoid; }
   .profile-doc .chapter { page-break-inside:avoid; padding:2.5rem 0; }
 }
+
+/* ═══════════════════════════════════════════════
+   Readability pass — larger, brighter body text on the dark document
+   ═══════════════════════════════════════════════ */
+.profile-doc .cs { font-size:16px; line-height:1.8; color:var(--ivoryd); }
+.profile-doc .hero-desc { font-size:18px; line-height:1.85; color:var(--ivoryd); }
+.profile-doc .hero-title .sub { color:var(--silver); }
+.profile-doc .sig-desc,
+.profile-doc .psr-b,
+.profile-doc .ac-body,
+.profile-doc .am-body,
+.profile-doc .irr-cell-body,
+.profile-doc .cur-note,
+.profile-doc .closing-note,
+.profile-doc .stack-val,
+.profile-doc .opp-tag { font-size:14px; line-height:1.7; color:var(--ivoryd); }
+.profile-doc .air-body { font-size:16px; line-height:1.8; color:rgba(247,242,245,.86); }
+.profile-doc .ac-body, .profile-doc .am-body { color:rgba(247,242,245,.8); }
+.profile-doc .ai-header-text, .profile-doc .lh-text { color:rgba(247,242,245,.66); font-size:13.5px; }
+.profile-doc .opp-ai-why { color:rgba(180,200,255,.8); font-size:13.5px; line-height:1.65; }
+.profile-doc .opp-risk { color:rgba(220,170,180,.8); }
+.profile-doc .pill { color:var(--silver); }
+.profile-doc .cur-ctx, .profile-doc .rl-sub, .profile-doc .opp-sl { color:var(--silverd); }
