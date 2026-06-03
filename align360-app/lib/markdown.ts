@@ -1,8 +1,8 @@
 /**
  * Minimal, dependency-free Markdown -> HTML for chat rendering.
  * Handles: headings, ordered/unordered lists, blockquotes, fenced + inline
- * code, bold, italic, links (safe schemes only), paragraphs with soft breaks.
- * Input is HTML-escaped first, so model output cannot inject markup.
+ * code, GFM tables, bold, italic, links (safe schemes only), paragraphs with
+ * soft breaks. Input is HTML-escaped first, so model output cannot inject markup.
  */
 function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -17,7 +17,6 @@ function inline(s: string): string {
     codes.push(c);
     return `@@CODE${codes.length - 1}@@`;
   });
-  // Links: only safe URL schemes; otherwise render the link text as plain.
   out = out.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_m, text, url) =>
     SAFE_URL.test(url) ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>` : text,
   );
@@ -25,8 +24,19 @@ function inline(s: string): string {
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/__([^_]+)__/g, '<strong>$1</strong>')
     .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
-  // Restore code spans (content was already HTML-escaped upstream).
   return out.replace(/@@CODE(\d+)@@/g, (_m, i) => (codes[Number(i)] !== undefined ? `<code>${codes[Number(i)]}</code>` : _m));
+}
+
+// A GFM table separator row, e.g. | --- | :--: | ---: |
+function isTableSep(line: string): boolean {
+  const t = line.trim();
+  return t.includes('-') && t.includes('|') && /^\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?$/.test(t);
+}
+function rowCells(line: string): string[] {
+  let l = line.trim();
+  if (l.startsWith('|')) l = l.slice(1);
+  if (l.endsWith('|')) l = l.slice(0, -1);
+  return l.split('|').map((c) => c.trim());
 }
 
 export function renderMarkdown(md: string): string {
@@ -46,13 +56,11 @@ export function renderMarkdown(md: string): string {
     }
   };
   const flushPara = () => {
-    if (para.length) {
-      out.push('<p>' + para.join('<br>') + '</p>');
-      para = [];
-    }
+    if (para.length) { out.push('<p>' + para.join('<br>') + '</p>'); para = []; }
   };
 
-  for (const raw of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
     const t = raw.trim();
 
     if (t.startsWith('```')) {
@@ -63,6 +71,23 @@ export function renderMarkdown(md: string): string {
     if (inCode) { codeBuf.push(raw); continue; }
 
     if (t === '') { flushList(); flushPara(); continue; }
+
+    // GFM table: a row with pipes followed by a separator row.
+    if (t.includes('|') && i + 1 < lines.length && isTableSep(lines[i + 1])) {
+      flushList(); flushPara();
+      const header = rowCells(t);
+      i += 2; // skip header + separator
+      const body: string[][] = [];
+      while (i < lines.length && lines[i].trim() && lines[i].includes('|')) {
+        body.push(rowCells(lines[i]));
+        i++;
+      }
+      i--; // step back; loop will increment
+      const thead = '<thead><tr>' + header.map((c) => `<th>${inline(c)}</th>`).join('') + '</tr></thead>';
+      const tbody = '<tbody>' + body.map((r) => '<tr>' + header.map((_, ci) => `<td>${inline(r[ci] || '')}</td>`).join('') + '</tr>').join('') + '</tbody>';
+      out.push(`<table>${thead}${tbody}</table>`);
+      continue;
+    }
 
     const h = t.match(/^(#{1,6})\s+(.*)$/);
     if (h) { flushList(); flushPara(); const lvl = Math.min(h[1].length, 6); out.push(`<h${lvl}>${inline(h[2])}</h${lvl}>`); continue; }
