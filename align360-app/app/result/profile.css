@@ -171,18 +171,26 @@
 .result-toolbar .rt-btn{font-family:var(--font-display,serif);font-size:12.5px;font-weight:600;padding:7px 14px;border-radius:999px;border:1px solid rgba(185,143,168,.35);color:#D9BBCB;background:transparent;transition:all .15s}
 .result-toolbar .rt-btn:hover{background:rgba(185,143,168,.16)}
 .result-toolbar .rt-btn.primary{background:#B98FA8;color:#15101B;border-color:#B98FA8}
+/* Floating back button — sits at the top-left of the profile area (tracks the sidebar width). */
+.result-back{position:fixed;top:14px;left:calc(var(--col-left,0px) + 16px);z-index:41;display:flex;align-items:center;gap:6px;padding:8px 15px;border-radius:999px;background:rgba(13,10,20,.6);backdrop-filter:saturate(140%) blur(10px);border:1px solid rgba(185,143,168,.22);color:#D9BBCB;font-family:var(--font-display,serif);font-size:13px;font-weight:600;transition:background .15s}
+.result-back:hover{background:rgba(185,143,168,.18)}
 .result-gen{flex:1;min-height:70vh;display:grid;place-items:center;text-align:center;color:#D6CDD3;background:#0D0A14;font-family:'Crimson Pro',serif}
 .result-gen .gen-pulse{width:54px;height:54px;border-radius:50%;margin:0 auto 24px;background:radial-gradient(circle,#B98FA8,#6E3F5F);animation:genpulse 1.7s ease-in-out infinite}
 @keyframes genpulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.18);opacity:.5}}
 
-/* Print → PDF: hide app chrome + toolbar, preserve dark colors */
+/* Print → PDF: full multi-page document, no app chrome.
+   The app shell normally clips to one screen (body/center-col are overflow:hidden,
+   height:100vh) — these overrides release that so the whole profile flows across pages. */
 @media print {
-  body { background:#050508 !important; }
-  .nav, .ip-notice, .result-toolbar { display:none !important; }
-  .app-main { min-height:0 !important; }
+  @page { margin: 0; }
+  html, body { height:auto !important; overflow:visible !important; background:#110319 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .sidebar, .mobile-bar, .reopen-tab, .drawer-scrim, .result-toolbar, .result-back, .ip-notice { display:none !important; }
+  .app-layout { display:block !important; height:auto !important; grid-template-columns:1fr !important; }
+  .center-col { display:block !important; height:auto !important; overflow:visible !important; }
   .profile-doc { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-  .profile-doc .hero { min-height:auto; padding:3rem 2rem; page-break-after:avoid; }
-  .profile-doc .chapter { page-break-inside:avoid; padding:2.5rem 0; }
+  .profile-doc .hero { min-height:auto !important; padding:3rem 2rem 2rem !important; page-break-after:avoid; }
+  .profile-doc .chapter { page-break-inside:avoid; padding:2.2rem 0 !important; }
+  .profile-doc .ornament { display:none; }
 }
 
 /* ═══════════════════════════════════════════════

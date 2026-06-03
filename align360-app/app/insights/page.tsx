@@ -3,7 +3,7 @@
 import '../result/profile.css';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import CombinedProfile from '../result/_components/CombinedProfile';
 import type { Profile } from '@/lib/profile';
 import type { Scores } from '@/lib/scoring';
@@ -19,6 +19,7 @@ type State =
 
 function InsightsInner() {
   const sp = useSearchParams();
+  const router = useRouter();
   const demo = sp.get('demo') === '1';
   const [state, setState] = useState<State>({ phase: 'loading' });
 
@@ -94,6 +95,7 @@ function InsightsInner() {
 
   return (
     <>
+      <button className="result-back" onClick={() => router.push('/')} aria-label="Back to chat" title="Back to chat">← Back</button>
       <div className="result-toolbar">
         {!state.generated && <span style={{ marginRight: 'auto', color: '#8A6E3A', fontSize: 12, fontStyle: 'italic' }}>Preview (deterministic fallback)</span>}
         {!demo && <button className="rt-btn" onClick={() => generate({ demo: false, force: true })}>↻ Regenerate</button>}
