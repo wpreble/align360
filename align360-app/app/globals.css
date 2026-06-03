@@ -2,8 +2,8 @@
    ALIGN — brand tokens (Black Cherry Fig system) + three-panel shell
    ═══════════════════════════════════════════════ */
 :root {
-  --fig:#2A122E; --fig-deep:#1B0C1E; --fig-mid:#6E3F5F; --fig-soft:#B98FA8; --fig-wash:#F3EAF0;
-  --obsidian:#0D0A14; --stone:#EDECEC; --white:#FFFFFF;
+  --fig:#4E0230; --fig-deep:#2A0118; --fig-mid:#7E3A66; --fig-soft:#C58FB0; --fig-wash:#F4EAF0;
+  --obsidian:#110319; --stone:#DBDCDB; --white:#FFFFFF;
 
   --font-display:'Cormorant Garamond','Fraunces',Georgia,serif; /* editorial serif */
   --font-sans:'Quicksand',-apple-system,BlinkMacSystemFont,sans-serif; /* clean sans */
@@ -22,7 +22,7 @@
   --accent:var(--fig); --cta:var(--fig); --cta-text:#FFFFFF;
 }
 [data-theme='dark'] {
-  --bg-body:#0D0A14; --bg-surface:#15101B; --bg-sidebar:#100B16; --bg-panel:#160F1C;
+  --bg-body:#110319; --bg-surface:#1B0A24; --bg-sidebar:#0C0214; --bg-panel:#1A0922;
   --bg-input:rgba(255,255,255,.04); --bg-ai:rgba(255,255,255,.04); --bg-user:rgba(185,143,168,.16); --bg-chip:rgba(255,255,255,.04);
   --border:rgba(237,236,236,.1); --border-strong:rgba(237,236,236,.24);
   --text-primary:#EDECEC; --text-secondary:rgba(237,236,236,.74); --text-muted:rgba(237,236,236,.5);
@@ -53,7 +53,11 @@ a { color:inherit; text-decoration:none; }
 /* ── Sidebar ── */
 .sidebar { background:var(--bg-sidebar); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; white-space:nowrap; min-width:0; }
 .sidebar-logo { display:flex; align-items:center; gap:10px; padding:18px 16px 14px; }
-.align-mark { width:24px; height:30px; flex-shrink:0; color:var(--accent); }
+.align-mark { display:inline-flex; align-items:center; height:24px; flex-shrink:0; }
+.align-mark-img { display:block; height:100%; width:auto; }
+.align-mark .wht { display:none; }
+[data-theme='dark'] .align-mark .fig { display:none; }
+[data-theme='dark'] .align-mark .wht { display:block; }
 .logo-text { font-family:var(--font-sans); font-weight:400; font-size:17px; letter-spacing:.3em; text-transform:uppercase; flex:1; }
 .collapse-left { margin-left:auto; }
 
@@ -150,6 +154,7 @@ a { color:inherit; text-decoration:none; }
 .chat-scroll { flex:1; overflow-y:auto; }
 .chat-welcome { max-width:600px; margin:0 auto; padding:8vh 24px 24px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:14px; }
 .welcome-avatar { color:var(--accent); }
+.welcome-mark { height:54px; margin-bottom:4px; }
 .welcome-name { font-family:var(--font-display); font-weight:600; font-size:38px; }
 .welcome-sub { font-family:var(--font-read); font-size:18px; line-height:1.6; color:var(--text-secondary); max-width:480px; }
 .suggestion-chips { display:flex; flex-direction:column; gap:10px; width:100%; max-width:430px; margin-top:10px; }
@@ -293,7 +298,7 @@ a { color:inherit; text-decoration:none; }
 .ob { position:fixed; inset:0; display:flex; flex-direction:column; background:var(--bg-body); overflow-y:auto; z-index:50; }
 .ob-header { display:flex; align-items:center; justify-content:space-between; padding:24px 32px 0; }
 .ob-logo { display:flex; align-items:center; gap:10px; color:var(--accent); }
-.ob-mark { width:22px; height:28px; }
+.ob-mark { height:24px; }
 .ob-word { font-family:var(--font-sans); font-weight:400; font-size:16px; letter-spacing:.3em; text-transform:uppercase; color:var(--text-primary); }
 .ob-progress { display:flex; gap:6px; align-items:center; }
 .prog-dot { width:6px; height:6px; border-radius:50%; background:var(--border-strong); transition:all .4s var(--ease-out); }
@@ -358,7 +363,7 @@ a { color:inherit; text-decoration:none; }
   .reopen-tab { display:none; }
   .mobile-bar { display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid var(--border); background:var(--bg-body); position:sticky; top:0; z-index:30; }
   .mobile-bar .logo-text { font-size:15px; letter-spacing:.28em; }
-  .mobile-bar .align-mark { width:20px; height:26px; color:var(--accent); }
+  .mobile-bar .align-mark { height:20px; }
   .welcome-name { font-size:30px; }
   .chat-welcome { padding:6vh 18px 24px; }
   .runner-q { font-size:24px; }

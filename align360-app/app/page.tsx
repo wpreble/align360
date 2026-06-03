@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { renderMarkdown } from '@/lib/markdown';
 import { buildProfileContext, getProfile, getChat, getName, getOnboarding, saveChat, newChatId, type ChatMsg } from '@/lib/storage';
 import { buildOnboardingContext, synthesize } from '@/lib/onboarding';
+import AlignMark from '@/app/_components/AlignMark';
 
 type Attachment = {
   id: string;
@@ -199,11 +200,7 @@ function ChatInner() {
       <div className="chat-scroll">
         {empty ? (
           <div className="chat-welcome">
-            <svg className="welcome-avatar" width="50" height="62" viewBox="0 0 40 50" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-              <line x1="20" y1="3" x2="20" y2="47" /><path d="M12 13 A 11 12 0 0 0 12 37" /><path d="M28 13 A 11 12 0 0 1 28 37" />
-              <line x1="3" y1="25" x2="8" y2="25" /><line x1="32" y1="25" x2="37" y2="25" />
-              <circle cx="20" cy="25" r="4.2" fill="currentColor" stroke="none" /><circle cx="20" cy="14" r="2" fill="currentColor" stroke="none" /><circle cx="20" cy="36" r="2" fill="currentColor" stroke="none" />
-            </svg>
+            <AlignMark className="welcome-mark" />
             <h1 className="welcome-name">How can I help you align{name ? `, ${name.split(' ')[0]}` : ''}?</h1>
             {welcomeLine && <p className="welcome-sub">{welcomeLine}</p>}
             <div className="suggestion-chips">

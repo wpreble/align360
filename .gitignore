@@ -36,3 +36,6 @@ build/
 
 # Claude Code — local-only settings (per-user, per-machine)
 .claude/settings.local.json
+
+# Heavy archives (logo packs etc.) — keep selected assets in repo, not the zip
+*.zip

@@ -4,7 +4,7 @@
 
 .profile-doc {
   /* Black Cherry Fig system — accents are fig/plum tints on Rich Obsidian. */
-  --void:#0D0A14;--obsidian:#15101B;--midnight:#1B1422;
+  --void:#110319;--obsidian:#1B0A24;--midnight:#261230;
   --gold:#B98FA8;--gold2:#D9BBCB;--goldd:#6E3F5F;
   --silver:#B8B4A8;--silverd:#8A7E86;--ivory:#F4EEF2;--ivoryd:#D6CDD3;
   --border:rgba(185,143,168,.16);--borderm:rgba(185,143,168,.32);
@@ -21,6 +21,8 @@
 .profile-doc .hero{min-height:88vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:5rem 2rem;position:relative;overflow:hidden;text-align:center}
 .profile-doc .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 55% 65% at 50% 45%,rgba(58,26,74,.35),transparent 60%),radial-gradient(ellipse 35% 35% at 12% 72%,rgba(10,50,50,.2),transparent 55%)}
 .profile-doc .hero-inner{position:relative;z-index:2;max-width:860px;margin:0 auto}
+.profile-doc .profile-hero-mark{display:flex;justify-content:center;margin:0 0 26px}
+.profile-doc .profile-hero-mark .align-mark-img{height:46px}
 .profile-doc .hero-eye{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--goldd);margin-bottom:2.5rem}
 .profile-doc .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,8vw,82px);font-weight:300;font-style:italic;color:var(--ivory);line-height:.95;margin-bottom:.3em}
 .profile-doc .hero-title .sub{display:block;font-size:clamp(15px,2.6vw,26px);color:var(--silverd);font-weight:300;margin-top:.4em;letter-spacing:.06em;font-style:normal}

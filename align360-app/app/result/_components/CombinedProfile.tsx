@@ -1,5 +1,6 @@
 import type { Profile } from '@/lib/profile';
 import type { Scores } from '@/lib/scoring';
+import AlignMark from '@/app/_components/AlignMark';
 
 function H({ html, className }: { html: string; className?: string }) {
   return <span className={className} dangerouslySetInnerHTML={{ __html: html }} />;
@@ -15,6 +16,7 @@ export default function CombinedProfile({ profile: p, scores }: { profile: Profi
       <div className="hero">
         <div className="hero-bg" />
         <div className="hero-inner">
+          <AlignMark white className="profile-hero-mark" />
           <div className="hero-eye">{p.hero.eyebrow}</div>
           <h1 className="hero-title">
             <H html={p.hero.title} />

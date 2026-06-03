@@ -4,16 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { OB_STEPS, synthesize, type Answers } from '@/lib/onboarding';
 import { setOnboarding, setName } from '@/lib/storage';
-
-function AlignMark() {
-  return (
-    <svg className="ob-mark" viewBox="0 0 40 50" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <line x1="20" y1="3" x2="20" y2="47" /><path d="M12 13 A 11 12 0 0 0 12 37" /><path d="M28 13 A 11 12 0 0 1 28 37" />
-      <line x1="3" y1="25" x2="8" y2="25" /><line x1="32" y1="25" x2="37" y2="25" />
-      <circle cx="20" cy="25" r="4.2" fill="currentColor" stroke="none" /><circle cx="20" cy="14" r="2" fill="currentColor" stroke="none" /><circle cx="20" cy="36" r="2" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
+import AlignMark from '@/app/_components/AlignMark';
 
 export default function Onboarding() {
   const router = useRouter();
@@ -56,7 +47,7 @@ export default function Onboarding() {
   return (
     <div className="ob">
       <header className="ob-header">
-        <div className="ob-logo"><AlignMark /><span className="ob-word">Align</span></div>
+        <div className="ob-logo"><AlignMark className="ob-mark" /><span className="ob-word">Align</span></div>
         <div className="ob-progress">{dots}</div>
       </header>
 

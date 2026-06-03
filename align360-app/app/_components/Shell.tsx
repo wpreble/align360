@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { getChats, deleteChat, getName, setName, isOnboarded, STORE_EVENT, type ChatSession } from '@/lib/storage';
+import AlignMark from './AlignMark';
 
 const NAV = [
   { key: 'chat', label: 'Chat', href: '/', icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
@@ -15,21 +16,6 @@ function Icon({ d }: { d: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
       <path d={d} />
-    </svg>
-  );
-}
-
-function AlignMark({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 40 50" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <line x1="20" y1="3" x2="20" y2="47" />
-      <path d="M12 13 A 11 12 0 0 0 12 37" />
-      <path d="M28 13 A 11 12 0 0 1 28 37" />
-      <line x1="3" y1="25" x2="8" y2="25" />
-      <line x1="32" y1="25" x2="37" y2="25" />
-      <circle cx="20" cy="25" r="4.2" fill="currentColor" stroke="none" />
-      <circle cx="20" cy="14" r="2" fill="currentColor" stroke="none" />
-      <circle cx="20" cy="36" r="2" fill="currentColor" stroke="none" />
     </svg>
   );
 }
@@ -91,7 +77,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
       <aside className="sidebar">
         <div className="sidebar-logo">
-          <AlignMark className="align-mark" />
+          <AlignMark />
           <span className="logo-text">Align</span>
           <button className="icon-btn collapse-left" onClick={toggleLeft} aria-label="Collapse sidebar">
             <Icon d="M15 18l-6-6 6-6" />
@@ -161,7 +147,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           <button className="icon-btn" onClick={() => setDrawerOpen(true)} aria-label="Open menu">
             <Icon d="M3 12h18M3 6h18M3 18h18" />
           </button>
-          <AlignMark className="align-mark" />
+          <AlignMark />
           <span className="logo-text">Align</span>
         </div>
         {leftCollapsed && (
