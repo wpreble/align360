@@ -4,6 +4,18 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Deployed to Vercel (2026-06-04)
+
+Live (public): **https://align360-app.vercel.app**. Verified end-to-end — public landing + live gpt-5.5 profile generation (`generated:true`), which also proves the in-app content (system prompt + assessments) is traced/read correctly on Vercel.
+
+- App made **self-contained**: `AI Model/` + `Assessments/` moved into `align360-app/content/`; read paths + `outputFileTracingIncludes` updated. No more `../` dependency.
+- Fixed build: `/api/chat` now instantiates OpenAI lazily (was module-scope → threw at build with no key).
+- Vercel project `align360-app` (team wprebles-projects), **rootDirectory = `align360-app`**, framework Next.js. Env: `OPENAI_API_KEY` + `OPENAI_MODEL=gpt-5.5` (Production).
+- **GitHub auto-deploy connected** — pushes to `main` ship automatically. Manual CLI deploys, if ever needed, must run from the repo root (rootDirectory builds the subdir).
+- Note: Deployment Protection is off (site is public). Next: custom domain `alpha.align360.io`.
+
+---
+
 ## Profile readability redesign + per-result color (2026-06-03)
 
 Will: "text still wayyy too small on the results pages… keep the direction but redesign; different colors for different results could be cool." Done both.
