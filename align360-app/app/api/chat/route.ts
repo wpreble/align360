@@ -4,10 +4,6 @@ import { buildSystemPrompt } from '@/lib/system-prompt';
 
 export const runtime = 'nodejs';
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 // content is a string, or a vision array ([{type:'text'...},{type:'image_url'...}]).
 type ChatMessage = { role: 'user' | 'assistant'; content: unknown };
 
@@ -18,6 +14,8 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
+  // Instantiate lazily (not at module scope) so the build doesn't require a key.
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   let body: { messages?: ChatMessage[]; profileContext?: string };
   try {
