@@ -7,7 +7,7 @@ import { getChats, deleteChat, getName, setName, isOnboarded, STORE_EVENT, type 
 import AlignMark from './AlignMark';
 
 const NAV = [
-  { key: 'chat', label: 'Chat', href: '/', icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
+  { key: 'chat', label: 'Chat', href: '/chat', icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
   { key: 'insights', label: 'Insights', href: '/insights', icon: 'M3 3v18h18M7 14l4-4 3 3 5-6' },
   { key: 'resources', label: 'Resources', href: '/resources', icon: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' },
 ];
@@ -56,12 +56,13 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Gate: first-time users go through onboarding before reaching the app.
+  // The landing page ('/') and onboarding are public + full-bleed.
   useEffect(() => {
-    if (pathname !== '/onboarding' && !isOnboarded()) router.replace('/onboarding');
+    if (pathname !== '/onboarding' && pathname !== '/' && !isOnboarded()) router.replace('/onboarding');
   }, [pathname, router]);
 
-  // Onboarding renders full-bleed — no sidebar/chrome.
-  if (pathname === '/onboarding') return <>{children}</>;
+  // Landing + onboarding render full-bleed — no sidebar/chrome.
+  if (pathname === '/onboarding' || pathname === '/') return <>{children}</>;
 
   const toggleLeft = () => setLeftCollapsed((v) => { const n = !v; try { localStorage.setItem('align360:leftCollapsed', n ? '1' : '0'); } catch {} return n; });
   const toggleTheme = () => {
@@ -86,7 +87,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
         <nav className="sidebar-section">
           {NAV.map((item) => {
-            const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+            const active = item.href === '/chat' ? pathname === '/chat' : pathname.startsWith(item.href);
             return (
               <Link key={item.key} href={item.href} className={`sidebar-nav-item${active ? ' active' : ''}`} title={item.label}>
                 <span className="nav-icon"><Icon d={item.icon} /></span>
@@ -103,7 +104,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               <svg className={`ch-caret${historyOpen ? ' open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
               <span>Chat History</span>
             </button>
-            <button className="ch-new" onClick={() => router.push('/?new=' + Date.now())} title="New chat" aria-label="New chat">+</button>
+            <button className="ch-new" onClick={() => router.push('/chat?new=' + Date.now())} title="New chat" aria-label="New chat">+</button>
           </div>
           {historyOpen && (
             <div className="ch-list" id="ch-list">
@@ -112,7 +113,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               ) : (
                 chats.map((c) => (
                   <div key={c.id} className="ch-item">
-                    <Link href={`/?chat=${c.id}`} className="ch-item-link" title={c.title}>{c.title || 'Untitled'}</Link>
+                    <Link href={`/chat?chat=${c.id}`} className="ch-item-link" title={c.title}>{c.title || 'Untitled'}</Link>
                     <button className="ch-del" onClick={() => deleteChat(c.id)} aria-label="Delete chat">✕</button>
                   </div>
                 ))

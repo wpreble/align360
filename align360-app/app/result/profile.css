@@ -19,7 +19,7 @@
 .profile-doc *{box-sizing:border-box;margin:0;padding:0}
 
 .profile-doc .hero{min-height:88vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:5rem 2rem;position:relative;overflow:hidden;text-align:center}
-.profile-doc .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 55% 65% at 50% 45%,rgba(58,26,74,.35),transparent 60%),radial-gradient(ellipse 35% 35% at 12% 72%,rgba(10,50,50,.2),transparent 55%)}
+.profile-doc .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 55% 65% at 50% 45%,var(--hero-glow,rgba(58,26,74,.45)),transparent 62%),radial-gradient(ellipse 35% 35% at 12% 72%,rgba(10,50,50,.2),transparent 55%)}
 .profile-doc .hero-inner{position:relative;z-index:2;max-width:860px;margin:0 auto}
 .profile-doc .profile-hero-mark{display:flex;justify-content:center;margin:0 0 26px}
 .profile-doc .profile-hero-mark .align-mark-img{height:46px}
@@ -194,11 +194,16 @@
 }
 
 /* ═══════════════════════════════════════════════
-   Readability pass — larger, brighter body text on the dark document
+   Readability redesign — same luxe direction, much larger / brighter text.
+   Body copy sits at 16–17px, sub-headings step up, labels stop being tiny.
    ═══════════════════════════════════════════════ */
-.profile-doc .cs { font-size:16px; line-height:1.8; color:var(--ivoryd); }
-.profile-doc .hero-desc { font-size:18px; line-height:1.85; color:var(--ivoryd); }
+
+/* Section intros + leads */
+.profile-doc .cs { font-size:17px; line-height:1.8; color:var(--ivoryd); max-width:640px; }
+.profile-doc .hero-desc { font-size:20px; line-height:1.85; color:var(--ivory); max-width:560px; }
 .profile-doc .hero-title .sub { color:var(--silver); }
+
+/* Body / description copy — the stuff that was unreadable */
 .profile-doc .sig-desc,
 .profile-doc .psr-b,
 .profile-doc .ac-body,
@@ -207,11 +212,48 @@
 .profile-doc .cur-note,
 .profile-doc .closing-note,
 .profile-doc .stack-val,
-.profile-doc .opp-tag { font-size:14px; line-height:1.7; color:var(--ivoryd); }
-.profile-doc .air-body { font-size:16px; line-height:1.8; color:rgba(247,242,245,.86); }
-.profile-doc .ac-body, .profile-doc .am-body { color:rgba(247,242,245,.8); }
-.profile-doc .ai-header-text, .profile-doc .lh-text { color:rgba(247,242,245,.66); font-size:13.5px; }
-.profile-doc .opp-ai-why { color:rgba(180,200,255,.8); font-size:13.5px; line-height:1.65; }
-.profile-doc .opp-risk { color:rgba(220,170,180,.8); }
-.profile-doc .pill { color:var(--silver); }
+.profile-doc .edge-body { font-size:16.5px; line-height:1.72; color:var(--ivoryd); }
+.profile-doc .edge-body { font-size:17px; max-width:660px; }
+.profile-doc .air-body { font-size:17.5px; line-height:1.8; color:rgba(247,242,245,.9); }
+.profile-doc .ac-body, .profile-doc .am-body { color:rgba(247,242,245,.84); }
+
+/* Opportunity rows — these were the smallest. NOTE the real class is .opp-why
+   (the old override targeted a non-existent .opp-ai-why and never applied). */
+.profile-doc .opp-t { font-size:20px; }
+.profile-doc .opp-tag { font-size:15.5px; line-height:1.6; color:var(--ivoryd); font-style:italic; }
+.profile-doc .opp-why { color:rgba(196,210,255,.92); font-size:15.5px; line-height:1.66; margin-top:.5rem; }
+.profile-doc .opp-risk { color:rgba(224,176,186,.9); font-size:11px; }
+.profile-doc .opp-sv { font-size:34px; }
+.profile-doc .ai-header-text, .profile-doc .lh-text { color:rgba(247,242,245,.74); font-size:15px; line-height:1.6; }
+.profile-doc .ai-header-title, .profile-doc .cur-title { font-size:22px; }
+
+/* Sub-headings step up so hierarchy still reads at the larger body size */
+.profile-doc .sig-name { font-size:24px; }
+.profile-doc .sig-desc { padding-top:1rem; margin-top:1rem; }
+.profile-doc .psr-h, .profile-doc .ac-title, .profile-doc .am-title, .profile-doc .irr-cell-cap { font-size:20px; }
+.profile-doc .stack-val { font-size:17px; }
+
+/* Gift bars — readable names + percentages */
+.profile-doc .gift-name { font-size:15px; min-width:140px; }
+.profile-doc .gift-pct { font-size:20px; }
+.profile-doc .gift-track, .profile-doc .gift-fill { height:2px; }
+.profile-doc .cr-name { font-size:10px; }
+.profile-doc .cr-ctx, .profile-doc .cur-sub { font-size:14px; }
+.profile-doc .cr-pct { font-size:22px; }
+
+/* Stop the labels from being microscopic */
+.profile-doc .ck { font-size:10.5px; }
+.profile-doc .sig-cat { font-size:9.5px; }
+.profile-doc .sig-n { font-size:11px; }
+.profile-doc .jc { font-size:10px; padding:5px 12px; }
+.profile-doc .stack-label, .profile-doc .irr-cell-lbl, .profile-doc .psr-l,
+.profile-doc .am-label, .profile-doc .ac-status, .profile-doc .opp-sl { font-size:9.5px; }
+.profile-doc .irr-cell-ai { font-size:13px; }
+
+.profile-doc .pill { color:var(--silver); font-size:10px; }
 .profile-doc .cur-ctx, .profile-doc .rl-sub, .profile-doc .opp-sl { color:var(--silverd); }
+
+/* ── Per-result accent — the document re-tints to the primary gift.
+   Driven by inline --gold / --gold2 / --goldd / --hero-glow set in
+   CombinedProfile based on scores.wiring.primary. Falls back to fig/rose. */
+.profile-doc { --accent: var(--gold); }

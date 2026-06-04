@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { Profile } from '@/lib/profile';
 import type { Scores } from '@/lib/scoring';
 import AlignMark from '@/app/_components/AlignMark';
@@ -8,10 +9,33 @@ function H({ html, className }: { html: string; className?: string }) {
 
 const GIFT_COLOR = ['var(--gold)', 'var(--crimson)', 'var(--teal)', 'var(--plum)', 'var(--amber)'];
 
+// Per-result accent — the document re-tints to the reader's primary gift, so
+// no two profiles feel the same. Each is a jewel tone that reads on near-black.
+type Accent = { gold: string; gold2: string; goldd: string; glow: string };
+const ACCENTS: Record<string, Accent> = {
+  Realist: { gold: '#C8A96E', gold2: '#E3C9A0', goldd: '#7A5C2E', glow: 'rgba(120,92,46,.40)' },
+  Supporter: { gold: '#6FB4A8', gold2: '#A6D6CD', goldd: '#2E5E55', glow: 'rgba(46,96,86,.42)' },
+  Doer: { gold: '#C56B7E', gold2: '#E6A8B5', goldd: '#7A3848', glow: 'rgba(122,56,72,.44)' },
+  Organizer: { gold: '#8090D4', gold2: '#B6C0EE', goldd: '#3A4680', glow: 'rgba(58,70,128,.42)' },
+  Explainer: { gold: '#C6A552', gold2: '#E2CC88', goldd: '#6E5A24', glow: 'rgba(110,90,36,.40)' },
+  Integrator: { gold: '#5FAE8E', gold2: '#A2D6BE', goldd: '#2E6650', glow: 'rgba(46,104,82,.42)' },
+  Enterpriser: { gold: '#D0966A', gold2: '#E8C3A2', goldd: '#7A5232', glow: 'rgba(122,82,50,.42)' },
+  Encourager: { gold: '#D98FA8', gold2: '#F2BBD0', goldd: '#7A4A5E', glow: 'rgba(122,74,94,.44)' },
+  'Wise Observer': { gold: '#A87BC8', gold2: '#CDB0E6', goldd: '#5E3F7A', glow: 'rgba(94,63,122,.44)' },
+};
+const DEFAULT_ACCENT: Accent = { gold: '#B98FA8', gold2: '#D9BBCB', goldd: '#6E3F5F', glow: 'rgba(110,26,76,.42)' };
+
 export default function CombinedProfile({ profile: p, scores }: { profile: Profile; scores: Scores }) {
   const year = new Date().getFullYear();
+  const a = ACCENTS[scores.wiring?.primary || ''] || DEFAULT_ACCENT;
+  const accentVars = {
+    '--gold': a.gold,
+    '--gold2': a.gold2,
+    '--goldd': a.goldd,
+    '--hero-glow': a.glow,
+  } as CSSProperties;
   return (
-    <div className="profile-doc">
+    <div className="profile-doc" style={accentVars}>
       {/* HERO */}
       <div className="hero">
         <div className="hero-bg" />

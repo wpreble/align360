@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation';
 
-// The Align tab is replaced by the Insight Engine (right panel). Tools launch
-// from there now. Keep this path working.
+// Legacy path. The app home is the chat at /chat now ('/' is the landing page).
 export default function AlignRedirect() {
-  redirect('/');
+  redirect('/chat');
 }

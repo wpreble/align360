@@ -34,6 +34,11 @@ function tallyTags(slug: string, answers: AnswerSet): Record<string, number> {
     if (!q) continue;
     const opt = q.options.find((o) => o.letter === letter);
     if (!opt?.giftTag) continue;
+    // Diagnostic tags (e.g. "Compressed pattern: …", "Activation condition: …",
+    // "Recovery mode: …", "Self-awareness: …") are metadata, not gift votes —
+    // canonical gift tags never contain a colon. Skip them so they don't pollute
+    // the tally or out-rank real gifts.
+    if (opt.giftTag.includes(':')) continue;
     const parts = opt.giftTag.split('/').map((p) => p.trim()).filter(Boolean);
     parts.forEach((p, i) => {
       counts[p] = (counts[p] || 0) + (i === 0 ? 1 : 0.6);

@@ -135,8 +135,42 @@ a { color:inherit; text-decoration:none; }
 .fw-tool.soon .fw-tool-dot { background:var(--text-muted); }
 .fw-tool-name { flex:1; font-size:15px; }
 .fw-tool-badge { font-size:10px; font-weight:700; color:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:1px 8px; }
-.fw-tool-go { font-size:13px; color:var(--accent); font-weight:600; }
+.fw-tool-go { font-size:13px; color:var(--accent); font-weight:600; white-space:nowrap; }
 .fw-tool-soon { font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); }
+.fw-tool-done { font-family:var(--font-brand); font-size:11px; letter-spacing:.04em; color:#5fae8e; margin-left:auto; }
+.fw-tool-done + .fw-tool-go { margin-left:14px; }
+
+/* ── Insights hub ── */
+.ins-page { max-width:860px; margin:0 auto; padding:48px 24px 80px; width:100%; }
+.ins-intro h1 { font-family:var(--font-display); font-weight:600; font-size:42px; margin-bottom:10px; }
+.ins-intro p { font-family:var(--font-read); font-size:18px; line-height:1.6; color:var(--text-secondary); max-width:640px; }
+.ins-hero { margin-top:30px; display:flex; align-items:center; gap:24px; padding:30px 32px; border-radius:var(--radius-lg); border:1px solid var(--border-strong); background:linear-gradient(135deg,var(--fig),var(--fig-deep)); color:#fff; flex-wrap:wrap; }
+.ins-hero-main { flex:1; min-width:240px; }
+.ins-hero-label { font-family:var(--font-brand); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,.7); margin-bottom:8px; }
+.ins-hero-name { font-family:var(--font-display); font-weight:500; font-style:italic; font-size:30px; line-height:1.1; margin-bottom:10px; }
+.ins-hero-note { font-family:var(--font-read); font-size:15px; line-height:1.6; color:rgba(255,255,255,.82); max-width:480px; }
+.ins-btn { display:inline-flex; align-items:center; font-family:var(--font-brand); font-weight:500; font-size:14px; letter-spacing:.02em; padding:12px 20px; border-radius:var(--radius-md); white-space:nowrap; transition:transform .15s,box-shadow .2s; }
+.ins-btn.primary { background:#fff; color:var(--fig); box-shadow:0 10px 30px -12px rgba(0,0,0,.5); }
+.ins-btn.primary:hover { transform:translateY(-2px); box-shadow:0 16px 38px -12px rgba(0,0,0,.6); }
+.ins-section-label { font-family:var(--font-brand); font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); margin:36px 0 14px; }
+.ins-list { display:flex; flex-direction:column; gap:10px; }
+.ins-card { display:flex; align-items:center; gap:14px; padding:18px 20px; border-radius:var(--radius-lg); border:1px solid var(--border); background:var(--bg-surface); transition:border-color .15s; }
+.ins-card.done { border-color:var(--border-strong); }
+.ins-card:hover { border-color:var(--accent); }
+.ins-dot { width:9px; height:9px; border-radius:50%; background:var(--text-muted); flex-shrink:0; }
+.ins-dot.on { background:#5fae8e; box-shadow:0 0 0 4px rgba(95,174,142,.16); }
+.ins-card-body { flex:1; min-width:0; }
+.ins-card-top { display:flex; align-items:center; gap:10px; margin-bottom:3px; flex-wrap:wrap; }
+.ins-card-name { font-family:var(--font-display); font-weight:600; font-size:19px; }
+.ins-badge { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:1px 7px; }
+.ins-status { font-family:var(--font-brand); font-size:11px; letter-spacing:.04em; color:var(--text-muted); margin-left:auto; }
+.ins-status.done { color:#5fae8e; }
+.ins-card-blurb { font-family:var(--font-read); font-size:14.5px; line-height:1.55; color:var(--text-secondary); }
+.ins-card-actions { display:flex; gap:14px; align-items:center; flex-shrink:0; }
+.ins-link { font-family:var(--font-brand); font-size:13px; font-weight:600; color:var(--accent); white-space:nowrap; }
+.ins-link.muted { color:var(--text-muted); font-weight:500; }
+.ins-link.go { color:var(--accent); }
+.ins-link:hover { text-decoration:underline; }
 
 /* ── Center column ── */
 .center-col { position:relative; min-width:0; overflow-y:auto; display:flex; flex-direction:column; }
@@ -376,6 +410,9 @@ a { color:inherit; text-decoration:none; }
   .mobile-bar { display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid var(--border); background:var(--bg-body); position:sticky; top:0; z-index:30; }
   .mobile-bar .logo-text { font-size:15px; letter-spacing:.28em; }
   .mobile-bar .align-mark { height:26px; }
+  /* On the rendered profile, the floating Back + toolbar ARE the page controls —
+     hide the app's top bar so they don't collide with the hamburger/logo. */
+  .center-col:has(.profile-doc) .mobile-bar { display:none; }
   .welcome-name { font-size:30px; }
   .chat-welcome { padding:6vh 18px 24px; }
   .runner-q { font-size:24px; }

@@ -38,7 +38,7 @@ export default function Runner({ title, slug, questions }: { title: string; slug
 
   function back() {
     if (idx === 0) {
-      router.push('/align');
+      router.push('/resources');
       return;
     }
     setDir('back');

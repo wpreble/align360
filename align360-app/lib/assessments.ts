@@ -82,9 +82,10 @@ export function parseAssessment(slug: string, md: string): Assessment {
     if (line.startsWith('### ')) {
       flushPrompt();
       const header = line.slice(4).trim();
-      const m = header.match(/^Q?(\d+)\s*[—\-–:]\s*(.*)$/);
+      // Match `Q12 — Label`, `Q12: Label`, or a bare `Q16` (no separator/label).
+      const m = header.match(/^Q?(\d+)\s*(?:[—\-–:]\s*(.*))?$/);
       const number = m ? parseInt(m[1], 10) : curSection ? curSection.questions.length + 1 : sections.length + 1;
-      const label = m ? m[2].trim() : header;
+      const label = m ? (m[2] || '').trim() : header;
       if (!curSection) {
         curSection = { name: '', questions: [] };
         sections.push(curSection);

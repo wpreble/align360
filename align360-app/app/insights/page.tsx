@@ -1,115 +1,108 @@
 'use client';
 
-import '../result/profile.css';
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
-import CombinedProfile from '../result/_components/CombinedProfile';
-import type { Profile } from '@/lib/profile';
-import type { Scores } from '@/lib/scoring';
-import { getAnswers, getProfile, setProfile, getOnboarding } from '@/lib/storage';
+import { getAnswers, getProfile, getOnboarding, STORE_EVENT } from '@/lib/storage';
 import { synthesize } from '@/lib/onboarding';
 
-type State =
-  | { phase: 'loading' }
-  | { phase: 'generating' }
-  | { phase: 'ready'; profile: Profile; scores: Scores; generated: boolean }
-  | { phase: 'empty' }
-  | { phase: 'error'; message: string };
+const ASSESSMENTS = [
+  { slug: 'wiring', name: 'Wiring for Impact', core: true, blurb: 'How you naturally create value — under pressure and at your best. The foundational read.' },
+  { slug: 'orientation', name: 'Orientation for Impact', blurb: 'How you read situations, think through complexity, and make decisions.' },
+  { slug: 'rejection-gift', name: 'Rejection Gift Finder', blurb: 'How adversity forged a specific capability that is now an edge.' },
+];
 
-function InsightsInner() {
-  const sp = useSearchParams();
-  const router = useRouter();
-  const demo = sp.get('demo') === '1';
-  const [state, setState] = useState<State>({ phase: 'loading' });
+export default function InsightsHub() {
+  const [done, setDone] = useState<Record<string, boolean>>({});
+  const [hasProfile, setHasProfile] = useState(false);
+  const [archetype, setArchetype] = useState<string>('');
+  const [prelim, setPrelim] = useState<string>('');
 
-  const generate = useCallback(async (opts: { demo?: boolean; force?: boolean }) => {
-    if (!opts.demo && !opts.force) {
-      const saved = getProfile();
-      if (saved?.profile) { setState({ phase: 'ready', profile: saved.profile, scores: saved.scores, generated: true }); return; }
-    }
+  const refresh = useCallback(() => {
     const answers = getAnswers();
-    if (!opts.demo && Object.keys(answers).length === 0) { setState({ phase: 'empty' }); return; }
-
-    setState({ phase: 'generating' });
-    let name = 'Friend';
-    try { name = localStorage.getItem('align360:name') || 'Friend'; } catch {}
-    try {
-      const res = await fetch('/api/profile/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(opts.demo ? { demo: true } : { name, answers }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Generation failed');
-      if (!opts.demo) setProfile({ profile: data.profile, scores: data.scores, generatedAt: new Date().toISOString() });
-      setState({ phase: 'ready', profile: data.profile, scores: data.scores, generated: data.generated });
-    } catch (err) {
-      setState({ phase: 'error', message: err instanceof Error ? err.message : 'Unknown error' });
+    const d: Record<string, boolean> = {};
+    for (const a of ASSESSMENTS) d[a.slug] = !!answers[a.slug];
+    setDone(d);
+    const p = getProfile();
+    setHasProfile(!!p?.profile);
+    if (p?.profile?.hero) {
+      const title = String(p.profile.hero.title || '').replace(/<[^>]+>/g, '');
+      setArchetype(title);
+    } else {
+      const ob = getOnboarding();
+      if (ob) { try { setPrelim('The ' + synthesize(ob).primaryGift); } catch {} }
     }
   }, []);
 
-  useEffect(() => { generate({ demo }); }, [generate, demo]);
+  useEffect(() => {
+    refresh();
+    window.addEventListener(STORE_EVENT, refresh);
+    return () => window.removeEventListener(STORE_EVENT, refresh);
+  }, [refresh]);
 
-  if (state.phase === 'empty') {
-    const ob = getOnboarding();
-    const s = ob ? synthesize(ob) : null;
-    return (
-      <div className="result-placeholder">
-        {s ? (
-          <>
-            <h1>Your preliminary read</h1>
-            <div className="pg-card" style={{ textAlign: 'left', maxWidth: 480, margin: '0 auto 24px' }}>
-              <div className="pg-label">Likely primary wiring</div>
-              <div className="pg-name">The {s.primaryGift}</div>
-              <div className="pg-note">A working read from your onboarding signals. Take <strong>Wiring for Impact</strong> to confirm your full profile and unlock your combined Insights.</div>
+  const completedCount = Object.values(done).filter(Boolean).length;
+  const anyDone = completedCount > 0;
+
+  return (
+    <div className="ins-page">
+      <div className="ins-intro">
+        <h1>Insights</h1>
+        <p>Your living profile. Complete assessments to sharpen it — each one is remembered and fed straight into your AI.</p>
+      </div>
+
+      {/* Combined profile hero */}
+      <div className="ins-hero">
+        <div className="ins-hero-main">
+          <div className="ins-hero-label">{hasProfile ? 'Your combined profile' : anyDone ? 'Ready to generate' : 'Preliminary read'}</div>
+          <div className="ins-hero-name">
+            {hasProfile && archetype ? archetype : anyDone ? 'Your profile is ready' : prelim ? prelim : 'Not yet assessed'}
+          </div>
+          <p className="ins-hero-note">
+            {hasProfile
+              ? 'Open your full identity document — wiring, behavioral intelligence, currency map, and AI-era calibration.'
+              : anyDone
+                ? 'You have completed an assessment. Generate your full combined profile now.'
+                : prelim
+                  ? 'A working read from your onboarding signals. Take Wiring for Impact to confirm your full profile.'
+                  : 'Take your first assessment to unlock your combined profile.'}
+          </p>
+        </div>
+        <div className="ins-hero-action">
+          {anyDone ? (
+            <Link href="/insights/profile" className="ins-btn primary">{hasProfile ? 'View full profile →' : 'Generate profile →'}</Link>
+          ) : (
+            <Link href="/assessment/wiring" className="ins-btn primary">Take Wiring for Impact →</Link>
+          )}
+        </div>
+      </div>
+
+      {/* Assessment status */}
+      <div className="ins-section-label">Assessments {anyDone ? `· ${completedCount}/${ASSESSMENTS.length} complete` : ''}</div>
+      <div className="ins-list">
+        {ASSESSMENTS.map((a) => {
+          const isDone = done[a.slug];
+          return (
+            <div key={a.slug} className={`ins-card${isDone ? ' done' : ''}`}>
+              <span className={`ins-dot${isDone ? ' on' : ''}`} />
+              <div className="ins-card-body">
+                <div className="ins-card-top">
+                  <span className="ins-card-name">{a.name}</span>
+                  {a.core && <span className="ins-badge">Core</span>}
+                  <span className={`ins-status${isDone ? ' done' : ''}`}>{isDone ? '✓ Completed' : 'Not started'}</span>
+                </div>
+                <p className="ins-card-blurb">{a.blurb}</p>
+              </div>
+              {isDone ? (
+                <div className="ins-card-actions">
+                  <Link href="/insights/profile" className="ins-link">View result</Link>
+                  <Link href={`/assessment/${a.slug}`} className="ins-link muted">Retake</Link>
+                </div>
+              ) : (
+                <Link href={`/assessment/${a.slug}`} className="ins-link go">Take it →</Link>
+              )}
             </div>
-            <Link href="/assessment/wiring" className="quiz-go">→ Take Wiring for Impact</Link>
-          </>
-        ) : (
-          <>
-            <h1>No insights yet</h1>
-            <p>Take an assessment and your combined profile will generate here — and your AI will instantly know how you&apos;re wired. Start with Wiring for Impact.</p>
-            <Link href="/resources" className="quiz-go">→ Browse frameworks</Link>
-          </>
-        )}
+          );
+        })}
       </div>
-    );
-  }
-  if (state.phase === 'error') {
-    return (
-      <div className="result-placeholder">
-        <h1>Something went wrong</h1>
-        <p>{state.message}</p>
-        <button className="quiz-go" onClick={() => generate({ demo, force: true })} style={{ background: 'none', border: 'none' }}>↻ Try again</button>
-      </div>
-    );
-  }
-  if (state.phase === 'loading' || state.phase === 'generating') {
-    return (
-      <div className="result-gen">
-        <div><div className="gen-pulse" /><p>{state.phase === 'generating' ? 'Reading your signals and composing your profile…' : 'Loading…'}</p></div>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <button className="result-back" onClick={() => router.push('/')} aria-label="Back to chat" title="Back to chat">← Back</button>
-      <div className="result-toolbar">
-        {!state.generated && <span style={{ marginRight: 'auto', color: '#8A6E3A', fontSize: 12, fontStyle: 'italic' }}>Preview (deterministic fallback)</span>}
-        {!demo && <button className="rt-btn" onClick={() => generate({ demo: false, force: true })}>↻ Regenerate</button>}
-        <button className="rt-btn primary" onClick={() => window.print()}>↓ Download PDF</button>
-      </div>
-      <CombinedProfile profile={state.profile} scores={state.scores} />
-    </>
-  );
-}
-
-export default function InsightsPage() {
-  return (
-    <Suspense fallback={<div className="result-gen"><div><div className="gen-pulse" /><p>Loading…</p></div></div>}>
-      <InsightsInner />
-    </Suspense>
+    </div>
   );
 }

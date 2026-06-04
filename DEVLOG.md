@@ -4,6 +4,59 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Profile readability redesign + per-result color (2026-06-03)
+
+Will: "text still wayyy too small on the results pages… keep the direction but redesign; different colors for different results could be cool." Done both.
+
+- **Readability redesign (`app/result/profile.css`).** Found + fixed a real bug: the readability override targeted `.opp-ai-why`, a class that doesn't exist — the actual opportunity descriptions are `.opp-why`, so they'd been stuck at 12px the whole time. Bumped the whole document: body/description copy 12–14px → **16.5px** (`.opp-why` 15.5px), hero desc 18 → 20px, section intros 17px, sub-headings (opp titles, psr/ac/am headings) → 20px, gift names 13 → 15px + percentages → 20px + bars 1px → 2px, and stepped the tiny Cinzel labels up so nothing's microscopic. Same luxe direction, just legible.
+- **Per-result accent (`CombinedProfile.tsx` + `profile.css`).** The document now re-tints to the reader's primary wiring gift — 9 jewel tones (Realist→amber, Doer→garnet, Supporter→teal, Organizer→sapphire, Explainer→citrine, Integrator→emerald, Enterpriser→copper, Encourager→coral, Wise Observer→amethyst), fig/rose fallback. Driven by inline `--gold`/`--gold2`/`--goldd`/`--hero-glow` CSS vars set from `scores.wiring.primary`; retints eyebrows, rules, percentages, pills, the hero glow, and the top gift bar. Verified: Wise Observer profile renders amethyst end-to-end. No two profiles look the same now.
+
+Build clean; no mobile overflow.
+
+---
+
+## Landing page + IA expansion (2026-06-03)
+
+Big feature pass: a real marketing landing page, app re-homed behind it, an Insights hub, smarter Resources, and a favicon. Production build clean (15 routes). Verified visually desktop + mobile.
+
+**Routing — landing is now the main page.** `/` = brand-forward marketing landing (full-bleed, ungated). The app moved to `/chat`; `/insights`, `/insights/profile`, `/resources`, `/assessment/[slug]`, `/onboarding` unchanged. Shell treats `/` like onboarding (no chrome, no gate); nav "Chat" → `/chat`; chat history + new-chat links → `/chat?...`; onboarding finish → `/chat`; `/align` legacy redirect → `/chat`; runner "back from Q1" → `/resources`. Only two refs ever treated `/` as chat, so the move was low-risk. **Login is intentionally skipped for the alpha** — every landing CTA enters at `/chat`, which gates new users into onboarding ("discover your wiring").
+
+**Landing page (`app/page.tsx` + `app/landing.css`).** Dark Black-Cherry-Fig, Cormorant display / Jost labels / Crimson Pro body, real ALIGN mark. Copy adapted + sharpened from align360.io: hero "Put out the fires. Then become one." → problem (5 life domains) → two pillars (who you are / what you do) → how it works (Minutes / 30 / 90 days) → what's included (DesignSuite + Career Navigator) → outcomes → "not another personality test" compare table → founder (Samuel Ngu) → final CTA → footer. `.lp` owns its own scroll region (the app shell sets `body{overflow:hidden}`). Mobile: nav collapses to logo + Log In; all grids → 1col; no horizontal overflow.
+
+**Insights hub (fixes "Back just goes to chat").** `/insights` is now a hub (light app theme): combined-profile card (archetype + "View full profile"), per-assessment status (Completed / Not started → View result / Take it), `1/3 complete` counter, onboarding preliminary read when empty. The full luxe document moved to **`/insights/profile`** with a **"← Insights"** back button (returns to the hub, not chat) + Regenerate + Download PDF.
+
+**Resources behavior.** Assessments: completed → `/insights/profile` ("View result"), else → the runner ("Start"). All non-assessment DesignSuite/Career-Navigator tools are now clickable and launch a guided chat: `/chat?run=<Name>` → new chat auto-sends "Run <Name>" → the AI runs the framework conversationally (verified live; it uses the user's name + profile). Completion state read from localStorage + live `STORE_EVENT`.
+
+**`?run=` chat launch.** `ChatInner` reads `?run=`, starts a fresh chat, auto-sends once (per-value ref guard). Made StrictMode-safe: when `?run=` is present the chat-load effect doesn't reset state (it was clobbering `idRef` on StrictMode's double-invoke, dropping the in-flight reply from the view). No `history.replaceState` (it fought Next's router and blanked the view).
+
+**Favicon.** `app/icon.png` + `app/apple-icon.png` generated from the white mark on a rounded fig tile; Next auto-detects them. Metadata title/description sharpened.
+
+**Confirmed:** all three assessments run end-to-end — Wiring (19), Orientation (12), Rejection Gift (12) — same generic runner, all feed scoring + the combined profile + model context.
+
+> Changes are in the working tree, not yet committed.
+
+---
+
+## QA + Insights optimization pass (2026-06-03)
+
+Full end-to-end walkthrough with visual verification (Preview MCP, desktop + mobile). Everything works; fixed three real bugs found along the way, plus a cosmetic one. Production build clean (12 routes, no type errors).
+
+**Verified working:** onboarding (11 steps → synthesis → gate → personalized chat welcome) · chat with gpt-5.5 (markdown **tables** render clean, AI uses onboarding context) · file uploads (PDF → Files API `file_id` → gpt-5.5 reads it natively, confirmed live; text inline; images vision) · chat history (persist / collapse / load) · assessment runner (all 19 Wiring Qs) → answers saved → profile regenerates → Insights · Resources accordion + Start links → `/assessment/<slug>` · nav (Chat/Insights/Resources).
+
+**Bugs fixed this pass:**
+1. **Assessment data loss (`lib/assessments.ts`)** — Wiring Q16–Q19 use bare `### Q16` headers (no `— label`); the header regex *required* a separator, so it fell back to per-section renumbering and the 4 compressed-mode questions got IDs `q1`–`q4`, **colliding with Section A and silently overwriting 4 answers** (19 asked → 15 saved). Made the separator/label optional: `/^Q?(\d+)\s*(?:[—\-–:]\s*(.*))?$/`. Now 19/19 persist. (Orientation/Rejection were already clean.)
+2. **Gift-tally pollution (`lib/scoring.ts`)** — Section F diagnostic tags (`Compressed pattern:`, `Activation condition:`, `Recovery mode:`, `Self-awareness:`) were being counted as gift votes. Canonical gifts never contain a colon, so: skip any `giftTag` containing `:` before tallying. Profile now ranks only the 9 real gifts (verified: Wise Observer 88% … Integrator 8%, no junk rows).
+3. **Mobile Insights control collision (`app/globals.css`)** — the fixed floating Back + Regenerate/Download toolbar (z-index 40/41) overlapped the sticky app top bar, hiding the hamburger and crowding the logo. On mobile, when the profile is showing, hide the redundant top bar: `.center-col:has(.profile-doc) .mobile-bar { display:none }`. The floating controls become the page's controls (matches the "floating back button to get out" intent).
+4. **Cosmetic (`app/onboarding/page.tsx`)** — stray space before the comma in the summary read ("confusion , with" → "confusion, with").
+
+**Insights audit notes:** fonts (Cormorant Garamond display + Cinzel labels) load and render correctly — earlier `document.fonts.check` false was a load-timing artifact. No horizontal overflow on mobile; multi-column grids collapse to 1col < 700px. `@media print` (full-page PDF, chrome hidden) intact.
+
+**Left as-is (not bugs):** Career Navigator carries an ACTIVE badge but all 7 tools show SOON (no broken Start — product/labeling call) · AI appends an IP/copyright footer to chat replies (system-prompt v6.4 behavior) · desktop toolbar can transiently overlap a full-width row at one scroll position (standard fixed-toolbar tradeoff).
+
+> Changes are in the working tree, not yet committed.
+
+---
+
 ## Current state (as of 2026-06-03)
 
 A working, branded, single-user alpha — **localStorage-backed, no accounts yet**. Runs locally; not deployed.

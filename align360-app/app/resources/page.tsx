@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { getAnswers, STORE_EVENT } from '@/lib/storage';
 
-type Tool = { name: string; slug?: string; badge?: string; soon?: boolean };
+type Tool = { name: string; slug?: string; badge?: string };
 type Framework = { key: string; name: string; status: 'active' | 'preview'; desc: string; tools?: Tool[] };
 
 const FRAMEWORKS: Framework[] = [
@@ -14,23 +15,23 @@ const FRAMEWORKS: Framework[] = [
       { name: 'Wiring for Impact', slug: 'wiring', badge: 'Core' },
       { name: 'Orientation for Impact', slug: 'orientation' },
       { name: 'Rejection Gift Finder', slug: 'rejection-gift' },
-      { name: 'Decision Simulation Lab', soon: true },
-      { name: 'Impact Pathways & Skill Builder', soon: true },
-      { name: 'Job & Market Trends Intelligence', soon: true },
-      { name: 'Family Mechanics Simulator', soon: true },
+      { name: 'Decision Simulation Lab' },
+      { name: 'Impact Pathways & Skill Builder' },
+      { name: 'Job & Market Trends Intelligence' },
+      { name: 'Family Mechanics Simulator' },
     ],
   },
   {
     key: 'careernav', name: 'Career Navigator', status: 'active',
     desc: 'Career clarity, acceleration, and confidence without burnout. Move forward without losing yourself.',
     tools: [
-      { name: 'Career Alignment Assessment', soon: true },
-      { name: 'Resume Analyzer + Builder', soon: true },
-      { name: 'Job Opportunity Finder', soon: true },
-      { name: 'Skills Gap Analyzer', soon: true },
-      { name: 'Interview Preparation', soon: true },
-      { name: 'Salary Negotiation Calculator', soon: true },
-      { name: 'LinkedIn Optimization', soon: true },
+      { name: 'Career Alignment Assessment' },
+      { name: 'Resume Analyzer + Builder' },
+      { name: 'Job Opportunity Finder' },
+      { name: 'Skills Gap Analyzer' },
+      { name: 'Interview Preparation' },
+      { name: 'Salary Negotiation Calculator' },
+      { name: 'LinkedIn Optimization' },
     ],
   },
   { key: 'integrate360', name: 'Integrate360', status: 'preview', desc: 'Life systems alignment — sustainability, wholeness, capacity. Stay aligned as complexity increases.' },
@@ -40,12 +41,26 @@ const FRAMEWORKS: Framework[] = [
 
 export default function ResourcesPage() {
   const [open, setOpen] = useState<string | null>('designsuite');
+  const [done, setDone] = useState<Record<string, boolean>>({});
+
+  const refresh = useCallback(() => {
+    const answers = getAnswers();
+    const d: Record<string, boolean> = {};
+    for (const slug of Object.keys(answers)) d[slug] = true;
+    setDone(d);
+  }, []);
+
+  useEffect(() => {
+    refresh();
+    window.addEventListener(STORE_EVENT, refresh);
+    return () => window.removeEventListener(STORE_EVENT, refresh);
+  }, [refresh]);
 
   return (
     <div className="resources-page">
       <div className="resources-intro">
         <h1>Resources</h1>
-        <p>The Align360 frameworks. Expand one to see what it includes. Active frameworks let you start now; the rest are in preview.</p>
+        <p>The Align360 frameworks. Assessments build your profile; the other tools launch a guided chat with your AI. Expand one to begin.</p>
       </div>
 
       <div className="fw-list">
@@ -67,22 +82,37 @@ export default function ResourcesPage() {
                     <div className="fw-preview">Coming after the alpha. This framework is in preview.</div>
                   ) : (
                     <div className="fw-tools">
-                      {fw.tools!.map((t) =>
-                        t.slug ? (
-                          <Link key={t.name} href={`/assessment/${t.slug}`} className="fw-tool live">
+                      {fw.tools!.map((t) => {
+                        // Assessment (has a slug): completed → view result; else take it.
+                        if (t.slug) {
+                          const completed = done[t.slug];
+                          return (
+                            <Link
+                              key={t.name}
+                              href={completed ? '/insights/profile' : `/assessment/${t.slug}`}
+                              className="fw-tool live"
+                            >
+                              <span className="fw-tool-dot" />
+                              <span className="fw-tool-name">{t.name}</span>
+                              {t.badge && <span className="fw-tool-badge">{t.badge}</span>}
+                              {completed && <span className="fw-tool-done">✓ Completed</span>}
+                              <span className="fw-tool-go">{completed ? 'View result →' : 'Start →'}</span>
+                            </Link>
+                          );
+                        }
+                        // Non-assessment tool: launch a guided chat ("Run <name>").
+                        return (
+                          <Link
+                            key={t.name}
+                            href={`/chat?run=${encodeURIComponent(t.name)}`}
+                            className="fw-tool live"
+                          >
                             <span className="fw-tool-dot" />
                             <span className="fw-tool-name">{t.name}</span>
-                            {t.badge && <span className="fw-tool-badge">{t.badge}</span>}
-                            <span className="fw-tool-go">Start →</span>
+                            <span className="fw-tool-go">Run →</span>
                           </Link>
-                        ) : (
-                          <div key={t.name} className="fw-tool soon">
-                            <span className="fw-tool-dot" />
-                            <span className="fw-tool-name">{t.name}</span>
-                            <span className="fw-tool-soon">soon</span>
-                          </div>
-                        ),
-                      )}
+                        );
+                      })}
                     </div>
                   )}
                 </div>

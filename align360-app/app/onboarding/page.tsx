@@ -37,7 +37,7 @@ export default function Onboarding() {
     const callName = (typeof answers.callName === 'string' && answers.callName.trim()) || '';
     setOnboarding(answers);
     if (callName || name) setName((callName || name).split(' ')[0]);
-    router.push('/');
+    router.push('/chat');
   }
 
   const dots = OB_STEPS.map((_, i) => (
@@ -125,7 +125,7 @@ function Summary({ answers, onEnter, onBack }: { answers: Answers; onEnter: () =
         <p className="synth-lead">
           You came in wanting to <strong>{synth.intentPhrase}</strong>. From how you described your best
           work, your wiring leans toward someone who can <strong>{synth.primaryBlurb}</strong>
-          {synth.secondaryBlurb && synth.primaryGift !== synth.secondaryGift ? <> , with a strong undercurrent of how you <strong>{synth.secondaryBlurb}</strong></> : null}.
+          {synth.secondaryBlurb && synth.primaryGift !== synth.secondaryGift ? <>, with a strong undercurrent of how you <strong>{synth.secondaryBlurb}</strong></> : null}.
         </p>
         <p className="synth-body">{synth.growthRead} — and it&apos;s already shaping how you show up. {synth.commsRead}</p>
       </div>
