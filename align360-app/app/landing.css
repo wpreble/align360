@@ -106,6 +106,12 @@
 .lp-frame li{display:flex;align-items:center;gap:11px;font-size:15px;color:var(--sec-text)}
 .lp-frame li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--sec-accent2);flex-shrink:0}
 .lp-frame li .soon{margin-left:auto;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--sec-muted)}
+/* Per-framework accent colors (a distinct signature per program) */
+.lp-frame.fw-design{--fw:#A03A6E}
+.lp-frame.fw-career{--fw:#2E7D6E}
+.lp-frame.fw-design, .lp-frame.fw-career{border-top:3px solid var(--fw)}
+.lp-frame.fw-design .lp-frame-tag, .lp-frame.fw-career .lp-frame-tag{color:var(--fw);border-color:var(--fw)}
+.lp-frame.fw-design li::before, .lp-frame.fw-career li::before{background:var(--fw)}
 
 /* ── Outcomes ── */
 .lp-outcomes{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}

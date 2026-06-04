@@ -118,7 +118,7 @@ export default function Landing() {
             <p className="lp-lead">Every assessment you complete is remembered and fed into your AI, so the more you do, the sharper it gets.</p>
           </div>
           <div className="lp-frames">
-            <div className="lp-frame">
+            <div className="lp-frame fw-design">
               <span className="lp-frame-tag">DesignSuite · Live</span>
               <h3>Understand how you&apos;re wired</h3>
               <p>Identity, judgment, resilience, and decision clarity, before you build on guesses.</p>
@@ -130,7 +130,7 @@ export default function Landing() {
                 <li>Impact Pathways &amp; Skill Builder <span className="soon">soon</span></li>
               </ul>
             </div>
-            <div className="lp-frame">
+            <div className="lp-frame fw-career">
               <span className="lp-frame-tag">Career Navigator</span>
               <h3>Move forward without losing yourself</h3>
               <p>Career clarity, acceleration, and confidence, without the burnout.</p>
