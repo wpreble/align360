@@ -11,7 +11,7 @@ export type Step =
 export const OB_STEPS: Step[] = [
   { type: 'inputs', eyebrow: "Let's begin", question: 'First, what should we call you?', sub: 'Just a few things to make this feel like yours.',
     inputs: [ { id: 'name', placeholder: 'Full name', key: 'name' }, { id: 'callName', placeholder: 'Preferred name (optional)', key: 'callName' } ] },
-  { type: 'multi', eyebrow: 'Warm welcome', question: 'What brings you to Align360 today?', sub: 'Pick all that apply — this helps us prioritize your first experience.',
+  { type: 'multi', eyebrow: 'Warm welcome', question: 'What brings you to Align360 today?', sub: 'Pick all that apply. This helps us prioritize your first experience.',
     options: ['Discover my strengths', 'Explore career direction', 'Align my life and priorities', 'Build something meaningful', 'Plan my next chapter', 'Just curious'], key: 'intent' },
   { type: 'single', eyebrow: 'Wiring signals · 1 of 3', question: "When you're at your best, what are you usually doing?", sub: 'Pick what resonates most right now.',
     options: ['Solving problems', 'Building systems', 'Helping people grow', 'Creating ideas', 'Organizing chaos', 'Leading initiatives', 'Learning and teaching'], key: 'wiring1' },
@@ -27,7 +27,7 @@ export const OB_STEPS: Step[] = [
     options: ['Being underestimated', 'High expectations', 'Having to figure things out alone', 'Failure or setbacks', 'Responsibility early in life', 'Being overlooked', 'Learning through hardship'], key: 'growthSignal' },
   { type: 'single', eyebrow: 'Connection style', question: 'What helps you feel most encouraged?',
     options: ['Words of encouragement', 'Quality time', 'Acts of support', 'Recognition', 'Shared experiences'], key: 'connection', compact: true },
-  { type: 'single', eyebrow: 'Faith & values · optional', question: 'Do spiritual or faith values play a role in how you approach life?', sub: "We'll respect whatever you share — or don't.",
+  { type: 'single', eyebrow: 'Faith & values · optional', question: 'Do spiritual or faith values play a role in how you approach life?', sub: "We'll respect whatever you share, or don't.",
     options: ['Yes, very important', 'Somewhat important', "I'm exploring", 'Not really', 'Prefer not to say'], key: 'faith', optional: true },
   { type: 'single', eyebrow: 'Curiosity', question: 'What are you most curious to discover about yourself?', sub: "Let's explore that together.",
     options: ['My strengths', 'My direction', 'My purpose', 'My next opportunity', 'My growth potential'], key: 'curiosity' },
@@ -81,16 +81,16 @@ const GROWTH_READS: Record<string, string> = {
   'Having to figure things out alone': 'Figuring things out alone builds resourcefulness most people never develop',
   'Failure or setbacks': "Moving through real setbacks builds the kind of resilience you can't fake",
   'Responsibility early in life': 'Carrying responsibility early tends to produce maturity and steadiness others sense',
-  'Being overlooked': 'Being overlooked early often sharpens perception — you see what others miss',
+  'Being overlooked': 'Being overlooked early often sharpens perception; you see what others miss',
   'Learning through hardship': 'Learning through hardship tends to create depth and a truer sense of what matters',
 };
 const DECISION_READS: Record<string, string> = {
   'Think deeply alone': "I'll give you space to think, and offer frameworks you can process solo.",
-  'Talk it through with others': "I'll engage with you conversationally — we'll think out loud together.",
-  'Research and analyze': "I'll bring data and structure — you can test my reasoning against your own.",
+  'Talk it through with others': "I'll engage with you conversationally; we'll think out loud together.",
+  'Research and analyze': "I'll bring data and structure; you can test my reasoning against your own.",
   'Follow intuition': "I'll ask questions that help you trust what you already sense.",
   'Pray and reflect': "I'll leave space for reflection, and respect the deeper layer in how you decide.",
-  'A mix of these': "I'll adapt — sometimes structured, sometimes open-ended, always following your lead.",
+  'A mix of these': "I'll adapt: sometimes structured, sometimes open-ended, always following your lead.",
 };
 
 export type Synthesis = {
@@ -153,7 +153,7 @@ export function buildOnboardingContext(answers: Answers): string {
     answers.connection && `Feels encouraged by: ${answers.connection}`,
     answers.faith && answers.faith !== 'Prefer not to say' && `Faith/values: ${answers.faith}`,
     answers.curiosity && `Most curious about: ${answers.curiosity}`,
-    `Preliminary wiring hypothesis (NOT confirmed — the Wiring for Impact assessment confirms it): ${s.primaryGift}, with undertones of ${s.secondaryGift}. Treat as a working read, not a label.`,
+    `Preliminary wiring hypothesis (NOT confirmed; the Wiring for Impact assessment confirms it): ${s.primaryGift}, with undertones of ${s.secondaryGift}. Treat as a working read, not a label.`,
     `Communication preference: ${s.commsRead}`,
   ].filter(Boolean);
   return lines.join('\n');

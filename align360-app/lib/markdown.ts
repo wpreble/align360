@@ -8,6 +8,14 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/** House style: no em/en dashes anywhere. Number ranges become hyphens; every
+ *  other dash becomes a comma. Applied to all AI-rendered text. */
+export function stripDashes(s: string): string {
+  return (s ?? '')
+    .replace(/(\d)\s*[—–]\s*(\d)/g, '$1-$2')
+    .replace(/\s*[—–]\s*/g, ', ');
+}
+
 const SAFE_URL = /^(https?:|mailto:|\/|#)/i;
 
 function inline(s: string): string {
@@ -40,7 +48,7 @@ function rowCells(line: string): string[] {
 }
 
 export function renderMarkdown(md: string): string {
-  const lines = escapeHtml(md ?? '').split(/\r?\n/);
+  const lines = escapeHtml(stripDashes(md ?? '')).split(/\r?\n/);
   const out: string[] = [];
   let listType: 'ul' | 'ol' | null = null;
   let listItems: string[] = [];

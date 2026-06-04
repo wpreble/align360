@@ -19,7 +19,7 @@ export const ALPHA_ASSESSMENTS: { slug: string; file: string; blurb: string }[] 
   {
     slug: 'wiring',
     file: 'Wiring for Impact.md',
-    blurb: 'How you naturally create value, under pressure and at your best. The foundational read — everything else builds on this.',
+    blurb: 'How you naturally create value, under pressure and at your best. The foundational read; everything else builds on this.',
   },
   {
     slug: 'orientation',

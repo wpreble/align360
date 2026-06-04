@@ -54,7 +54,7 @@ function ProfileInner() {
     return (
       <div className="result-placeholder">
         <h1>No profile yet</h1>
-        <p>Take an assessment and your combined profile generates here — and your AI instantly knows how you&apos;re wired.</p>
+        <p>Take an assessment and your combined profile generates here, and your AI instantly knows how you&apos;re wired.</p>
         <Link href="/insights" className="quiz-go">← Back to Insights</Link>
       </div>
     );

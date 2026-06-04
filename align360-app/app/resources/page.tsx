@@ -34,9 +34,9 @@ const FRAMEWORKS: Framework[] = [
       { name: 'LinkedIn Optimization' },
     ],
   },
-  { key: 'integrate360', name: 'Integrate360', status: 'preview', desc: 'Life systems alignment — sustainability, wholeness, capacity. Stay aligned as complexity increases.' },
+  { key: 'integrate360', name: 'Integrate360', status: 'preview', desc: 'Life systems alignment: sustainability, wholeness, capacity. Stay aligned as complexity increases.' },
   { key: '627', name: '627 Figures', status: 'preview', desc: 'Leadership, value creation, and income acceleration. Turn experience into influence.' },
-  { key: 'legacylab', name: 'LegacyLab', status: 'preview', desc: 'Ownership, succession, and wealth transfer. Preserve and transfer value — not lose it.' },
+  { key: 'legacylab', name: 'LegacyLab', status: 'preview', desc: 'Ownership, succession, and wealth transfer. Preserve and transfer value, not lose it.' },
 ];
 
 export default function ResourcesPage() {

@@ -3,12 +3,12 @@ import Link from 'next/link';
 import AlignMark from '@/app/_components/AlignMark';
 
 export const metadata = {
-  title: 'Align360 — Put out the fires. Then become one.',
+  title: 'Align360 · Put out the fires. Then become one.',
   description:
-    'Align360 is an AI system that knows how you are wired — it solves what is urgent, then builds the clarity to align your career, decisions, and life for the AI era.',
+    'Align360 is an AI system that knows how you are wired. It solves what is urgent, then builds the clarity to align your career, decisions, and life for the AI era.',
 };
 
-// Login is intentionally skipped for the alpha — every CTA enters the app at
+// Login is intentionally skipped for the alpha. Every CTA enters the app at
 // /chat, which routes new users through onboarding ("discover your wiring").
 const ENTER = '/chat';
 
@@ -19,18 +19,10 @@ export default function Landing() {
       <header className="lp-nav">
         <div className="wrap">
           <Link href="/" className="lp-brand">
-            <AlignMark white />
+            <AlignMark />
             <span className="lp-word">Align</span>
           </Link>
-          <nav className="lp-nav-links">
-            <a href="#how">How It Works</a>
-            <a href="#included">What&apos;s Included</a>
-            <a href="#founder">About</a>
-          </nav>
-          <div className="lp-nav-cta">
-            <Link href={ENTER} className="lp-login">Log In</Link>
-            <Link href={ENTER} className="lp-btn primary small">Discover Your Wiring</Link>
-          </div>
+          <Link href={ENTER} className="lp-btn primary small lp-nav-login">Log In</Link>
         </div>
       </header>
 
@@ -38,25 +30,23 @@ export default function Landing() {
       <section className="lp-hero">
         <div className="lp-hero-bg" />
         <div className="wrap">
-          <div className="lp-hero-mark"><AlignMark white /></div>
-          <span className="eyebrow">AI-Era Personal &amp; Professional Development</span>
+          <div className="lp-hero-mark"><AlignMark /></div>
           <h1 className="lp-h1">Put out the fires.<br /><em>Then become one.</em></h1>
-          <p className="lp-sub">Align360 solves what&apos;s urgent — then builds the clarity to ignite everything else. One system that actually knows how you&apos;re wired.</p>
+          <p className="lp-sub">Align360 solves what&apos;s urgent, then builds the clarity to ignite everything else. One system that actually knows how you&apos;re wired.</p>
           <div className="lp-hero-cta">
-            <Link href={ENTER} className="lp-btn primary">Discover Your Wiring — Free →</Link>
+            <Link href={ENTER} className="lp-btn primary">Discover Your Wiring →</Link>
             <Link href={ENTER} className="lp-btn ghost">Log In</Link>
           </div>
-          <div className="lp-hero-note">No credit card. Your first read in minutes.</div>
         </div>
       </section>
 
       {/* PROBLEM */}
-      <section className="lp-section tint">
+      <section className="lp-section dark">
         <div className="wrap">
           <div className="lp-sec-head">
             <div className="lp-rule" />
             <h2 className="lp-h2">You&apos;re navigating life without a system that <em>knows you</em>.</h2>
-            <p className="lp-lead">Education, career, money, relationships, and an AI shift rewriting all of it — and the only tools you have are generic. So you guess. Compare. Chase things that don&apos;t fit.</p>
+            <p className="lp-lead">Education, career, money, relationships, and an AI shift rewriting all of it, while the only tools you have are generic. So you guess. Compare. Chase things that don&apos;t fit.</p>
           </div>
           <div className="lp-domains">
             <span className="lp-domain">Education</span>
@@ -72,7 +62,6 @@ export default function Landing() {
       <section className="lp-section">
         <div className="wrap">
           <div className="lp-sec-head">
-            <span className="eyebrow">The Foundation</span>
             <h2 className="lp-h2">Two questions everything else is built on</h2>
             <p className="lp-lead">Optimize these first. Then your finances, relationships, health, and legacy have something true to organize around.</p>
           </div>
@@ -80,22 +69,21 @@ export default function Landing() {
             <div className="lp-pillar">
               <div className="lp-pillar-n">01</div>
               <h3>Who you are</h3>
-              <p>Your wiring, your gifts, the way you read situations and recover from setbacks. Not a label — a working model that sharpens over time.</p>
+              <p>Your wiring, your gifts, the way you read situations and recover from setbacks. Not a label, but a working model that sharpens over time.</p>
             </div>
             <div className="lp-pillar">
               <div className="lp-pillar-n">02</div>
               <h3>What you do</h3>
-              <p>How that identity converts into direction, decisions, and momentum — career moves, opportunities, and the work that compounds.</p>
+              <p>How that identity converts into direction, decisions, and momentum: career moves, opportunities, and the work that compounds.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* HOW IT WORKS */}
-      <section id="how" className="lp-section tint">
+      <section id="how" className="lp-section dark">
         <div className="wrap">
           <div className="lp-sec-head">
-            <span className="eyebrow">How It Works</span>
             <h2 className="lp-h2">Urgent first. Then aligned for what&apos;s next.</h2>
           </div>
           <div className="lp-steps">
@@ -109,13 +97,13 @@ export default function Landing() {
               <div className="lp-step-time">30 Days</div>
               <div className="lp-step-n">II</div>
               <h3>Discover your wiring</h3>
-              <p>Assessments reveal how you create value, decide, and bounce back — and your AI starts knowing you from message one.</p>
+              <p>Assessments reveal how you create value, decide, and bounce back, and your AI starts knowing you from message one.</p>
             </div>
             <div className="lp-step">
               <div className="lp-step-time">90 Days</div>
               <div className="lp-step-n">III</div>
               <h3>Align for what&apos;s next</h3>
-              <p>Turn that clarity into direction — career, money, relationships — calibrated for where the world is actually going.</p>
+              <p>Turn that clarity into direction across career, money, and relationships, calibrated for where the world is actually going.</p>
             </div>
           </div>
         </div>
@@ -125,15 +113,14 @@ export default function Landing() {
       <section id="included" className="lp-section">
         <div className="wrap">
           <div className="lp-sec-head">
-            <span className="eyebrow">What&apos;s Included</span>
             <h2 className="lp-h2">Frameworks that compound</h2>
-            <p className="lp-lead">Every assessment you complete is remembered and fed into your AI — so the more you do, the sharper it gets.</p>
+            <p className="lp-lead">Every assessment you complete is remembered and fed into your AI, so the more you do, the sharper it gets.</p>
           </div>
           <div className="lp-frames">
             <div className="lp-frame">
               <span className="lp-frame-tag">DesignSuite · Live</span>
               <h3>Understand how you&apos;re wired</h3>
-              <p>Identity, judgment, resilience, and decision clarity — before you build on guesses.</p>
+              <p>Identity, judgment, resilience, and decision clarity, before you build on guesses.</p>
               <ul>
                 <li>Wiring for Impact</li>
                 <li>Orientation for Impact</li>
@@ -145,7 +132,7 @@ export default function Landing() {
             <div className="lp-frame">
               <span className="lp-frame-tag">Career Navigator</span>
               <h3>Move forward without losing yourself</h3>
-              <p>Career clarity, acceleration, and confidence — without the burnout.</p>
+              <p>Career clarity, acceleration, and confidence, without the burnout.</p>
               <ul>
                 <li>Career Alignment Assessment</li>
                 <li>Resume Analyzer + Builder</li>
@@ -159,27 +146,26 @@ export default function Landing() {
       </section>
 
       {/* OUTCOMES */}
-      <section className="lp-section tint">
+      <section className="lp-section dark">
         <div className="wrap">
           <div className="lp-sec-head">
-            <span className="eyebrow">What You Walk Away With</span>
-            <h2 className="lp-h2">Clarity you can feel — on a timeline</h2>
+            <h2 className="lp-h2">Clarity you can feel, on a real timeline</h2>
           </div>
           <div className="lp-outcomes">
             <div className="lp-outcome">
               <div className="lp-outcome-lbl">In 45 Minutes</div>
               <div className="lp-outcome-big">1</div>
-              <p>Articulate exactly how you create value — in language you&apos;d actually use.</p>
+              <p>Articulate exactly how you create value, in language you&apos;d actually use.</p>
             </div>
             <div className="lp-outcome">
               <div className="lp-outcome-lbl">In 30 Days</div>
-              <div className="lp-outcome-big">50–70%</div>
+              <div className="lp-outcome-big">50-70%</div>
               <p>Less major life and career indecision. Fewer loops, faster moves.</p>
             </div>
             <div className="lp-outcome">
               <div className="lp-outcome-lbl">In 90 Days</div>
               <div className="lp-outcome-big">∞</div>
-              <p>A thriving life of peace and simplicity — aligned, not just busy.</p>
+              <p>A thriving life of peace and simplicity. Aligned, not just busy.</p>
             </div>
           </div>
         </div>
@@ -189,7 +175,6 @@ export default function Landing() {
       <section className="lp-section">
         <div className="wrap">
           <div className="lp-sec-head">
-            <span className="eyebrow">Why It&apos;s Different</span>
             <h2 className="lp-h2">Not another personality test</h2>
           </div>
           <div className="lp-compare">
@@ -214,14 +199,14 @@ export default function Landing() {
       </section>
 
       {/* FOUNDER */}
-      <section id="founder" className="lp-section tint">
+      <section id="founder" className="lp-section dark">
         <div className="wrap">
           <div className="lp-founder">
             <div className="lp-founder-badge"><AlignMark white /></div>
             <div>
               <div className="lp-founder-name">Samuel Ngu</div>
               <div className="lp-founder-role">Founder · Align360</div>
-              <p>&ldquo;Smart, capable people were stalling — not because they lacked talent, but because their identity, decisions, and execution weren&apos;t aligned. Align360 is the system I wish they&apos;d had.&rdquo;</p>
+              <p>&ldquo;Smart, capable people were stalling, not because they lacked talent, but because their identity, decisions, and execution weren&apos;t aligned. Align360 is the system I wish they&apos;d had.&rdquo;</p>
               <div className="lp-stats">
                 <div className="lp-stat"><b>$200M+</b><span>Deals Executed</span></div>
                 <div className="lp-stat"><b>Fortune 500</b><span>Operating Experience</span></div>
@@ -238,8 +223,8 @@ export default function Landing() {
         <div className="wrap">
           <div className="lp-rule" />
           <h2 className="lp-h2">Start with the fire.<br /><em>Leave with the clarity.</em></h2>
-          <p className="lp-sub">Your first read takes minutes — and your AI remembers everything after.</p>
-          <Link href={ENTER} className="lp-btn primary">Discover Your Wiring — Free →</Link>
+          <p className="lp-sub">Your first read takes minutes, and your AI remembers everything after.</p>
+          <Link href={ENTER} className="lp-btn primary">Discover Your Wiring →</Link>
         </div>
       </section>
 

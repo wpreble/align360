@@ -63,7 +63,7 @@ function ChatInner() {
     const ob = getOnboarding();
     if (ob) {
       const s = synthesize(ob);
-      setWelcomeLine(`You came in wanting to ${s.intentPhrase}. Your wiring leans toward someone who can ${s.primaryBlurb} — let's build on that.`);
+      setWelcomeLine(`You came in wanting to ${s.intentPhrase}. Your wiring leans toward someone who can ${s.primaryBlurb}. Let's build on that.`);
     }
   }, []);
 
@@ -268,7 +268,7 @@ function ChatInner() {
             </div>
             <div className="composer-right">
               {input.length > 0 && <span className="char-count">{input.length.toLocaleString()} / 20,000</span>}
-              <button className="composer-btn" aria-label="Voice input (coming soon)" title="Voice input — coming soon" disabled>
+              <button className="composer-btn" aria-label="Voice input (coming soon)" title="Voice input (coming soon)" disabled>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3" /></svg>
               </button>
               <button className="send-btn" onClick={() => sendText(input)} disabled={(!input.trim() && attachments.filter((a) => a.status === 'ready').length === 0) || sending || uploading} aria-label="Send">↑</button>

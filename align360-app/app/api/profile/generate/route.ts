@@ -4,6 +4,19 @@ import { buildSystemPrompt } from '@/lib/system-prompt';
 import { getAssessment } from '@/lib/assessments';
 import { computeScores, type AnswerSet } from '@/lib/scoring';
 import { PROFILE_SCHEMA_A, PROFILE_SCHEMA_B, fallbackProfile, type Profile } from '@/lib/profile';
+import { stripDashes } from '@/lib/markdown';
+
+/** Recursively apply house style (no em/en dashes) to every string field. */
+function deepStripDashes<T>(v: T): T {
+  if (typeof v === 'string') return stripDashes(v) as unknown as T;
+  if (Array.isArray(v)) return v.map(deepStripDashes) as unknown as T;
+  if (v && typeof v === 'object') {
+    const o: Record<string, unknown> = {};
+    for (const [k, val] of Object.entries(v as Record<string, unknown>)) o[k] = deepStripDashes(val);
+    return o as unknown as T;
+  }
+  return v;
+}
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -108,7 +121,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const [a, b] = await Promise.all([gen(PROFILE_SCHEMA_A), gen(PROFILE_SCHEMA_B)]);
-    const profile = { ...fallbackProfile(scores, name), ...a.parsed, ...b.parsed } as Profile;
+    const profile = deepStripDashes({ ...fallbackProfile(scores, name), ...a.parsed, ...b.parsed }) as Profile;
     const ok = Object.keys(a.parsed).length > 0 || Object.keys(b.parsed).length > 0;
     const debug = req.nextUrl.searchParams.has('debug')
       ? { finishA: a.finish, finishB: b.finish, lenA: a.len, lenB: b.len, keysA: Object.keys(a.parsed), keysB: Object.keys(b.parsed) }

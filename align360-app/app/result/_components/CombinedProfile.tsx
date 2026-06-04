@@ -94,7 +94,7 @@ export default function CombinedProfile({ profile: p, scores }: { profile: Profi
 
         {/* II · WIRING — ALL NINE */}
         <div className="chapter">
-          <div className="ck">II · Wiring Profile — All Nine Gifts</div>
+          <div className="ck">II · Wiring Profile · All Nine Gifts</div>
           <h2 className="ct">Where your contribution concentrates</h2>
           <div className="gifts">
             {scores.wiring.allNine.map((gtally, i) => (
@@ -160,7 +160,7 @@ export default function CombinedProfile({ profile: p, scores }: { profile: Profi
 
         {/* V · OPPORTUNITY — LEGACY + AI */}
         <div className="chapter">
-          <div className="ck">V · Opportunity Signals — Two Calibrations</div>
+          <div className="ck">V · Opportunity Signals · Two Calibrations</div>
           <h2 className="ct">The market has changed. Your signals should too.</h2>
           <p className="cs">{p.opportunity.intro}</p>
 
@@ -225,7 +225,7 @@ export default function CombinedProfile({ profile: p, scores }: { profile: Profi
 
         {/* VI · AI-ERA INTELLIGENCE */}
         <div className="chapter">
-          <div className="ck">VI · AI-Era Intelligence — What This Means for You</div>
+          <div className="ck">VI · AI-Era Intelligence · What This Means for You</div>
           <h2 className="ct">The reframe, the pivot, the work ahead</h2>
           <div className="ai-reframe">
             <div className="air-label">{p.aiEra.reframeLabel}</div>
@@ -295,7 +295,7 @@ export default function CombinedProfile({ profile: p, scores }: { profile: Profi
         {/* VII · LIFE POSITIONING */}
         <div className="chapter">
           <div className="ck">VII · Life Positioning Map</div>
-          <h2 className="ct">The five layers — calibrated for where the world is going</h2>
+          <h2 className="ct">The five layers, calibrated for where the world is going</h2>
           <div className="stack">
             {p.positioning.map((row, i) => (
               <div className="stack-item" key={i}>

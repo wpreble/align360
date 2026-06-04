@@ -127,7 +127,7 @@ function Summary({ answers, onEnter, onBack }: { answers: Answers; onEnter: () =
           work, your wiring leans toward someone who can <strong>{synth.primaryBlurb}</strong>
           {synth.secondaryBlurb && synth.primaryGift !== synth.secondaryGift ? <>, with a strong undercurrent of how you <strong>{synth.secondaryBlurb}</strong></> : null}.
         </p>
-        <p className="synth-body">{synth.growthRead} — and it&apos;s already shaping how you show up. {synth.commsRead}</p>
+        <p className="synth-body">{synth.growthRead}, and it&apos;s already shaping how you show up. {synth.commsRead}</p>
       </div>
 
       <div className="pg-card">

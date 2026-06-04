@@ -6,7 +6,7 @@ import { getAnswers, getProfile, getOnboarding, STORE_EVENT } from '@/lib/storag
 import { synthesize } from '@/lib/onboarding';
 
 const ASSESSMENTS = [
-  { slug: 'wiring', name: 'Wiring for Impact', core: true, blurb: 'How you naturally create value — under pressure and at your best. The foundational read.' },
+  { slug: 'wiring', name: 'Wiring for Impact', core: true, blurb: 'How you naturally create value, under pressure and at your best. The foundational read.' },
   { slug: 'orientation', name: 'Orientation for Impact', blurb: 'How you read situations, think through complexity, and make decisions.' },
   { slug: 'rejection-gift', name: 'Rejection Gift Finder', blurb: 'How adversity forged a specific capability that is now an edge.' },
 ];
@@ -46,7 +46,7 @@ export default function InsightsHub() {
     <div className="ins-page">
       <div className="ins-intro">
         <h1>Insights</h1>
-        <p>Your living profile. Complete assessments to sharpen it — each one is remembered and fed straight into your AI.</p>
+        <p>Your living profile. Complete assessments to sharpen it. Each one is remembered and fed straight into your AI.</p>
       </div>
 
       {/* Combined profile hero */}
@@ -58,7 +58,7 @@ export default function InsightsHub() {
           </div>
           <p className="ins-hero-note">
             {hasProfile
-              ? 'Open your full identity document — wiring, behavioral intelligence, currency map, and AI-era calibration.'
+              ? 'Open your full identity document: wiring, behavioral intelligence, currency map, and AI-era calibration.'
               : anyDone
                 ? 'You have completed an assessment. Generate your full combined profile now.'
                 : prelim
