@@ -1,13 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Include AI Model + Assessments folders in the serverless bundle so the
-  // chat / profile API routes can read them at runtime on Vercel.
-  // NOTE: in Next 14 these live under `experimental` (promoted to top-level in Next 15).
+  // The AI Model + Assessments markdown lives inside the app (./content) so the
+  // app is self-contained and deploys cleanly from this directory. Bundle that
+  // content into the serverless functions that read it at runtime.
   experimental: {
-    // Allow reading files outside the project root at build/runtime.
-    outputFileTracingRoot: require('path').join(__dirname, '..'),
     outputFileTracingIncludes: {
-      '/api/chat': ['../AI Model/**/*', '../Assessments/**/*'],
+      '/api/chat': ['./content/**/*'],
+      '/api/profile/generate': ['./content/**/*'],
+      '/assessment/[slug]': ['./content/**/*'],
     },
   },
 };

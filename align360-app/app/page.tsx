@@ -1,6 +1,7 @@
 import './landing.css';
 import Link from 'next/link';
 import AlignMark from '@/app/_components/AlignMark';
+import FounderAvatar from '@/app/_components/FounderAvatar';
 
 export const metadata = {
   title: 'Align360 · Put out the fires. Then become one.',
@@ -202,7 +203,7 @@ export default function Landing() {
       <section id="founder" className="lp-section dark">
         <div className="wrap">
           <div className="lp-founder">
-            <div className="lp-founder-badge"><AlignMark white /></div>
+            <div className="lp-founder-badge"><FounderAvatar /></div>
             <div>
               <div className="lp-founder-name">Samuel Ngu</div>
               <div className="lp-founder-role">Founder · Align360</div>

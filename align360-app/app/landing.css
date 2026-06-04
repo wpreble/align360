@@ -129,6 +129,7 @@
 .lp-founder{display:grid;grid-template-columns:auto 1fr;gap:2.5rem;align-items:center;max-width:880px;margin:0 auto;border:1px solid var(--sec-border);background:var(--sec-card);padding:3rem;border-radius:4px}
 .lp-founder-badge{width:120px;height:120px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#7E1A4C,#4E0230);border:1px solid var(--sec-borderm);flex-shrink:0}
 .lp-founder-badge .align-mark-img{height:54px}
+.lp-founder-photo{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
 .lp-founder-name{font-family:'Cormorant Garamond',serif;font-weight:400;font-style:italic;font-size:30px;color:var(--sec-heading);margin-bottom:.2rem}
 .lp-founder-role{font-family:'Jost',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--sec-eyebrow);margin-bottom:1rem}
 .lp-founder p{font-size:16px;font-weight:300;color:var(--sec-muted);line-height:1.75}

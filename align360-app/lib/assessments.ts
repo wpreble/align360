@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const ROOT = path.join(process.cwd(), '..');
+// Content lives inside the app (align360-app/content) so the app is self-contained.
+const ROOT = path.join(process.cwd(), 'content');
 
 export type Option = { letter: string; text: string; giftTag?: string };
 export type Question = { id: string; number: number; label: string; prompt: string; options: Option[] };

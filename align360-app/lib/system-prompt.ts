@@ -1,7 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const ROOT = path.join(process.cwd(), '..');
+// Content lives inside the app (align360-app/content) so the app is
+// self-contained and deploys cleanly. Editing these .md files still updates
+// the live prompt on the next request (no rebuild in dev).
+const ROOT = path.join(process.cwd(), 'content');
 
 function safeRead(relPath: string): string {
   try {
