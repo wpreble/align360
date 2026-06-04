@@ -4,44 +4,68 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getAnswers, STORE_EVENT } from '@/lib/storage';
 
-type Tool = { name: string; slug?: string; badge?: string };
-type Framework = { key: string; name: string; status: 'active' | 'preview'; desc: string; tools?: Tool[] };
+type Kind = 'assessment' | 'guided' | 'video' | 'guide';
+type Item = {
+  id: string;
+  kind: Kind;
+  title: string;
+  desc: string;
+  meta?: string;          // e.g. "12 questions", "6 min", "PDF"
+  slug?: string;          // assessment route
+  runName?: string;       // guided chat launch
+  soon?: boolean;         // placeholder content
+};
+type Section = { title: string; sub?: string; items: Item[] };
 
-const FRAMEWORKS: Framework[] = [
+const SECTIONS: Section[] = [
   {
-    key: 'designsuite', name: 'DesignSuite', status: 'active',
-    desc: 'Identity, judgment, resilience, and decision clarity. Understand how you are wired before you build on guesses.',
-    tools: [
-      { name: 'Wiring for Impact', slug: 'wiring', badge: 'Core' },
-      { name: 'Orientation for Impact', slug: 'orientation' },
-      { name: 'Rejection Gift Finder', slug: 'rejection-gift' },
-      { name: 'Decision Simulation Lab' },
-      { name: 'Impact Pathways & Skill Builder' },
-      { name: 'Job & Market Trends Intelligence' },
-      { name: 'Family Mechanics Simulator' },
+    title: 'Frameworks',
+    sub: 'Build your profile. Each one is remembered and fed into your AI.',
+    items: [
+      { id: 'wiring', kind: 'assessment', slug: 'wiring', title: 'Wiring for Impact', desc: 'How you naturally create value, under pressure and at your best.', meta: 'Core · 19 questions' },
+      { id: 'orientation', kind: 'assessment', slug: 'orientation', title: 'Orientation for Impact', desc: 'How you read situations and make decisions.', meta: '12 questions' },
+      { id: 'rejection-gift', kind: 'assessment', slug: 'rejection-gift', title: 'Rejection Gift Finder', desc: 'How adversity forged a specific edge that is now yours.', meta: '12 questions' },
+      { id: 'career-align', kind: 'guided', runName: 'Career Alignment', title: 'Career Alignment', desc: 'Talk through where you are and where you want to go.', meta: 'Guided chat' },
+      { id: 'resume', kind: 'guided', runName: 'Resume Analyzer', title: 'Resume Analyzer', desc: 'Sharpen your resume against your real wiring.', meta: 'Guided chat' },
     ],
   },
   {
-    key: 'careernav', name: 'Career Navigator', status: 'active',
-    desc: 'Career clarity, acceleration, and confidence without burnout. Move forward without losing yourself.',
-    tools: [
-      { name: 'Career Alignment Assessment' },
-      { name: 'Resume Analyzer + Builder' },
-      { name: 'Job Opportunity Finder' },
-      { name: 'Skills Gap Analyzer' },
-      { name: 'Interview Preparation' },
-      { name: 'Salary Negotiation Calculator' },
-      { name: 'LinkedIn Optimization' },
+    title: 'Watch',
+    sub: 'Short videos to get the most from Align360.',
+    items: [
+      { id: 'v1', kind: 'video', soon: true, title: 'Welcome to Align360', desc: 'A 3-minute orientation to how the system works.', meta: '3 min' },
+      { id: 'v2', kind: 'video', soon: true, title: 'Reading Your Profile', desc: 'Make sense of your combined identity document.', meta: '5 min' },
+      { id: 'v3', kind: 'video', soon: true, title: 'The Nine Gifts', desc: 'A tour of the wiring gifts and what they mean.', meta: '8 min' },
+      { id: 'v4', kind: 'video', soon: true, title: 'Aligning for the AI Era', desc: 'Positioning your edge as the market shifts.', meta: '6 min' },
     ],
   },
-  { key: 'integrate360', name: 'Integrate360', status: 'preview', desc: 'Life systems alignment: sustainability, wholeness, capacity. Stay aligned as complexity increases.' },
-  { key: '627', name: '627 Figures', status: 'preview', desc: 'Leadership, value creation, and income acceleration. Turn experience into influence.' },
-  { key: 'legacylab', name: 'LegacyLab', status: 'preview', desc: 'Ownership, succession, and wealth transfer. Preserve and transfer value, not lose it.' },
+  {
+    title: 'Guides & Docs',
+    sub: 'Read at your own pace.',
+    items: [
+      { id: 'g1', kind: 'guide', soon: true, title: 'The Align360 Field Guide', desc: 'Concepts, language, and how the frameworks connect.', meta: 'PDF' },
+      { id: 'g2', kind: 'guide', soon: true, title: 'True Riches Currency Map', desc: 'The currencies that compound regardless of market.', meta: 'PDF' },
+      { id: 'g3', kind: 'guide', soon: true, title: 'Rejection Gift Workbook', desc: 'Turn a specific setback into a named advantage.', meta: 'Worksheet' },
+      { id: 'g4', kind: 'guide', soon: true, title: 'Career Navigator Playbook', desc: 'A step-by-step for your next move.', meta: 'PDF' },
+    ],
+  },
 ];
 
+const ICONS: Record<Kind, string> = {
+  assessment: 'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',
+  guided: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+  video: 'M23 7l-7 5 7 5V7zM1 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H1z',
+  guide: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z',
+};
+const KIND_LABEL: Record<Kind, string> = { assessment: 'Assessment', guided: 'Guided', video: 'Video', guide: 'Doc' };
+
+function Icon({ d }: { d: string }) {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>;
+}
+
 export default function ResourcesPage() {
-  const [open, setOpen] = useState<string | null>('designsuite');
   const [done, setDone] = useState<Record<string, boolean>>({});
+  const [open, setOpen] = useState<Item | null>(null);
 
   const refresh = useCallback(() => {
     const answers = getAnswers();
@@ -56,71 +80,88 @@ export default function ResourcesPage() {
     return () => window.removeEventListener(STORE_EVENT, refresh);
   }, [refresh]);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(null); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  function cardInner(it: Item) {
+    const completed = it.slug && done[it.slug];
+    return (
+      <>
+        <span className={`lib-poster k-${it.kind}`}>
+          <span className="lib-poster-icon"><Icon d={ICONS[it.kind]} /></span>
+          <span className="lib-kind">{KIND_LABEL[it.kind]}</span>
+          {completed && <span className="lib-done">✓ Done</span>}
+          {it.soon && <span className="lib-soon">Soon</span>}
+        </span>
+        <span className="lib-card-body">
+          <span className="lib-title">{it.title}</span>
+          <span className="lib-desc">{it.desc}</span>
+          {it.meta && <span className="lib-meta">{it.meta}</span>}
+        </span>
+      </>
+    );
+  }
+
   return (
-    <div className="resources-page">
-      <div className="resources-intro">
+    <div className="lib-page">
+      <div className="lib-intro">
         <h1>Resources</h1>
-        <p>The Align360 frameworks. Assessments build your profile; the other tools launch a guided chat with your AI. Expand one to begin.</p>
+        <p>Frameworks, videos, and guides to go deeper. Tap any card to begin.</p>
       </div>
 
-      <div className="fw-list">
-        {FRAMEWORKS.map((fw) => {
-          const isOpen = open === fw.key;
-          return (
-            <div key={fw.key} className={`fw${isOpen ? ' open' : ''}`}>
-              <button className="fw-head" onClick={() => setOpen(isOpen ? null : fw.key)} aria-expanded={isOpen}>
-                <span className={`fw-status ${fw.status}`} />
-                <span className="fw-name">{fw.name}</span>
-                <span className={`fw-tag ${fw.status}`}>{fw.status === 'active' ? 'Active' : 'Preview'}</span>
-                <svg className={`fw-caret${isOpen ? ' open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg>
-              </button>
+      {SECTIONS.map((sec) => (
+        <section className="lib-section" key={sec.title}>
+          <div className="lib-section-head">
+            <h2>{sec.title}</h2>
+            {sec.sub && <p>{sec.sub}</p>}
+          </div>
+          <div className="lib-grid">
+            {sec.items.map((it) => {
+              // Real, routable cards become links; placeholders open a detail sheet.
+              if (it.slug) {
+                const completed = done[it.slug];
+                return (
+                  <Link key={it.id} href={completed ? '/insights/profile' : `/assessment/${it.slug}`} className="lib-card">
+                    {cardInner(it)}
+                  </Link>
+                );
+              }
+              if (it.runName) {
+                return (
+                  <Link key={it.id} href={`/chat?run=${encodeURIComponent(it.runName)}`} className="lib-card">
+                    {cardInner(it)}
+                  </Link>
+                );
+              }
+              return (
+                <button key={it.id} className="lib-card" onClick={() => setOpen(it)}>
+                  {cardInner(it)}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      ))}
 
-              {isOpen && (
-                <div className="fw-body">
-                  <p className="fw-desc">{fw.desc}</p>
-                  {fw.status === 'preview' ? (
-                    <div className="fw-preview">Coming after the alpha. This framework is in preview.</div>
-                  ) : (
-                    <div className="fw-tools">
-                      {fw.tools!.map((t) => {
-                        // Assessment (has a slug): completed → view result; else take it.
-                        if (t.slug) {
-                          const completed = done[t.slug];
-                          return (
-                            <Link
-                              key={t.name}
-                              href={completed ? '/insights/profile' : `/assessment/${t.slug}`}
-                              className="fw-tool live"
-                            >
-                              <span className="fw-tool-dot" />
-                              <span className="fw-tool-name">{t.name}</span>
-                              {t.badge && <span className="fw-tool-badge">{t.badge}</span>}
-                              {completed && <span className="fw-tool-done">✓ Completed</span>}
-                              <span className="fw-tool-go">{completed ? 'View result →' : 'Start →'}</span>
-                            </Link>
-                          );
-                        }
-                        // Non-assessment tool: launch a guided chat ("Run <name>").
-                        return (
-                          <Link
-                            key={t.name}
-                            href={`/chat?run=${encodeURIComponent(t.name)}`}
-                            className="fw-tool live"
-                          >
-                            <span className="fw-tool-dot" />
-                            <span className="fw-tool-name">{t.name}</span>
-                            <span className="fw-tool-go">Run →</span>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
+      {open && (
+        <div className="lib-modal-scrim" onClick={() => setOpen(null)}>
+          <div className="lib-modal" onClick={(e) => e.stopPropagation()}>
+            <div className={`lib-modal-poster k-${open.kind}`}>
+              <span className="lib-poster-icon"><Icon d={ICONS[open.kind]} /></span>
+              <span className="lib-kind">{KIND_LABEL[open.kind]}{open.meta ? ` · ${open.meta}` : ''}</span>
             </div>
-          );
-        })}
-      </div>
+            <div className="lib-modal-body">
+              <h3>{open.title}</h3>
+              <p>{open.desc}</p>
+              <div className="lib-modal-note">This {open.kind === 'video' ? 'video' : 'resource'} is coming soon. We&apos;ll drop you a note when it&apos;s live.</div>
+              <button className="lib-modal-close" onClick={() => setOpen(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

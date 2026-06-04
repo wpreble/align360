@@ -257,3 +257,77 @@
    Driven by inline --gold / --gold2 / --goldd / --hero-glow set in
    CombinedProfile based on scores.wiring.primary. Falls back to fig/rose. */
 .profile-doc { --accent: var(--gold); }
+
+/* ════════════════════════════════════════════════════════════════
+   Contrast + legibility pass — buttons, boxes, and header labels must
+   read clearly on the dark document (no matter the device backdrop).
+   Brighter borders, lifted card surfaces, accent-colored (not deep-dim)
+   labels, and uppercase labels nudged up so none are microscopic.
+   ════════════════════════════════════════════════════════════════ */
+.profile-doc {
+  --border: rgba(199,154,186,.34);    /* was .16 — panels now separate */
+  --borderm: rgba(199,154,186,.56);
+  --obsidian:#23112F;                 /* card surface, lifted above --void */
+  --midnight:#2E1742;
+}
+
+/* Header / section / micro labels were on the deep accent (too dim).
+   Move them to the bright mid accent (or ivory/silver). */
+.profile-doc .hero-eye,
+.profile-doc .ck,
+.profile-doc .edge-label,
+.profile-doc .sig-n,
+.profile-doc .stack-label,
+.profile-doc .irr-cell-lbl,
+.profile-doc .cr-name,
+.profile-doc .opp-sl,
+.profile-doc .am-label,
+.profile-doc .ac-status,
+.profile-doc .psr-l { color: var(--gold); }
+.profile-doc .sig-cat { color: var(--silver); }
+.profile-doc .hero-latin,
+.profile-doc .closing-latin { color: var(--gold2); opacity:.85; }
+
+/* Uppercase labels: bump so nothing reads as tiny */
+.profile-doc .ck { font-size:11.5px; }
+.profile-doc .hero-eye { font-size:11px; letter-spacing:.24em; }
+.profile-doc .sig-cat { font-size:10.5px; }
+.profile-doc .stack-label, .profile-doc .irr-cell-lbl, .profile-doc .psr-l,
+.profile-doc .am-label, .profile-doc .ac-status, .profile-doc .opp-sl,
+.profile-doc .cr-name, .profile-doc .lh-badge, .profile-doc .ai-badge { font-size:10.5px; }
+.profile-doc .hero-latin, .profile-doc .closing-latin { font-size:10px; }
+
+/* Hero pills + role chips: visible border, bright text */
+.profile-doc .pill { border:1px solid var(--borderm); color:var(--ivory); font-size:11px; padding:.55rem 1.2rem; }
+.profile-doc .jc { font-size:10.5px; }
+
+/* Cards/boxes: lift + shadow so each panel separates from the backdrop */
+.profile-doc .signal-trio { border-color: var(--borderm); }
+.profile-doc .sig,
+.profile-doc .edge,
+.profile-doc .gifts,
+.profile-doc .currency,
+.profile-doc .psr,
+.profile-doc .irreplaceable,
+.profile-doc .opp-legacy,
+.profile-doc .opp-ai { box-shadow: 0 22px 54px -38px rgba(0,0,0,.85); }
+.profile-doc .gift-track { background: rgba(255,255,255,.09); }
+
+/* Floating controls — solid and clearly tappable on any backdrop */
+.result-back {
+  background: rgba(36,18,48,.96);
+  border:1px solid rgba(217,187,203,.55);
+  color:#F5ECF2;
+  box-shadow:0 8px 24px -10px rgba(0,0,0,.75);
+}
+.result-back:hover { background: rgba(54,30,70,.98); }
+.result-toolbar {
+  background: rgba(36,18,48,.95);
+  border:1px solid rgba(217,187,203,.42);
+}
+.result-toolbar .rt-btn { border:1px solid rgba(217,187,203,.5); color:#F4ECF1; }
+.result-toolbar .rt-btn:hover { background: rgba(217,187,203,.18); }
+/* concrete fill — the toolbar sits outside .profile-doc, so the per-result
+   --gold isn't in scope here. */
+.result-toolbar .rt-btn.primary { background:#CDA0C2; color:#1B0A24; border-color:#CDA0C2; font-weight:700; }
+.result-toolbar .rt-btn.primary:hover { background:#DBB6D2; }
