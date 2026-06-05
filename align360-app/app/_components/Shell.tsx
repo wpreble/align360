@@ -29,6 +29,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const [historyOpen, setHistoryOpen] = useState(true);
   const [chats, setChats] = useState<ChatSession[]>([]);
   const [name, setNameState] = useState('');
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [theme, setTheme] = useState('light');
   const year = new Date().getFullYear();
 
   const refreshChats = useCallback(() => setChats(getChats()), []);
@@ -38,6 +40,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       setLeftCollapsed(localStorage.getItem('align360:leftCollapsed') === '1');
       const t = localStorage.getItem('align360:theme');
       if (t) document.documentElement.setAttribute('data-theme', t);
+      setTheme(document.documentElement.getAttribute('data-theme') || 'light');
     } catch {}
     // Chat history collapsed by default on mobile.
     setHistoryOpen(typeof window !== 'undefined' ? window.innerWidth > 900 : true);
@@ -51,7 +54,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
   // Escape closes the mobile drawer.
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setDrawerOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setDrawerOpen(false); setAccountOpen(false); } };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
@@ -70,6 +73,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     const cur = document.documentElement.getAttribute('data-theme') || 'light';
     const next = cur === 'light' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', next);
+    setTheme(next);
     try { localStorage.setItem('align360:theme', next); } catch {}
   };
 
@@ -123,27 +127,55 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           )}
         </div>
 
-        {/* Account / settings + copyright pinned to the bottom. */}
+        {/* Account + copyright pinned to the bottom. */}
         <div className="sidebar-foot">
-          <input
-            className="name-field"
-            value={name}
-            onChange={(e) => { setNameState(e.target.value); setName(e.target.value); }}
-            placeholder="Set your name"
-            aria-label="Your name"
-            maxLength={40}
-          />
           <div className="foot-controls">
+            <button className="account-btn" onClick={() => setAccountOpen(true)} aria-label="Account and settings" title="Account & settings">
+              <span className="account-avatar">{(name || '?').trim().charAt(0).toUpperCase()}</span>
+              <span className="account-name">{name || 'Your account'}</span>
+              <span className="account-gear" aria-hidden>
+                <Icon d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15H4a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 5.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6h.09A1.65 1.65 0 0 0 11 3.09V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 21 9v.09a1.65 1.65 0 0 0 0 4z" />
+              </span>
+            </button>
             <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle theme" title="Toggle light / dark">
               <Icon d="M12 3v2M12 19v2M5 5l1.5 1.5M17.5 17.5L19 19M3 12h2M19 12h2M5 19l1.5-1.5M17.5 6.5L19 5M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />
-            </button>
-            <button className="icon-btn" aria-label="Account & settings" title="Account & settings (coming soon)" disabled>
-              <Icon d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15H4a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 5.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6h.09A1.65 1.65 0 0 0 11 3.09V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 21 9v.09a1.65 1.65 0 0 0 0 4z" />
             </button>
           </div>
           <div className="sidebar-ip">© {year} Align360. All rights reserved.</div>
         </div>
       </aside>
+
+      {/* Account & Settings panel */}
+      {accountOpen && (
+        <div className="acct-scrim" onClick={() => setAccountOpen(false)}>
+          <div className="acct-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Account and settings">
+            <div className="acct-head">
+              <span className="account-avatar lg">{(name || '?').trim().charAt(0).toUpperCase()}</span>
+              <div>
+                <div className="acct-name-display">{name || 'Guest'}</div>
+                <div className="acct-sub">Align360 account</div>
+              </div>
+              <button className="acct-x" onClick={() => setAccountOpen(false)} aria-label="Close">✕</button>
+            </div>
+
+            <label className="acct-field">
+              <span>Display name</span>
+              <input value={name} onChange={(e) => { setNameState(e.target.value); setName(e.target.value); }} placeholder="Your name" maxLength={40} />
+            </label>
+
+            <div className="acct-section-label">Account</div>
+            <button className="acct-item" disabled><span>Profile</span><span className="acct-soon">Soon</span></button>
+            <button className="acct-item" disabled><span>Plan &amp; billing</span><span className="acct-soon">Soon</span></button>
+            <button className="acct-item" disabled><span>Sign in / Sign up</span><span className="acct-soon">Soon</span></button>
+
+            <div className="acct-section-label">Preferences</div>
+            <button className="acct-item" onClick={toggleTheme}><span>Appearance</span><span className="acct-val">{theme === 'dark' ? 'Dark' : 'Light'}</span></button>
+            <button className="acct-item" disabled><span>Notifications</span><span className="acct-soon">Soon</span></button>
+
+            <button className="acct-done" onClick={() => setAccountOpen(false)}>Done</button>
+          </div>
+        </div>
+      )}
 
       <main className="center-col">
         <div className="mobile-bar">

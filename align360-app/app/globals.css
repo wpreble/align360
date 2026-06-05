@@ -79,10 +79,36 @@ a { color:inherit; text-decoration:none; }
 .history-empty { font-size:12.5px; color:var(--text-muted); line-height:1.5; padding:0 11px; white-space:normal; font-style:italic; }
 
 .sidebar-foot { border-top:1px solid var(--border); padding:10px 12px 12px; }
-.name-field { width:100%; background:transparent; border:1px solid var(--border); border-radius:8px; padding:7px 10px; font-size:13px; color:var(--text-primary); margin-bottom:8px; transition:border-color .15s; }
-.name-field:focus { outline:none; border-color:var(--accent); }
-.name-field::placeholder { color:var(--text-muted); }
-.foot-controls { display:flex; gap:6px; }
+.foot-controls { display:flex; gap:6px; align-items:center; }
+.account-btn { flex:1; display:flex; align-items:center; gap:9px; padding:6px 8px; border-radius:var(--radius-md); border:1px solid var(--border); background:var(--bg-surface); color:var(--text-primary); min-width:0; transition:border-color .15s, background .15s; }
+.account-btn:hover { border-color:var(--accent); background:var(--fig-wash); }
+[data-theme='dark'] .account-btn:hover { background:rgba(185,143,168,.08); }
+.account-avatar { width:26px; height:26px; flex:none; border-radius:50%; display:grid; place-items:center; background:var(--fig); color:#fff; font-family:var(--font-brand); font-weight:600; font-size:12.5px; }
+[data-theme='dark'] .account-avatar { background:var(--fig-soft); color:var(--fig-deep); }
+.account-name { flex:1; min-width:0; text-align:left; font-size:13.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.account-gear { flex:none; color:var(--text-muted); display:grid; place-items:center; }
+.account-gear svg { width:16px; height:16px; }
+
+/* Account & settings panel */
+.acct-scrim { position:fixed; inset:0; z-index:90; background:rgba(13,6,18,.5); backdrop-filter:blur(5px); display:grid; place-items:center; padding:22px; }
+.acct-modal { width:100%; max-width:380px; background:var(--bg-surface); border:1px solid var(--border-strong); border-radius:var(--radius-lg); padding:18px; box-shadow:0 40px 90px -40px rgba(0,0,0,.6); }
+.acct-head { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+.account-avatar.lg { width:44px; height:44px; font-size:19px; }
+.acct-name-display { font-family:var(--font-display); font-weight:600; font-size:20px; line-height:1.1; }
+.acct-sub { font-size:12px; color:var(--text-muted); }
+.acct-x { margin-left:auto; width:28px; height:28px; border-radius:8px; color:var(--text-muted); font-size:14px; }
+.acct-x:hover { background:var(--bg-chip); }
+.acct-field { display:block; margin-bottom:14px; }
+.acct-field > span { display:block; font-family:var(--font-brand); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); margin-bottom:5px; }
+.acct-field input { width:100%; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-md); padding:9px 11px; font-size:14px; color:var(--text-primary); }
+.acct-field input:focus { outline:none; border-color:var(--accent); }
+.acct-section-label { font-family:var(--font-brand); font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); margin:14px 0 6px; }
+.acct-item { width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 12px; border-radius:var(--radius-md); font-size:14.5px; color:var(--text-primary); transition:background .15s; }
+.acct-item:not(:disabled):hover { background:var(--bg-chip); }
+.acct-item:disabled { opacity:.5; cursor:default; }
+.acct-soon { font-family:var(--font-brand); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); border:1px solid var(--border); border-radius:999px; padding:2px 8px; }
+.acct-val { font-size:13px; color:var(--accent); font-weight:600; }
+.acct-done { width:100%; margin-top:16px; padding:11px; border-radius:var(--radius-md); background:var(--cta); color:var(--cta-text); font-family:var(--font-brand); font-weight:600; font-size:14px; }
 .sidebar-ip { font-size:10px; color:var(--text-muted); margin-top:8px; white-space:normal; line-height:1.4; }
 
 /* ── Chat history — its own scrolling section below the nav ── */
