@@ -24,6 +24,27 @@ The alpha-sprint docs landed in the repo. Current state:
 
 ---
 
+## 0.2 Drive intake — 2026-06-05 (Will, after Samuel's 2026-06-04 Drive upload)
+
+**Drive is now the canonical source for Samuel's working artifacts.** Path: `My Drive / War Room / VENTURES / zsecondary / A360`. URL: <https://drive.google.com/drive/folders/1EQkVfN_vrZr-HFEyPItjIeQDNLjo1JjN>. Five subfolders, ~33 HTMLs, plus binary brand assets. The repo mirrors only what the build needs; for everything else, go to Drive.
+
+**The full intake summary lives at `Drive Intake — A360 (2026-06-04)/INTAKE NOTES.md`** — new vocabulary table, R1–R8 rules, the full file index with IDs for re-pulling, and the architectural diff against this dev plan. Read that doc when starting any new build step.
+
+**Local copies saved during intake (in `Drive Intake — A360 (2026-06-04)/`):** `align360_interaction_spec.html` (the canonical interaction contract — ★★ load-bearing), `A360_Differentiator Onepager.html`, `A360_Individual (Simple view of Home Page).html`, `A360_Strategic Planning (Vertical).html`, `Align Health (Vertical).html`, `A360_Family360 Dashboard.html`, `Samuel Ngu (personal website).html`, `3. Samuel_Primary User Model Results with AI-Era Combo.html` (more up-to-date than the §3.4 reference), `5. Sam x Drew_Combined Results.html`. Coding agent can pull anything else by ID per §9 of the intake notes.
+
+**Load-bearing scope adjustments — apply when reading the rest of this plan:**
+
+1. **The three alpha assessments are now formally the "Primary User Model"** — WFI + OFI + RGF. Separate compute path from the **"Clarity Layer"** (Impact Readiness + Value Spectrum — *not in alpha scope*). The combined alpha output is a "Primary User Model Profile (Phase 1)" — *not* the "Integrated User Model" (that's Primary + Clarity, post-alpha).
+2. **`assessment_slug` grouping.** Per §3.2 schema, switch to `primary:wiring`, `primary:orientation`, `primary:rejection-gift` from day 1. The Clarity Layer (`clarity:impact-readiness`, `clarity:value-spectrum`) and Wellness (`wellness:b3-*`) slugs are reserved. Cheap to add now; expensive to migrate later.
+3. **The result-page section list in §3.4 is still right, but use `3. Samuel_Primary User Model Results with AI-Era Combo.html` as the master template** (in `Drive Intake — A360 (2026-06-04)/Primary User Model Results/`). It includes the **AI-Era Readiness composite score (94% for Samuel)** and the **Life Season** rendering (one of: Discovery / Healing / Building / Expansion / Legacy) — both of which the older `Samuel x Drew__Combined.html` lacks. Drew's combined HTML stays a valid palette reference; the AI-Era Combo doc is the structural reference.
+4. **Don't expose product codenames** ("Master Chief" for the individual product, "Mr. JC" for enterprise) in customer-facing UI or in any prompt the coding agent reads — they're internal shorthand from the spec.
+5. **B3 is read-only to scoring engines (R3 in the spec).** B3 inputs flow into `currentDayState` ∈ {A, B, C} and the NarrativeLayer only — never mutate WFI/OFI/RGF/IR/VS scores. The alpha doesn't ship a B3 runner, but bake this constraint into the data model anyway.
+6. **Sub-score canonical values are `{0, 3, 7, 10}` (R7).** The primary gap = the sub-score whose value is **3**. If any sub-score rendering ends up in the alpha result page, respect this.
+
+These adjustments **revise §0.1, §2 criterion #1, §3.2, §3.4, and §3.5**. Read the intake notes for the full architectural picture (PersonaContext, NarrativeEntry, Semantic Bridge, AmplificationLayers, ContextLens, AlignmentDelta) — those are post-alpha but inform schema/naming decisions made now.
+
+---
+
 ## 0.1 Scope revision — 2026-05-29 (Will)
 
 This revision **supersedes the lean cuts in §4** where they conflict. The alpha is no longer "auth → Q1 → result → done." It is a small but real app with a persistent shell. Where §4 below says "no chat in UI," "no chat-with-your-profile," "no multi-step navigation" — those are **reversed** by this section. Everything else in §4 still stands (no payment, no B3/Onboarding runners, no admin panel, no notification emails, light-mode only).

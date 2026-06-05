@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" data-page="home">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Align360 · Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--cherry:#2A122E;--cherry2:#3D1A42;--cherry3:#521F58;--obsidian:#0D0A14;--deep:#07050A;--white:#fff;--gold:#C9A96E;--gold2:#E8C97E;--glass:rgba(255,255,255,.055);--glass2:rgba(255,255,255,.09);--line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.04);--muted:#8A7E8E;--text:rgba(255,255,255,.82);--green:#0F6E56;--green2:#27AE60;--sidebar:200px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--deep);color:var(--text);min-height:100vh;display:flex}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 50% 60% at 15% 0%,rgba(42,18,46,.85),transparent 55%);pointer-events:none;z-index:0}
+
+/* SIDEBAR */
+nav{width:var(--sidebar);flex-shrink:0;background:rgba(7,5,10,.8);border-right:1px solid var(--line2);display:flex;flex-direction:column;padding:24px 16px;position:sticky;top:0;height:100vh;z-index:10}
+.logo{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.logo svg{width:22px;height:22px;flex-shrink:0}
+.logo-word{font-family:'Playfair Display',serif;font-size:18px;font-weight:500;letter-spacing:.1em;color:var(--white)}
+.logo-tag{font-size:8px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(201,169,110,.4);margin-bottom:24px;padding-left:2px}
+.persona-mini{background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.14);border-radius:10px;padding:10px 12px;margin-bottom:22px}
+.pm-label{font-size:8px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+.pm-name{font-size:13px;font-weight:500;color:var(--white);margin-bottom:1px}
+.pm-sub{font-size:10px;color:var(--muted)}
+.pm-dot{display:flex;align-items:center;gap:5px;margin-top:6px}
+.dot-green{width:6px;height:6px;border-radius:50%;background:var(--green2);box-shadow:0 0 6px var(--green2)}
+.dot-text{font-size:10px;color:var(--muted)}
+.nav-section{font-size:8px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:12px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:12px;transition:all .18s;margin-bottom:1px;border:1px solid transparent;text-decoration:none}
+.nav-item:hover{background:var(--glass);color:var(--white)}
+.nav-item.active{background:var(--glass2);color:var(--white);border-color:var(--line)}
+.nav-icon{font-size:12px;width:14px;text-align:center;flex-shrink:0}
+.nav-footer{margin-top:auto;padding-top:14px;border-top:1px solid var(--line2)}
+.nav-footer-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:11px}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-height:100vh;position:relative;z-index:1;max-width:780px;padding:48px 52px}
+
+/* GREETING */
+.greeting-label{font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.greeting-title{font-family:'Playfair Display',serif;font-size:clamp(36px,5vw,58px);font-weight:400;color:var(--white);line-height:1.05;margin-bottom:8px}
+.greeting-title em{color:var(--gold2);font-style:italic}
+.greeting-sub{font-size:14px;font-weight:300;color:var(--muted);margin-bottom:52px;line-height:1.6}
+
+/* PRIMARY SCORE */
+.primary-score{display:flex;align-items:center;gap:36px;margin-bottom:52px;padding-bottom:48px;border-bottom:1px solid var(--line2)}
+.score-ring{position:relative;flex-shrink:0;cursor:pointer}
+.score-ring svg{transform:rotate(-90deg)}
+.score-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.score-num{font-family:'Playfair Display',serif;font-size:42px;font-weight:400;color:var(--white);line-height:1}
+.score-lbl{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.score-meta{flex:1}
+.score-meta-title{font-family:'Playfair Display',serif;font-size:22px;color:var(--white);margin-bottom:6px;line-height:1.25}
+.score-meta-body{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px}
+.score-chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:10px;font-weight:500;padding:4px 11px;border-radius:20px;border:1px solid;cursor:pointer;transition:all .18s;text-decoration:none}
+.chip-ir{border-color:rgba(42,18,46,.6);color:rgba(200,160,200,.7);background:rgba(42,18,46,.2)}
+.chip-ir:hover{background:rgba(42,18,46,.4);color:var(--white)}
+.chip-vs{border-color:rgba(201,100,10,.35);color:rgba(201,160,100,.7);background:rgba(201,100,10,.08)}
+.chip-vs:hover{background:rgba(201,100,10,.18);color:var(--white)}
+.chip-ai{border-color:rgba(15,110,86,.35);color:rgba(100,200,150,.7);background:rgba(15,110,86,.08)}
+.chip-ai:hover{background:rgba(15,110,86,.18);color:var(--white)}
+
+/* MEANING CARD */
+.meaning-card{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:28px;margin-bottom:28px;position:relative;overflow:hidden;cursor:pointer;transition:all .25s}
+.meaning-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 100% 100%,rgba(201,169,110,.05),transparent 70%)}
+.meaning-card:hover{background:var(--glass2)}
+.mc-label{font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;position:relative}
+.mc-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--white);line-height:1.3;margin-bottom:8px;position:relative}
+.mc-body{font-size:13px;color:var(--muted);line-height:1.7;position:relative}
+.mc-action{display:flex;align-items:center;gap:8px;margin-top:16px;position:relative}
+.mc-action-btn{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold2);background:rgba(201,169,110,.1);border:1px solid rgba(201,169,110,.2);border-radius:20px;padding:6px 14px;cursor:pointer;text-decoration:none}
+.mc-action-note{font-size:11px;color:rgba(255,255,255,.25)}
+
+/* RHYTHM STRIP */
+.rhythm-strip{display:flex;align-items:center;gap:14px;background:rgba(15,110,86,.07);border:1px solid rgba(15,110,86,.15);border-radius:14px;padding:14px 20px;margin-bottom:28px}
+.rs-dot{width:8px;height:8px;border-radius:50%;background:var(--green2);box-shadow:0 0 10px var(--green2);flex-shrink:0;animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.rs-text{font-size:13px;color:rgba(255,255,255,.6);flex:1}
+.rs-text strong{color:var(--white)}
+.rs-optional{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(15,110,86,.6);white-space:nowrap;border:1px solid rgba(15,110,86,.2);border-radius:20px;padding:4px 10px}
+
+/* QUICK ACTIONS */
+.quick-label{font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:14px}
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.quick-card{background:var(--glass);border:1px solid var(--line2);border-radius:14px;padding:16px;cursor:pointer;transition:all .22s;text-decoration:none;display:block}
+.quick-card:hover{background:var(--glass2);transform:translateY(-2px)}
+.qc-icon{font-size:20px;margin-bottom:8px}
+.qc-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.qc-title{font-size:13px;font-weight:500;color:var(--white)}
+
+/* DRAWER */
+.drawer{position:fixed;right:-560px;top:0;width:540px;max-width:95vw;height:100vh;background:linear-gradient(180deg,#0D0A14,#070509);border-left:1px solid var(--line);padding:32px;transition:.38s cubic-bezier(.16,1,.3,1);z-index:100;overflow:auto}
+.drawer.open{right:0}
+.drawer-close{background:var(--glass);border:1px solid var(--line2);color:var(--muted);font-size:11px;padding:6px 14px;border-radius:50px;cursor:pointer;float:right;margin-bottom:24px;font-family:'DM Sans',sans-serif}
+.drawer-eye{font-size:9px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;clear:both}
+.drawer-title{font-family:'Playfair Display',serif;font-size:32px;color:var(--white);margin-bottom:14px;line-height:1.15}
+.drawer-body{font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:20px}
+.drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dg-cell{background:var(--glass);border:1px solid var(--line2);border-radius:12px;padding:14px}
+.dgc-lbl{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.dgc-val{font-size:15px;font-weight:500;color:var(--white)}
+.domain-bars{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.db-row{display:flex;align-items:center;gap:12px}
+.db-name{font-size:12px;color:var(--muted);min-width:80px}
+.db-bar{flex:1;height:2px;background:rgba(255,255,255,.07);border-radius:1px;overflow:hidden}
+.db-fill{height:100%;border-radius:1px;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
+.db-val{font-size:13px;font-weight:500;color:var(--white);min-width:28px;text-align:right}
+.overlay{position:fixed;inset:0;background:rgba(7,5,10,.65);z-index:99;display:none}
+.overlay.open{display:block}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<nav>
+  <div class="logo">
+    <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="10" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><circle cx="20" cy="20" r="3" fill="white" opacity=".8"/><line x1="20" y1="2" x2="20" y2="10" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><line x1="20" y1="30" x2="20" y2="38" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><line x1="2" y1="20" x2="10" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><line x1="30" y1="20" x2="38" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><path d="M13 20 Q20 10 27 20" stroke="white" stroke-width=".9" fill="none" stroke-opacity=".35"/><path d="M13 20 Q20 30 27 20" stroke="white" stroke-width=".9" fill="none" stroke-opacity=".35"/></svg>
+    <span class="logo-word">ALIGN</span>
+  </div>
+  <div class="logo-tag">Clarity · Alignment · Abundance</div>
+
+  <div class="persona-mini">
+    <div class="pm-label">Your companion</div>
+    <div class="pm-name">Master Chief</div>
+    <div class="pm-sub">Mr. JC · Feeling Like Chocolate</div>
+    <div class="pm-dot"><div class="dot-green"></div><span class="dot-text">A Day · Full capacity</span></div>
+  </div>
+
+  <div class="nav-section">Navigate</div>
+  <a class="nav-item active" href="v2_home.html"><span class="nav-icon">◎</span>Home</a>
+  <a class="nav-item" href="v2_alignment.html"><span class="nav-icon">◈</span>My Alignment</a>
+  <a class="nav-item" href="v2_usermodel.html"><span class="nav-icon">○</span>User Model</a>
+  <a class="nav-item" href="v2_journey.html"><span class="nav-icon">◇</span>Life Journey™</a>
+  <a class="nav-item" href="v2_ask.html"><span class="nav-icon">✦</span>Ask Master Chief</a>
+
+  <div class="nav-section">Products</div>
+  <a class="nav-item" href="#"><span class="nav-icon">◉</span>DesignSuite™</a>
+  <a class="nav-item" href="#"><span class="nav-icon">◉</span>Career Navigator™</a>
+  <a class="nav-item" href="#"><span class="nav-icon">◉</span>Integrate360™</a>
+  <a class="nav-item" href="#"><span class="nav-icon">◉</span>627™</a>
+  <a class="nav-item" href="#"><span class="nav-icon">◉</span>LegacyLab™</a>
+
+  <div class="nav-footer">
+    <div class="nav-footer-item"><span>◐</span>Samuel</div>
+    <div class="nav-footer-item"><span>⚙</span>Settings</div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="greeting-label">Tuesday · Season: Building</div>
+  <h1 class="greeting-title">Good morning,<em>Samuel.</em></h1>
+  <p class="greeting-sub">Master Chief has 3 signals. Your User Model updated overnight.</p>
+
+  <!-- PRIMARY SCORE -->
+  <div class="primary-score">
+    <div class="score-ring" onclick="openDrawer('User Model Score','89','Your combined alignment score across all five assessments and all ongoing inputs. This number compounds — every conversation, journal entry, life event, and decision updates it. Click to see the full User Model breakdown.',[['Conviction Score™','86'],['Value Score™','92'],['AI-Era Readiness','94%'],['Season','Building']])">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <circle cx="65" cy="65" r="54" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="6"/>
+        <circle cx="65" cy="65" r="54" fill="none" stroke="url(#scoreGrad)" stroke-width="6" stroke-dasharray="339.3" stroke-dashoffset="37.3" stroke-linecap="round"/>
+        <defs><linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#C9A96E"/><stop offset="100%" stop-color="#E8C97E"/></linearGradient></defs>
+      </svg>
+      <div class="score-center">
+        <div class="score-num">89</div>
+        <div class="score-lbl">Alignment</div>
+      </div>
+    </div>
+    <div class="score-meta">
+      <div class="score-meta-title">Your clarity is compounding.</div>
+      <div class="score-meta-body">You are at Conviction (IR: 86) and Authentic Rockstar (VS: 92). One practice remains between where you are and the full expression of what you have built.</div>
+      <div class="score-chips">
+        <a class="chip chip-ir" href="v2_alignment.html">Impact Readiness · 86</a>
+        <a class="chip chip-vs" href="v2_alignment.html">Value Spectrum · 92</a>
+        <span class="chip chip-ai">AI-Era · 94%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RHYTHM -->
+  <div class="rhythm-strip">
+    <div class="rs-dot"></div>
+    <div class="rs-text"><strong>RhythmOS: A Day</strong> — Full capacity. High-stakes decisions and creative work recommended. Master Chief calibrates automatically.</div>
+    <span class="rs-optional">Optional check-in</span>
+  </div>
+
+  <!-- MEANING -->
+  <div class="meaning-card" onclick="openDrawer('Today\'s Signal','','Master Chief is reading from your User Model, Life Journey, and current B3 state before surfacing this signal. Your Value Score (92) and Conviction Score (86) are both at peak recorded levels. The gap between knowing and full expression is Release Threshold (3/10) and Ask Capacity (7/10). Today is an A Day. This is the window.',[['Primary gap','Release Threshold · 3/10'],['VS gap','Ask Capacity · 7/10'],['Season','Building'],['Recommended','Decision Suite']])">
+    <div class="mc-label">Master Chief · Today's signal</div>
+    <div class="mc-title">You build what is right. The last step is releasing it at full authority.</div>
+    <div class="mc-body">Your worth is settled (Value Score 92). Your impact readiness is near-maximum (86). One practice remains: release the work, state the number, then stop. No qualification. Today is the window — A Day, full capacity.</div>
+    <div class="mc-action">
+      <a class="mc-action-btn" href="v2_ask.html">Ask Master Chief →</a>
+      <span class="mc-action-note">or open Decision Suite to apply this now</span>
+    </div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="quick-label">What comes next</div>
+  <div class="quick-grid">
+    <a class="quick-card" href="v2_alignment.html">
+      <div class="qc-icon">◈</div>
+      <div class="qc-label">Full scores</div>
+      <div class="qc-title">My Alignment</div>
+    </a>
+    <a class="quick-card" href="v2_usermodel.html">
+      <div class="qc-icon">○</div>
+      <div class="qc-label">Your digital twin</div>
+      <div class="qc-title">User Model</div>
+    </a>
+    <a class="quick-card" href="v2_ask.html">
+      <div class="qc-icon">✦</div>
+      <div class="qc-label">Context-aware AI</div>
+      <div class="qc-title">Ask Master Chief</div>
+    </a>
+  </div>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer" id="drawer">
+  <button class="drawer-close" onclick="closeDrawer()">Close ×</button>
+  <div class="drawer-eye" id="d-eye">Detail</div>
+  <div class="drawer-title" id="d-title"></div>
+  <div class="drawer-body" id="d-body"></div>
+  <div class="drawer-grid" id="d-grid"></div>
+  <div class="domain-bars" id="d-bars"></div>
+</div>
+
+<script>
+function openDrawer(title, sub, body, cells, bars){
+  document.getElementById('d-title').textContent = title+(sub?' · '+sub:'');
+  document.getElementById('d-body').textContent = body||'';
+  const g = document.getElementById('d-grid');
+  g.innerHTML='';
+  if(cells) cells.forEach(([l,v])=>{const d=document.createElement('div');d.className='dg-cell';d.innerHTML=`<div class="dgc-lbl">${l}</div><div class="dgc-val">${v}</div>`;g.appendChild(d);});
+  const b = document.getElementById('d-bars');
+  b.innerHTML='';
+  if(bars) bars.forEach(([n,w,c])=>{const d=document.createElement('div');d.className='db-row';d.innerHTML=`<span class="db-name">${n}</span><div class="db-bar"><div class="db-fill" style="width:0%;background:${c}" data-w="${w}"></div></div><span class="db-val">${w}</span>`;b.appendChild(d);});
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(()=>document.querySelectorAll('.db-fill').forEach(el=>el.style.width=el.dataset.w),100);
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+</script>
+</body>
+</html>

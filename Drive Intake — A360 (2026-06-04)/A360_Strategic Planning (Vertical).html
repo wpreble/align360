@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>StrategyOS · Align360 Enterprise</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep:#07050A;--white:#fff;
+  --glass:rgba(255,255,255,.055);--glass2:rgba(255,255,255,.09);
+  --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.04);
+  --muted:#8A7E8E;--text:rgba(255,255,255,.82);
+  --green:#0F6E56;--green2:#27AE60;
+  --amber:#854F0B;--amber2:#C97A1A;
+  /* StrategyOS palette — slate blue authority */
+  --strat:#0F2744;--stratfade:rgba(15,39,68,.18);--stratborder:rgba(15,39,68,.5);
+  --stratlight:#1E4A82;--stratbright:#2E6AC8;--strataccent:#5B9FE8;
+  --gold:#C9A96E;--gold2:#E8C97E;
+  --cherry:#2A122E;--cherry3:#521F58;
+  --sidebar:220px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--deep);color:var(--text);min-height:100vh;display:flex}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 60% 50% at 20% 0%,rgba(15,39,68,.35),transparent 55%),
+  radial-gradient(ellipse 40% 40% at 80% 100%,rgba(15,39,68,.2),transparent 60%);
+  pointer-events:none;z-index:0}
+
+nav{width:var(--sidebar);flex-shrink:0;background:rgba(7,5,10,.85);border-right:1px solid var(--line2);display:flex;flex-direction:column;padding:22px 16px;position:sticky;top:0;height:100vh;z-index:10;overflow:auto}
+.logo-row{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.logo-word{font-family:'Playfair Display',serif;font-size:17px;font-weight:500;letter-spacing:.08em;color:var(--white)}
+.logo-tag{font-size:8px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(91,159,232,.4);margin-bottom:18px}
+.strat-badge{background:var(--stratfade);border:1px solid var(--stratborder);border-radius:10px;padding:10px 12px;margin-bottom:20px}
+.sb-label{font-size:8px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:rgba(91,159,232,.7);margin-bottom:3px}
+.sb-org{font-family:'Playfair Display',serif;font-size:14px;color:var(--white);margin-bottom:2px}
+.sb-plan{font-size:10px;color:var(--muted)}
+.sb-status{font-size:10px;color:rgba(91,159,232,.55);margin-top:5px;padding-top:5px;border-top:1px solid var(--stratborder)}
+.nav-section{font-size:8px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:12px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:12px;transition:all .18s;margin-bottom:1px;border:1px solid transparent;text-decoration:none}
+.nav-item:hover{background:var(--stratfade);color:rgba(91,159,232,.9);border-color:var(--stratborder)}
+.nav-item.active{background:rgba(15,39,68,.25);color:rgba(120,180,255,.95);border-color:rgba(91,159,232,.35)}
+.nav-icon{font-size:12px;width:14px;text-align:center;flex-shrink:0}
+.nav-badge-sm{margin-left:auto;font-size:9px;font-weight:600;padding:2px 6px;border-radius:20px;background:var(--stratfade);color:rgba(91,159,232,.8);border:1px solid var(--stratborder)}
+.nav-footer{margin-top:auto;padding-top:14px;border-top:1px solid var(--line2)}
+.nav-footer-item{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;color:var(--muted);font-size:11px}
+
+.main{flex:1;padding:36px 44px;overflow:auto;position:relative;z-index:1}
+.page-eye{font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(91,159,232,.65);margin-bottom:10px}
+.page-title{font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,40px);font-weight:500;color:var(--white);margin-bottom:6px;line-height:1.05}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.65;max-width:620px}
+.sec-rule{font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(91,159,232,.38);display:flex;align-items:center;gap:12px;margin-bottom:16px;margin-top:28px}
+.sec-rule::after{content:'';flex:1;height:1px;background:rgba(15,39,68,.4)}
+
+/* STRATEGIC ALIGNMENT SCORE */
+.alignment-band{background:var(--glass);border:1px solid var(--line2);border-radius:22px;padding:24px;margin-bottom:20px;display:flex;align-items:center;gap:32px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.alignment-band::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 50% 70% at 100% 50%,rgba(15,39,68,.15),transparent 70%)}
+.alignment-band:hover{background:var(--glass2)}
+.strat-ring{position:relative;flex-shrink:0}
+.strat-ring svg{transform:rotate(-90deg);display:block}
+.strat-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.strat-num{font-family:'Playfair Display',serif;font-size:34px;color:var(--strataccent);line-height:1}
+.strat-lbl{font-size:8px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.ab-meta{flex:1;position:relative}
+.ab-label{font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(91,159,232,.6);margin-bottom:.5rem}
+.ab-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--white);margin-bottom:.375rem;line-height:1.25}
+.ab-body{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:1rem}
+.strat-chips{display:flex;flex-wrap:wrap;gap:6px}
+.schip{font-size:10px;font-weight:500;padding:4px 11px;border-radius:20px;border:1px solid var(--stratborder);color:rgba(91,159,232,.7);background:var(--stratfade)}
+
+/* ORG METRICS */
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.sm{background:var(--glass);border:1px solid var(--line2);border-radius:16px;padding:16px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.sm::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.sm-align::before{background:linear-gradient(90deg,var(--stratlight),var(--stratbright))}
+.sm-capacity::before{background:linear-gradient(90deg,var(--green),var(--green2))}
+.sm-velocity::before{background:linear-gradient(90deg,var(--amber),var(--amber2))}
+.sm-risk::before{background:linear-gradient(90deg,var(--cherry),var(--cherry3))}
+.sm:hover{background:var(--glass2);transform:translateY(-2px)}
+.sm-label{font-size:9px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.sm-val{font-family:'Playfair Display',serif;font-size:34px;color:var(--white);line-height:1;margin-bottom:3px}
+.sm-sub{font-size:11px;color:var(--muted)}
+.sm-bar{height:2px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden;margin-top:10px}
+.sm-fill{height:100%;border-radius:1px;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
+
+/* STRATEGY PILLARS */
+.pillars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.pillar-card{background:var(--glass);border:1px solid var(--line2);border-radius:18px;padding:18px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.pillar-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .22s}
+.pillar-card:hover{background:var(--glass2);transform:translateY(-2px)}
+.pillar-card:hover::before{opacity:1}
+.pc-growth::before{background:linear-gradient(90deg,var(--stratlight),var(--stratbright))}
+.pc-market::before{background:linear-gradient(90deg,var(--green),var(--green2))}
+.pc-ops::before{background:linear-gradient(90deg,var(--amber),var(--amber2))}
+.pc-label{font-size:9px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+.pc-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--white);margin-bottom:.375rem}
+.pc-progress{display:flex;align-items:center;gap:10px;margin-top:.75rem}
+.pc-pct{font-family:'Playfair Display',serif;font-size:24px;font-weight:400;color:var(--strataccent)}
+.pc-bar-wrap{flex:1;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.pc-bar-fill{height:100%;border-radius:2px;transition:width 1.3s cubic-bezier(.16,1,.3,1)}
+.pc-initiatives{font-size:11px;color:var(--muted);margin-top:.5rem}
+
+/* CAPACITY PLANNING */
+.capacity-card{background:linear-gradient(135deg,var(--stratfade),rgba(15,39,68,.06));border:1px solid var(--stratborder);border-radius:20px;padding:22px;margin-bottom:16px;cursor:pointer;transition:all .25s}
+.capacity-card:hover{background:rgba(15,39,68,.28)}
+.cc-label{font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(91,159,232,.65);margin-bottom:.625rem}
+.cc-title{font-family:'Playfair Display',serif;font-size:19px;color:var(--white);margin-bottom:.5rem;line-height:1.25}
+.cc-body{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:1rem}
+.capacity-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.cg-cell{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;text-align:center}
+.cgc-val{font-family:'Playfair Display',serif;font-size:22px;color:var(--white)}
+.cgc-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.cgc-note{font-size:10px;color:rgba(255,255,255,.25);margin-top:2px}
+
+/* INITIATIVE TRACKER */
+.initiative-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.init-item{background:var(--glass);border:1px solid var(--line2);border-radius:14px;padding:16px;cursor:pointer;transition:all .22s;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
+.init-item:hover{background:var(--glass2)}
+.init-item.at-risk{border-color:rgba(133,79,11,.3);background:rgba(133,79,11,.04)}
+.init-item.on-track{border-color:rgba(15,110,86,.2);background:rgba(15,110,86,.03)}
+.ii-status{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ii-body{}
+.ii-name{font-size:13px;font-weight:500;color:var(--white);margin-bottom:2px}
+.ii-meta{font-size:11px;color:var(--muted)}
+.ii-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.ii-pct{font-family:'Playfair Display',serif;font-size:20px;color:var(--white)}
+.ii-chip{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px}
+.chip-ontrack{background:rgba(15,110,86,.1);color:var(--green2);border:1px solid rgba(15,110,86,.2)}
+.chip-atrisk{background:rgba(133,79,11,.1);color:#E8A060;border:1px solid rgba(133,79,11,.2)}
+.chip-blocked{background:rgba(139,26,26,.1);color:#E88080;border:1px solid rgba(139,26,26,.2)}
+
+/* ENVIRONMENTAL SCAN */
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.env-card{background:var(--glass);border:1px solid var(--line2);border-radius:16px;padding:16px;cursor:pointer;transition:all .22s}
+.env-card:hover{background:var(--glass2)}
+.ec-label{font-size:9px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+.ec-title{font-size:14px;font-weight:500;color:var(--white);margin-bottom:.375rem;line-height:1.3}
+.ec-body{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:.625rem}
+.ec-signal{font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px;display:inline-block}
+.sig-opp{background:rgba(15,110,86,.08);color:var(--green2);border:1px solid rgba(15,110,86,.2)}
+.sig-threat{background:rgba(139,26,26,.08);color:#E88080;border:1px solid rgba(139,26,26,.2)}
+.sig-watch{background:rgba(133,79,11,.08);color:#E8A060;border:1px solid rgba(133,79,11,.2)}
+.sig-neutral{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--line2)}
+
+/* TEAM ALIGNMENT */
+.team-alignment{background:var(--glass);border:1px solid var(--line2);border-radius:18px;padding:20px;margin-bottom:16px}
+.ta-label{font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.ta-note{font-size:11px;color:rgba(255,255,255,.22);margin-bottom:12px;font-style:italic}
+.ta-rows{display:flex;flex-direction:column;gap:10px}
+.ta-row{display:flex;align-items:center;gap:12px}
+.ta-name{font-size:13px;color:var(--white);min-width:120px}
+.ta-bar-wrap{flex:1;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.ta-bar-fill{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
+.ta-season{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.ta-private{font-size:10px;color:rgba(255,255,255,.18);font-style:italic;white-space:nowrap}
+
+/* DRAWER */
+.drawer{position:fixed;right:-580px;top:0;width:560px;max-width:95vw;height:100vh;background:linear-gradient(180deg,#0D0A14,#07050A);border-left:1px solid var(--line);padding:32px;transition:.38s cubic-bezier(.16,1,.3,1);z-index:100;overflow:auto}
+.drawer.open{right:0}
+.drawer-close{background:var(--glass);border:1px solid var(--line2);color:var(--muted);font-size:11px;padding:6px 14px;border-radius:50px;cursor:pointer;float:right;margin-bottom:24px;font-family:'DM Sans',sans-serif}
+.drawer-eye{font-size:9px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(91,159,232,.6);margin-bottom:8px;clear:both}
+.drawer-title{font-family:'Playfair Display',serif;font-size:28px;color:var(--white);margin-bottom:12px;line-height:1.15}
+.drawer-body{font-size:13px;color:var(--muted);line-height:1.78;margin-bottom:16px}
+.drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dg-cell{background:var(--glass);border:1px solid var(--line2);border-radius:12px;padding:14px}
+.dgc-lbl{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.dgc-val{font-size:13px;font-weight:500;color:var(--white)}
+.overlay{position:fixed;inset:0;background:rgba(7,5,10,.62);z-index:99;display:none}
+.overlay.open{display:block}
+</style>
+</head>
+<body>
+<div class="overlay" id="ov" onclick="closeD()"></div>
+
+<nav>
+  <div class="logo-row">
+    <svg width="20" height="20" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="10" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><circle cx="20" cy="20" r="3" fill="white" opacity=".8"/><line x1="20" y1="2" x2="20" y2="10" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><line x1="20" y1="30" x2="20" y2="38" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><line x1="2" y1="20" x2="10" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><line x1="30" y1="20" x2="38" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".55"/></svg>
+    <span class="logo-word">StrategyOS</span>
+  </div>
+  <div class="logo-tag">Align360 Enterprise</div>
+
+  <div class="strat-badge">
+    <div class="sb-label">Organization</div>
+    <div class="sb-org">Align360 Inc.</div>
+    <div class="sb-plan">StrategyOS · Enterprise</div>
+    <div class="sb-status">Powered by Align360 Intelligence</div>
+  </div>
+
+  <div class="nav-section">Strategy</div>
+  <a class="nav-item active"><span class="nav-icon">◎</span>Strategic Alignment</a>
+  <a class="nav-item"><span class="nav-icon">◈</span>Goal Architecture</a>
+  <a class="nav-item"><span class="nav-icon">○</span>Initiative Tracker</a>
+  <a class="nav-item"><span class="nav-icon">◇</span>Execution Monitoring</a>
+
+  <div class="nav-section">Intelligence</div>
+  <a class="nav-item"><span class="nav-icon">⬡</span>Environmental Scan</a>
+  <a class="nav-item"><span class="nav-icon">⬡</span>Capacity Planning<span class="nav-badge-sm">Alert</span></a>
+  <a class="nav-item"><span class="nav-icon">⬡</span>Team Alignment</a>
+  <a class="nav-item"><span class="nav-icon">⬡</span>Risk Register</a>
+
+  <div class="nav-section">Enterprise</div>
+  <a class="nav-item"><span class="nav-icon">◉</span>Org Intelligence</a>
+  <a class="nav-item"><span class="nav-icon">◉</span>Decision Suite™</a>
+  <a class="nav-item"><span class="nav-icon">◉</span>Board Reports</a>
+  <a class="nav-item"><span class="nav-icon">🔒</span>Data Governance</a>
+
+  <div class="nav-footer"><div class="nav-footer-item"><span>◐</span>Admin · Align360</div></div>
+</nav>
+
+<div class="main">
+  <div class="page-eye">StrategyOS · Align360 Inc. · Enterprise Strategic Planning</div>
+  <h1 class="page-title">Strategy grounded in real organizational capacity.</h1>
+  <p class="page-sub">StrategyOS reads from the Align360 semantic bridge — team readiness signals, season distribution, capacity patterns — and combines them with your strategic inputs to produce plans the organization can actually execute. Not aspirational projections. Grounded strategy.</p>
+
+  <!-- STRATEGIC ALIGNMENT SCORE -->
+  <div class="alignment-band" onclick="openD('Strategic Alignment Score','74','The Strategic Alignment Score measures how well organizational execution aligns with stated strategic direction. It combines goal completion velocity, capacity utilization, team season alignment, and initiative execution rate. 74 is a strong score — the primary gap is capacity planning for Q3 expansion.',['Goal completion rate','78%'],['Capacity utilization','82%'],['Season alignment','Building dominant'],['Primary gap','Q3 capacity planning'])">
+    <div class="strat-ring">
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        <circle cx="55" cy="55" r="44" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="6"/>
+        <circle cx="55" cy="55" r="44" fill="none" stroke="url(#sGrad)" stroke-width="6" stroke-dasharray="276.5" stroke-dashoffset="71.9" stroke-linecap="round"/>
+        <defs><linearGradient id="sGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#0F2744"/><stop offset="100%" stop-color="#5B9FE8"/></linearGradient></defs>
+      </svg>
+      <div class="strat-center"><div class="strat-num">74</div><div class="strat-lbl">Strategic Alignment</div></div>
+    </div>
+    <div class="ab-meta">
+      <div class="ab-label">Strategic Alignment Score™ · StrategyOS</div>
+      <div class="ab-title">Strong alignment. The org is executing in the Building season. One capacity gap entering Q3.</div>
+      <div class="ab-body">Goal completion velocity is strong. Team readiness signal is high — 7 of 12 members at full capacity. The one gap: Q3 expansion initiatives require two additional roles and a leadership season that is not yet present in the team.</div>
+      <div class="strat-chips">
+        <span class="schip">Building season dominant</span>
+        <span class="schip">Goal velocity: strong</span>
+        <span class="schip">Q3 capacity gap identified</span>
+        <span class="schip">Team readiness: 7 of 12 high</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORG METRICS -->
+  <div class="sec-rule">Org intelligence · From Align360 semantic bridge · Anonymized signals</div>
+  <div class="metric-grid">
+    <div class="sm sm-align" onclick="openD('Goal Completion Rate','78%','78% of active Q2 goals are on track for completion. The completion velocity is higher than the previous quarter. Three goals are at risk due to resource constraints, not strategic misalignment.',['On track','78% of goals'],['At risk','3 goals'],['Primary reason','Resource constraints'],['vs Q1','Up 12%'])">
+      <div class="sm-label">Goal completion rate</div>
+      <div class="sm-val">78%</div>
+      <div class="sm-sub">On track · Q2</div>
+      <div class="sm-bar"><div class="sm-fill" data-w="78%" style="background:linear-gradient(90deg,var(--stratlight),var(--stratbright))"></div></div>
+    </div>
+    <div class="sm sm-capacity" onclick="openD('Org Capacity','High','7 of 12 team members showing high capacity signals. This is the highest collective capacity signal of the year. StrategyOS recommends advancing Q3 decisions now while the window is open.',['High capacity','7 of 12'],['Moderate','3 of 12'],['Building signal','2 of 12'],['Recommendation','Advance Q3 now'])">
+      <div class="sm-label">Team capacity signal</div>
+      <div class="sm-val" style="font-size:22px;margin-top:6px">High</div>
+      <div class="sm-sub">7 of 12 at full signal</div>
+      <div class="sm-bar"><div class="sm-fill" data-w="82%" style="background:linear-gradient(90deg,var(--green),var(--green2))"></div></div>
+    </div>
+    <div class="sm sm-velocity" onclick="openD('Execution Velocity','Strong','Execution velocity measures how quickly initiatives move through stages against plan. Current velocity is strong — the Building season alignment across the team is producing consistent forward movement.',['Velocity','Strong'],['vs plan','On pace'],['Bottleneck','Q3 hiring gap'],['Season driver','Building dominant'])">
+      <div class="sm-label">Execution velocity</div>
+      <div class="sm-val" style="font-size:22px;margin-top:6px">Strong</div>
+      <div class="sm-sub">On pace · Building season</div>
+      <div class="sm-bar"><div class="sm-fill" data-w="74%" style="background:linear-gradient(90deg,var(--amber),var(--amber2))"></div></div>
+    </div>
+    <div class="sm sm-risk" onclick="openD('Strategic Risk Score','Low','Low strategic risk profile. One capacity gap (Q3 expansion roles) is the primary risk. No misalignment between stated strategy and current team season signals — the organization is building what the strategy requires.',['Risk level','Low'],['Primary risk','Q3 capacity gap'],['Secondary','Kiki season unknown'],['Strategy alignment','Building season confirmed'])">
+      <div class="sm-label">Strategic risk</div>
+      <div class="sm-val" style="font-size:22px;margin-top:6px">Low</div>
+      <div class="sm-sub">One capacity gap</div>
+      <div class="sm-bar"><div class="sm-fill" data-w="22%" style="background:linear-gradient(90deg,var(--cherry),var(--cherry3))"></div></div>
+    </div>
+  </div>
+
+  <!-- STRATEGY PILLARS -->
+  <div class="sec-rule">Strategic pillars · Q2–Q3 2026</div>
+  <div class="pillars-grid">
+    <div class="pillar-card pc-growth" onclick="openD('Growth Pillar','Enterprise Distribution','Expanding the enterprise distribution channel — white-label and wholesale. Three signed partners. Two in negotiation. StrategyOS model: team Building season supports execution. Aloys Expansion season provides the leadership model for enterprise conversations.',['Status','On track'],['Signed partners','3'],['In negotiation','2'],['Capacity signal','High — advance now'])">
+      <div class="pc-label">Pillar 1 · Growth</div>
+      <div class="pc-title">Enterprise Distribution</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5">White-label and wholesale channel expansion. Three partners signed. Two in negotiation.</div>
+      <div class="pc-progress">
+        <span class="pc-pct" style="color:var(--strataccent)">68%</span>
+        <div class="pc-bar-wrap"><div class="pc-bar-fill" data-w="68%" style="background:linear-gradient(90deg,var(--stratlight),var(--stratbright))"></div></div>
+      </div>
+      <div class="pc-initiatives">4 active initiatives · 1 at risk</div>
+    </div>
+    <div class="pillar-card pc-market" onclick="openD('Market Pillar','Individual Acquisition','Building the individual user acquisition funnel. Assessment completion rates strong. Viral coefficient improving — result sharing is the primary organic driver.',['Status','On track'],['Assessment completions','Up 34%'],['Viral signal','Result sharing growing'],['CAC','Improving'])">
+      <div class="pc-label">Pillar 2 · Market</div>
+      <div class="pc-title">Individual Acquisition</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5">Assessment funnel and result sharing driving organic growth. Viral coefficient improving.</div>
+      <div class="pc-progress">
+        <span class="pc-pct" style="color:var(--green2)">82%</span>
+        <div class="pc-bar-wrap"><div class="pc-bar-fill" data-w="82%" style="background:linear-gradient(90deg,var(--green),var(--green2))"></div></div>
+      </div>
+      <div class="pc-initiatives">3 active initiatives · All on track</div>
+    </div>
+    <div class="pillar-card pc-ops" onclick="openD('Operations Pillar','Platform Infrastructure','SOC 2 audit initiated. Assessment engine scaling. AI persona layer performance improving. Primary gap: two engineering roles needed for Q3 DiagnosticOS development.',['Status','Watch'],['SOC 2','Initiated'],['Gap','2 engineering roles'],['DiagnosticOS','Q3 development target'])">
+      <div class="pc-label">Pillar 3 · Operations</div>
+      <div class="pc-title">Platform Infrastructure</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5">SOC 2 initiated. Infrastructure scaling. Two engineering roles needed for Q3 DiagnosticOS.</div>
+      <div class="pc-progress">
+        <span class="pc-pct" style="color:#E8A060">54%</span>
+        <div class="pc-bar-wrap"><div class="pc-bar-fill" data-w="54%" style="background:linear-gradient(90deg,var(--amber),var(--amber2))"></div></div>
+      </div>
+      <div class="pc-initiatives">5 active initiatives · 2 at risk</div>
+    </div>
+  </div>
+
+  <!-- CAPACITY PLANNING -->
+  <div class="capacity-card" onclick="openD('Capacity Planning Intelligence','Q3 Gap Analysis','StrategyOS reads from the Align360 semantic bridge to understand real organizational capacity — not self-reported confidence. The Q3 plan requires two additional roles and a leadership expansion signal that is not yet present in the team. The semantic bridge shows 7 of 12 at high capacity — meaning the current team can execute on current commitments but does not have the headroom for Q3 expansion without the two new hires.',['Gap type','Two engineering roles'],['Hiring window','Recommend Q2 close'],['Semantic signal','7 of 12 high capacity'],['Season needed','Expansion leadership signal'])">
+    <div class="cc-label">Capacity Planning Intelligence™ · StrategyOS · From Align360 Semantic Bridge</div>
+    <div class="cc-title">Q3 plan requires two engineering roles not yet in place. Hire window: close by end of Q2.</div>
+    <div class="cc-body">StrategyOS reads from the Align360 semantic bridge to understand real organizational capacity — not self-reported confidence. The team is at high capacity now, but Q3 expansion requires two new roles and a leadership season that is not yet present. The hire decision should be made this week while the Decision Suite window is open.</div>
+    <div class="capacity-grid">
+      <div class="cg-cell"><div class="cgc-val" style="color:var(--strataccent)">12</div><div class="cgc-label">Current seats</div><div class="cgc-note">Active team</div></div>
+      <div class="cg-cell"><div class="cgc-val" style="color:#E8A060">+2</div><div class="cgc-label">Q3 gap</div><div class="cgc-note">Engineering roles</div></div>
+      <div class="cg-cell"><div class="cgc-val" style="color:var(--green2)">7</div><div class="cgc-label">High capacity</div><div class="cgc-note">Semantic signal</div></div>
+      <div class="cg-cell"><div class="cgc-val" style="color:var(--amber2)">Q2</div><div class="cgc-label">Hire by</div><div class="cgc-note">End of quarter</div></div>
+    </div>
+  </div>
+
+  <!-- INITIATIVES -->
+  <div class="sec-rule">Initiative tracker · Execution monitoring</div>
+  <div class="initiative-list">
+    <div class="init-item on-track" onclick="openD('Enterprise Partner Program','On track · 68%','Three enterprise partners signed. Two in negotiation. The Building season alignment in the team is producing consistent forward movement on partnership conversations. StrategyOS recommends advancing the two negotiating partners to close before Q3 begins.',['Status','On track'],['Signed','3 partners'],['In negotiation','2'],['Next action','Close negotiating partners'])">
+      <div class="ii-status" style="background:rgba(15,110,86,.15);color:var(--green2)">◎</div>
+      <div class="ii-body"><div class="ii-name">Enterprise Partner Program — White Label & Wholesale</div><div class="ii-meta">3 partners signed · 2 in negotiation · Building season execution</div></div>
+      <div class="ii-right"><div class="ii-pct">68%</div><span class="ii-chip chip-ontrack">On track</span></div>
+    </div>
+    <div class="init-item on-track" onclick="openD('Assessment Funnel Optimization','On track · 82%','Assessment completion rates are up 34%. Result sharing is the primary viral driver — people are sharing their Conviction Score and Value Score results organically. The funnel from result to full User Model completion is the next optimization target.',['Status','On track'],['Completion rate','Up 34%'],['Primary driver','Result sharing viral'],['Next target','Result to full model funnel'])">
+      <div class="ii-status" style="background:rgba(15,110,86,.15);color:var(--green2)">◈</div>
+      <div class="ii-body"><div class="ii-name">Assessment Funnel — IR + VS Completion</div><div class="ii-meta">Completion rate up 34% · Result sharing driving viral · Next: result to User Model funnel</div></div>
+      <div class="ii-right"><div class="ii-pct">82%</div><span class="ii-chip chip-ontrack">On track</span></div>
+    </div>
+    <div class="init-item at-risk" onclick="openD('Q3 Engineering Hires','At risk · 30%','Two engineering roles needed for DiagnosticOS Q3 development and StrategyOS infrastructure. Hiring has not started. StrategyOS flags this as the primary execution risk for Q3. Recommendation: open roles this week.',['Status','At risk'],['Roles needed','2 engineering'],['Impact','DiagnosticOS Q3 delayed'],['Action','Open roles this week'])">
+      <div class="ii-status" style="background:rgba(133,79,11,.15);color:#E8A060">◇</div>
+      <div class="ii-body"><div class="ii-name">Q3 Engineering Hires — DiagnosticOS & StrategyOS Infrastructure</div><div class="ii-meta">2 roles not yet opened · Blocks DiagnosticOS Q3 launch · Capacity gap confirmed</div></div>
+      <div class="ii-right"><div class="ii-pct">30%</div><span class="ii-chip chip-atrisk">At risk</span></div>
+    </div>
+    <div class="init-item on-track" onclick="openD('SOC 2 Type II Audit','On track · 45%','SOC 2 Type II audit initiated. Target completion: 12 months. Current phase: evidence collection. StrategyOS notes this is a trust signal required for enterprise sales — the timing should align with Phase 3 StrategyOS launch.',['Status','On track'],['Phase','Evidence collection'],['Target completion','12 months'],['Strategic note','Required for enterprise sales'])">
+      <div class="ii-status" style="background:rgba(24,95,165,.15);color:#4EA8F5">○</div>
+      <div class="ii-body"><div class="ii-name">SOC 2 Type II Certification</div><div class="ii-meta">Evidence collection phase · 12-month timeline · Required for enterprise sales</div></div>
+      <div class="ii-right"><div class="ii-pct">45%</div><span class="ii-chip chip-ontrack">On track</span></div>
+    </div>
+  </div>
+
+  <!-- ENVIRONMENTAL SCAN -->
+  <div class="sec-rule">Environmental scan · Competitive and market intelligence</div>
+  <div class="env-grid">
+    <div class="env-card" onclick="openD('Opportunity: AI Coaching Fatigue','Market signal','The enterprise coaching market is showing signs of AI fatigue — generic AI tools that lack context. BetterUp and others have deployed AI that is query-aware but not context-aware. The window for a User Model-powered AI persona is open and widening.',['Signal type','Market opportunity'],['Source','Competitive intelligence'],['Window','12–18 months'],['StrategyOS action','Accelerate enterprise positioning'])">
+      <div class="ec-label">Market intelligence</div>
+      <div class="ec-title">AI coaching fatigue — enterprise buyers want context, not queries</div>
+      <div class="ec-body">Generic AI tools lack context. The User Model-powered persona is the differentiation. Window is widening.</div>
+      <span class="ec-signal sig-opp">Opportunity · 12–18 month window</span>
+    </div>
+    <div class="env-card" onclick="openD('Opportunity: Transparent Pricing','Positioning signal','BetterUp, Lattice, Culture Amp, and 15Five all hide pricing. Align360 publishes it. Enterprise buyers are increasingly flagging opaque pricing as a trust signal failure. This differentiator costs nothing to maintain and creates real advantage.',['Signal type','Positioning opportunity'],['Competitors','All hide pricing'],['Align360','Publishes pricing'],['Action','Amplify in enterprise messaging'])">
+      <div class="ec-label">Competitive positioning</div>
+      <div class="ec-title">Transparent pricing is a trust signal — competitors are all opaque</div>
+      <div class="ec-body">BetterUp, Lattice, Culture Amp, 15Five all hide pricing. Align360's transparency is a differentiator.</div>
+      <span class="ec-signal sig-opp">Positioning advantage · Maintain</span>
+    </div>
+    <div class="env-card" onclick="openD('Watch: Enterprise Sales Cycle','Competitive watch','Enterprise sales cycles in the HR technology space are lengthening — 6–12 months for new entrants. StrategyOS recommends building a pilot-first sales motion to compress the cycle.',['Signal type','Competitive watch'],['Average cycle','6–12 months'],['Recommended motion','Pilot-first'],['StrategyOS action','Design pilot offer structure'])">
+      <div class="ec-label">Sales environment</div>
+      <div class="ec-title">Enterprise HR tech sales cycles lengthening — pilot-first motion recommended</div>
+      <div class="ec-body">6–12 month cycles for new entrants. Pilot-first motion compresses the cycle and builds internal champions.</div>
+      <span class="ec-signal sig-watch">Watch · Design pilot offer</span>
+    </div>
+    <div class="env-card" onclick="openD('Watch: DiagnosticOS Regulatory','Compliance watch','As DiagnosticOS moves into lab interpretation and health diagnostics, regulatory considerations emerge — FDA, HIPAA, and state-level health data laws. StrategyOS flags this as a watch item for Q3 legal review.',['Signal type','Regulatory watch'],['Relevant frameworks','FDA · HIPAA · State health law'],['Timeline','Q3 legal review'],['Action','Engage healthcare attorney'])">
+      <div class="ec-label">Regulatory environment</div>
+      <div class="ec-title">DiagnosticOS lab interpretation may trigger health data regulations — legal review Q3</div>
+      <div class="ec-body">FDA, HIPAA, and state health data laws relevant as DiagnosticOS scales. Q3 legal review required.</div>
+      <span class="ec-signal sig-watch">Watch · Legal review Q3</span>
+    </div>
+  </div>
+
+  <!-- TEAM ALIGNMENT -->
+  <div class="sec-rule">Team alignment · Semantic signals from Align360 bridge · Anonymized</div>
+  <div class="team-alignment">
+    <div class="ta-label">Leadership team · Season signals · Individual data never accessible here</div>
+    <div class="ta-note">What you see: consented season signals only. Individual scores, assessment answers, B3 states, and AI conversations are private to each team member. StrategyOS uses only what the semantic bridge surfaces.</div>
+    <div class="ta-rows">
+      <div class="ta-row">
+        <span class="ta-name">Samuel</span>
+        <div class="ta-bar-wrap"><div class="ta-bar-fill" data-w="86%" style="background:linear-gradient(90deg,var(--cherry),var(--cherry3))"></div></div>
+        <span class="ta-season" style="background:rgba(201,169,110,.1);color:var(--gold2);border:1px solid rgba(201,169,110,.2)">Building</span>
+      </div>
+      <div class="ta-row">
+        <span class="ta-name">Aloys</span>
+        <div class="ta-bar-wrap"><div class="ta-bar-fill" data-w="92%" style="background:linear-gradient(90deg,#185FA5,#2E86DE)"></div></div>
+        <span class="ta-season" style="background:rgba(24,95,165,.1);color:#4EA8F5;border:1px solid rgba(24,95,165,.2)">Expansion</span>
+      </div>
+      <div class="ta-row">
+        <span class="ta-name">Drew (COS)</span>
+        <div class="ta-bar-wrap"><div class="ta-bar-fill" data-w="78%" style="background:linear-gradient(90deg,var(--green),var(--green2))"></div></div>
+        <span class="ta-season" style="background:rgba(15,110,86,.1);color:var(--green2);border:1px solid rgba(15,110,86,.2)">Building</span>
+      </div>
+      <div class="ta-row">
+        <span class="ta-name">Team Lead · Eng</span>
+        <div class="ta-bar-wrap"><div class="ta-bar-fill" data-w="65%" style="background:linear-gradient(90deg,#521F58,#9B59B6)"></div></div>
+        <span class="ta-season" style="background:rgba(82,31,88,.1);color:#D4A0FF;border:1px solid rgba(82,31,88,.25)">Building</span>
+      </div>
+      <div class="ta-row">
+        <span class="ta-name">Team Member · Ops</span>
+        <div class="ta-bar-wrap"><div class="ta-bar-fill" data-w="0%" style="background:rgba(255,255,255,.1)"></div></div>
+        <span class="ta-private">Season private</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer" id="drawer">
+  <button class="drawer-close" onclick="closeD()">Close ×</button>
+  <div class="drawer-eye">StrategyOS · Detail</div>
+  <div class="drawer-title" id="d-title"></div>
+  <div class="drawer-body" id="d-body"></div>
+  <div class="drawer-grid" id="d-grid"></div>
+</div>
+
+<script>
+setTimeout(()=>document.querySelectorAll('[data-w]').forEach(el=>el.style.width=el.dataset.w),400);
+function openD(title,val,body,cells){
+  document.getElementById('d-title').textContent=title+(val?' · '+val:'');
+  document.getElementById('d-body').textContent=body||'';
+  const g=document.getElementById('d-grid');g.innerHTML='';
+  if(cells&&cells.length){
+    const pairs=typeof cells[0]==='string'?
+      cells.reduce((a,v,i)=>{if(i%2===0)a.push([v,cells[i+1]||'']);return a;},[]):cells;
+    pairs.forEach(([l,v])=>{const d=document.createElement('div');d.className='dg-cell';d.innerHTML=`<div class="dgc-lbl">${l}</div><div class="dgc-val">${v}</div>`;g.appendChild(d);});
+  }
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('ov').classList.add('open');
+}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('ov').classList.remove('open')}
+</script>
+</body>
+</html>

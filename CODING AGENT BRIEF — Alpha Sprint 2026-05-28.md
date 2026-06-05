@@ -6,14 +6,17 @@
 
 ## Read these first, in this order
 
-1. `DEV PLAN — Alpha Sprint 2026-05-28.md` (this folder) — full context, scope, sequence, what NOT to build.
-2. `Align__Alpha Sprint Brief for Dev Team.docx` (this folder) — Samuel's decisions on pricing, stages, and his P0 blockers.
-3. `align360-app/README.md` — current state of the app you'll be building into.
-4. `AI Model/System Prompt.md` and `AI Model/Standing Rules.md` — the live AI brain. Don't modify; read.
-5. `Assessments/Wiring for Impact.md`, `Orientation for Impact.md`, `Rejection Gift Finder.md` — the three question banks you'll be parsing.
-6. The reference HTMLs listed in the dev plan §8 — the visual/structural target for the result page.
+1. `DEV PLAN — Alpha Sprint 2026-05-28.md` (this folder) — full context, scope, sequence, what NOT to build. **§0.2 is required reading** — the 2026-06-05 Drive intake substantially evolves the vocabulary (Primary User Model vs. Clarity Layer vs. Integrated User Model) and pins data-model decisions you need to make in step 1.
+2. `Drive Intake — A360 (2026-06-04)/INTAKE NOTES.md` — the architectural intel from Samuel's 2026-06-04 Drive upload: full vocabulary table (PersonaContext, NarrativeEntry, Semantic Bridge, AmplificationLayers, AI-Era Readiness, Life Season), R1–R8 interaction rules, the local-vs-Drive file index with IDs, and the explicit contradictions this batch raised against the older parts of the dev plan.
+3. `Drive Intake — A360 (2026-06-04)/Interact with A360/align360_interaction_spec.html` — the canonical interaction contract. R1, R3, R4, R7 are load-bearing for the data model.
+4. `Drive Intake — A360 (2026-06-04)/Primary User Model Results/3. Samuel_Primary User Model Results with AI-Era Combo.html` — the **master structural template for the result page** (supersedes the older `Samuel x Drew__Combined.html` for structure; that one stays a valid palette reference).
+5. `Align__Alpha Sprint Brief for Dev Team.docx` (this folder) — Samuel's decisions on pricing, stages, and his P0 blockers.
+6. `align360-app/README.md` — current state of the app you'll be building into.
+7. `AI Model/System Prompt.md` and `AI Model/Standing Rules.md` — the live AI brain. Don't modify; read.
+8. `Assessments/Wiring for Impact.md`, `Orientation for Impact.md`, `Rejection Gift Finder.md` — the three question banks you'll be parsing. (Per the dev plan §0.1 hard blocker, these are placeholders/short extracts until Samuel's full banks land — build against them as content placeholders; the loader picks up the .md at request time so the swap is content-only.)
+9. Other reference HTMLs listed in the dev plan §8 — visual variants and palette samples.
 
-If anything in this brief contradicts the dev plan, the dev plan wins. This brief is the operational layer on top of it.
+If anything in this brief contradicts the dev plan, the dev plan wins. If the dev plan contradicts the interaction spec on a behavior contract (R-rules), the spec wins. This brief is the operational layer on top of both.
 
 ---
 

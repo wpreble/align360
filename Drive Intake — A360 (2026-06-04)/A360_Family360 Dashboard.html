@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Family360 · Nkuindji Family</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cherry:#2A122E;--cherry2:#3D1A42;--cherry3:#521F58;
+  --deep:#07050A;--white:#fff;
+  --gold:#C9A96E;--gold2:#E8C97E;
+  --glass:rgba(255,255,255,.055);--glass2:rgba(255,255,255,.09);
+  --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.04);
+  --muted:#8A7E8E;--text:rgba(255,255,255,.82);
+  --green:#0F6E56;--green2:#27AE60;
+  --fam:#8B4513;--famfade:rgba(139,69,19,.1);--famfade2:rgba(139,69,19,.18);--famborder:rgba(139,69,19,.28);
+  --famgold:#D4A853;--famgold2:#E8C87A;
+  --origin:#4A1A6B;--originfade:rgba(74,26,107,.12);--originborder:rgba(74,26,107,.3);
+  --sidebar:210px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--deep);color:var(--text);min-height:100vh;display:flex}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 55% 60% at 15% 0%,rgba(42,18,46,.75),transparent 50%),
+  radial-gradient(ellipse 40% 40% at 85% 100%,rgba(139,69,19,.12),transparent 55%);
+  pointer-events:none;z-index:0}
+
+nav{width:var(--sidebar);flex-shrink:0;background:rgba(7,5,10,.82);border-right:1px solid var(--line2);display:flex;flex-direction:column;padding:22px 16px;position:sticky;top:0;height:100vh;z-index:10;overflow:auto}
+.logo-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.logo-word{font-family:'Playfair Display',serif;font-size:18px;font-weight:500;letter-spacing:.1em;color:var(--white)}
+.logo-tag{font-size:8px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(201,169,110,.4);margin-bottom:16px}
+.fam-badge{background:var(--famfade);border:1px solid var(--famborder);border-radius:10px;padding:10px 12px;margin-bottom:18px}
+.fb-label{font-size:8px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:rgba(212,168,83,.7);margin-bottom:3px}
+.fb-name{font-family:'Playfair Display',serif;font-size:14px;color:var(--white);margin-bottom:2px}
+.fb-sub{font-size:10px;color:var(--muted)}
+.fb-count{font-size:10px;color:rgba(212,168,83,.55);margin-top:6px;padding-top:6px;border-top:1px solid var(--famborder)}
+.nav-section{font-size:8px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:12px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:12px;transition:all .18s;margin-bottom:1px;border:1px solid transparent;text-decoration:none}
+.nav-item:hover{background:var(--famfade);color:rgba(212,168,83,.9);border-color:var(--famborder)}
+.nav-item.active{background:var(--famfade2);color:rgba(230,200,120,.95);border-color:var(--famborder)}
+.nav-icon{font-size:12px;width:14px;text-align:center;flex-shrink:0}
+.nav-badge-sm{margin-left:auto;font-size:9px;font-weight:600;padding:2px 6px;border-radius:20px;background:var(--famfade);color:rgba(212,168,83,.8);border:1px solid var(--famborder)}
+.nav-footer{margin-top:auto;padding-top:14px;border-top:1px solid var(--line2)}
+.nav-footer-item{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;color:var(--muted);font-size:11px}
+
+.main{flex:1;padding:36px 44px;overflow:auto;position:relative;z-index:1}
+.page-eye{font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(212,168,83,.65);margin-bottom:10px}
+.page-title{font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,42px);font-weight:500;color:var(--white);margin-bottom:6px;line-height:1.05}
+.page-title em{color:var(--famgold2);font-style:italic}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.65;max-width:600px}
+.sec-rule{font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(212,168,83,.38);display:flex;align-items:center;gap:12px;margin-bottom:16px;margin-top:28px}
+.sec-rule::after{content:'';flex:1;height:1px;background:rgba(139,69,19,.2)}
+
+/* FAMILY ORBIT */
+.orbit-section{background:var(--glass);border:1px solid var(--line2);border-radius:22px;padding:28px;margin-bottom:20px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.orbit-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 50% 60% at 100% 100%,rgba(139,69,19,.08),transparent 70%)}
+.orbit-section:hover{background:var(--glass2)}
+.orbit-inner{display:flex;align-items:center;gap:32px;position:relative}
+.orbit-center{position:relative;flex-shrink:0}
+.orbit-ring{position:relative}
+.orbit-ring svg{display:block}
+.orbit-score{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.or-num{font-family:'Playfair Display',serif;font-size:30px;font-weight:400;color:var(--famgold2);line-height:1}
+.or-lbl{font-size:8px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.orbit-meta{flex:1}
+.om-label{font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(212,168,83,.6);margin-bottom:.5rem}
+.om-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--white);margin-bottom:.375rem;line-height:1.25}
+.om-body{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:1rem}
+.family-chips{display:flex;flex-wrap:wrap;gap:6px}
+.fchip{font-size:10px;font-weight:500;padding:4px 11px;border-radius:20px;border:1px solid var(--famborder);color:rgba(212,168,83,.7);background:var(--famfade)}
+
+/* MEMBER CARDS */
+.members-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.member-card{background:var(--glass);border:1px solid var(--line2);border-radius:16px;padding:16px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.member-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .22s}
+.member-card:hover{background:var(--glass2);transform:translateY(-2px)}
+.member-card:hover::before{opacity:1}
+.mc-samuel::before{background:linear-gradient(90deg,var(--cherry),var(--cherry3))}
+.mc-aloys::before{background:linear-gradient(90deg,#0F5E8B,#2E86DE)}
+.mc-kiki::before{background:linear-gradient(90deg,#0F6E56,#27AE60)}
+.mc-alain::before{background:linear-gradient(90deg,#6B1A6B,#9B59B6)}
+.mc-mom::before{background:linear-gradient(90deg,var(--fam),var(--famgold))}
+.member-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:15px;margin-bottom:10px;border:2px solid}
+.av-samuel{background:rgba(42,18,46,.5);border-color:rgba(82,31,88,.6);color:var(--gold2)}
+.av-aloys{background:rgba(15,94,139,.25);border-color:rgba(46,134,222,.35);color:#7BC5F5}
+.av-kiki{background:rgba(15,110,86,.2);border-color:rgba(39,174,96,.3);color:#5EE8A0}
+.av-alain{background:rgba(107,26,107,.25);border-color:rgba(155,89,182,.35);color:#D4A0FF}
+.av-mom{background:rgba(139,69,19,.25);border-color:var(--famborder);color:var(--famgold2)}
+.mc-role{font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.mc-name{font-size:14px;font-weight:500;color:var(--white);margin-bottom:4px}
+.mc-wiring{font-size:11px;color:var(--muted);margin-bottom:6px;line-height:1.4}
+.mc-season{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:3px 8px;border-radius:20px;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
+.mc-season-dot{width:5px;height:5px;border-radius:50%}
+.mc-privacy{font-size:9px;color:rgba(255,255,255,.2);margin-top:8px;font-style:italic}
+.mc-you{position:absolute;top:10px;right:10px;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);background:rgba(201,169,110,.1);border:1px solid rgba(201,169,110,.2);border-radius:20px;padding:2px 7px}
+
+/* GENERATIONAL PATTERN */
+.pattern-card{background:linear-gradient(135deg,var(--originfade),rgba(74,26,107,.05));border:1px solid var(--originborder);border-radius:20px;padding:22px;margin-bottom:16px;cursor:pointer;transition:all .25s}
+.pattern-card:hover{background:rgba(74,26,107,.18)}
+.pc-label{font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(180,120,255,.65);margin-bottom:.625rem}
+.pc-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--white);margin-bottom:.5rem;line-height:1.25}
+.pc-body{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:1rem}
+.pattern-rows{display:flex;flex-direction:column;gap:8px}
+.pr-row{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px}
+.pr-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.pr-text{font-size:12px;color:var(--muted);line-height:1.6}
+.pr-text strong{color:rgba(200,170,255,.8)}
+
+/* COMPLEMENTARITY MAP */
+.comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.comp-card{background:var(--glass);border:1px solid var(--line2);border-radius:16px;padding:16px;cursor:pointer;transition:all .22s}
+.comp-card:hover{background:var(--glass2)}
+.cc-pair{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.cc-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.cc-connector{font-size:16px;color:var(--muted)}
+.cc-score{font-family:'Playfair Display',serif;font-size:26px;margin-bottom:3px}
+.cc-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.cc-insight{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* TRAJECTORY */
+.traj-card{background:var(--glass);border:1px solid var(--line2);border-radius:20px;padding:20px;margin-bottom:16px}
+.traj-row{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--line2)}
+.traj-row:last-child{border:none}
+.tr-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.tr-name{font-size:13px;font-weight:500;color:var(--white);min-width:60px}
+.tr-from{font-size:11px;color:var(--muted)}
+.tr-arrow{font-size:14px;color:rgba(255,255,255,.3);flex-shrink:0}
+.tr-to{font-size:12px;font-weight:500}
+.tr-event{font-size:11px;color:var(--muted);flex:1;text-align:right;font-style:italic}
+.tr-bar-wrap{flex:1;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;min-width:60px}
+.tr-bar-fill{height:100%;border-radius:2px;transition:width 1.4s cubic-bezier(.16,1,.3,1)}
+
+/* OPPORTUNITY */
+.opp-card{background:linear-gradient(135deg,var(--famfade2),rgba(139,69,19,.06));border:1px solid var(--famborder);border-radius:20px;padding:22px;margin-bottom:16px;cursor:pointer;transition:all .25s}
+.opp-card:hover{border-color:rgba(212,168,83,.45)}
+.oc-label{font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(212,168,83,.6);margin-bottom:.625rem}
+.oc-title{font-family:'Playfair Display',serif;font-size:19px;color:var(--white);margin-bottom:.5rem;line-height:1.25}
+.oc-body{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:1rem}
+.opp-tags{display:flex;flex-wrap:wrap;gap:6px}
+.otag{font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px;border:1px solid var(--famborder);color:rgba(212,168,83,.7);background:var(--famfade)}
+
+/* MILESTONE FEED */
+.milestone-feed{display:flex;flex-direction:column;gap:8px}
+.mf-item{background:var(--glass);border:1px solid var(--line2);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:12px}
+.mf-item:hover{background:var(--glass2)}
+.mf-item.achievement{border-color:rgba(39,174,96,.2);background:rgba(39,174,96,.04)}
+.mfi-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.mfi-body{flex:1}
+.mfi-type{font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.mfi-title{font-size:13px;color:var(--white);margin-bottom:2px}
+.mfi-sub{font-size:11px;color:var(--muted);line-height:1.5}
+.mfi-time{font-size:10px;color:rgba(255,255,255,.2);margin-top:3px}
+
+/* WELLBEING */
+.wellbeing-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.wb-cell{background:var(--glass);border:1px solid var(--line2);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all .2s}
+.wb-cell:hover{background:var(--glass2)}
+.wb-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;margin:0 auto 6px}
+.wb-name{font-size:11px;font-weight:500;color:var(--white);margin-bottom:3px}
+.wb-state{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px}
+.wb-a{background:rgba(39,174,96,.1);color:var(--green2);border:1px solid rgba(39,174,96,.2)}
+.wb-b{background:rgba(201,169,110,.1);color:var(--gold2);border:1px solid rgba(201,169,110,.2)}
+.wb-c{background:rgba(230,126,34,.1);color:#E67E22;border:1px solid rgba(230,126,34,.2)}
+.wb-private{font-size:9px;color:rgba(255,255,255,.18);margin-top:4px;font-style:italic}
+
+/* DRAWER */
+.drawer{position:fixed;right:-580px;top:0;width:560px;max-width:95vw;height:100vh;background:linear-gradient(180deg,#0D0A14,#07050A);border-left:1px solid var(--line);padding:32px;transition:.38s cubic-bezier(.16,1,.3,1);z-index:100;overflow:auto}
+.drawer.open{right:0}
+.drawer-close{background:var(--glass);border:1px solid var(--line2);color:var(--muted);font-size:11px;padding:6px 14px;border-radius:50px;cursor:pointer;float:right;margin-bottom:24px;font-family:'DM Sans',sans-serif}
+.drawer-eye{font-size:9px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(212,168,83,.6);margin-bottom:8px;clear:both}
+.drawer-title{font-family:'Playfair Display',serif;font-size:28px;color:var(--white);margin-bottom:12px;line-height:1.15}
+.drawer-body{font-size:13px;color:var(--muted);line-height:1.78;margin-bottom:16px}
+.drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dg-cell{background:var(--glass);border:1px solid var(--line2);border-radius:12px;padding:14px}
+.dgc-lbl{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.dgc-val{font-size:13px;font-weight:500;color:var(--white)}
+.overlay{position:fixed;inset:0;background:rgba(7,5,10,.62);z-index:99;display:none}
+.overlay.open{display:block}
+</style>
+</head>
+<body>
+<div class="overlay" id="ov" onclick="closeD()"></div>
+
+<nav>
+  <div class="logo-row"><svg width="20" height="20" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="10" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><circle cx="20" cy="20" r="3" fill="white" opacity=".8"/><line x1="20" y1="2" x2="20" y2="10" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><line x1="20" y1="30" x2="20" y2="38" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><line x1="2" y1="20" x2="10" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><line x1="30" y1="20" x2="38" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".55"/></svg><span class="logo-word">ALIGN</span></div>
+  <div class="logo-tag">Family360</div>
+  <div class="fam-badge">
+    <div class="fb-label">Family context</div>
+    <div class="fb-name">Nkuindji Family</div>
+    <div class="fb-sub">Samuel · Aloys · Kiki · Alain · Mom</div>
+    <div class="fb-count">5 members · 4 active · Origin anchor connected</div>
+  </div>
+  <div class="nav-section">Family Views</div>
+  <a class="nav-item active"><span class="nav-icon">◎</span>Family Home</a>
+  <a class="nav-item"><span class="nav-icon">◈</span>Generational Patterns</a>
+  <a class="nav-item"><span class="nav-icon">○</span>Complementarity Map</a>
+  <a class="nav-item"><span class="nav-icon">◇</span>Growth Trajectory</a>
+  <a class="nav-item"><span class="nav-icon">✦</span>Family Opportunity</a>
+  <div class="nav-section">Members</div>
+  <a class="nav-item"><span class="nav-icon">◉</span>Samuel <span style="margin-left:auto;font-size:9px;color:var(--gold)">You</span></a>
+  <a class="nav-item"><span class="nav-icon">◉</span>Aloys</a>
+  <a class="nav-item"><span class="nav-icon">◉</span>Kiki</a>
+  <a class="nav-item"><span class="nav-icon">◉</span>Alain</a>
+  <a class="nav-item"><span class="nav-icon">◉</span>Mom</a>
+  <div class="nav-section">Tools</div>
+  <a class="nav-item"><span class="nav-icon">⬡</span>Family Decision Suite<span class="nav-badge-sm">2</span></a>
+  <a class="nav-item"><span class="nav-icon">⬡</span>LegacyLab™ · Family</a>
+  <a class="nav-item"><span class="nav-icon">🔒</span>Sharing Settings</a>
+  <div class="nav-footer"><div class="nav-footer-item"><span>◐</span>Samuel · Personal</div></div>
+</nav>
+
+<div class="main">
+  <div class="page-eye">Family360 · Nkuindji · Samuel's view</div>
+  <h1 class="page-title">The Nkuindji family<em>is leveling up.</em></h1>
+  <p class="page-sub">What you see here is derived from consented meaning profiles — not individual scores. Each member controls exactly what crosses the family bridge. The patterns, opportunities, and trajectory below emerge from what the family has chosen to share collectively.</p>
+
+  <!-- FAMILY ORBIT -->
+  <div class="orbit-section" onclick="openD('Family Alignment Signal','72','The family alignment signal is a composite of all consented meaning profiles across connected members. It reflects season compatibility, collective readiness patterns, and network complementarity — not an average of individual scores. Individual scores are never used in this computation.',['Season alignment','Building dominant'],['Complementarity avg','81%'],['Members active','4 of 5'],['Origin anchor','Mom · connected'])">
+    <div class="orbit-inner">
+      <div class="orbit-center">
+        <div class="orbit-ring">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="48" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="7"/>
+            <circle cx="60" cy="60" r="48" fill="none" stroke="url(#famGrad)" stroke-width="7" stroke-dasharray="301.6" stroke-dashoffset="84.4" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+            <defs><linearGradient id="famGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#8B4513"/><stop offset="100%" stop-color="#D4A853"/></linearGradient></defs>
+          </svg>
+          <div class="orbit-score"><div class="or-num">72</div><div class="or-lbl">Family</div></div>
+        </div>
+      </div>
+      <div class="orbit-meta">
+        <div class="om-label">Nkuindji Family · Alignment signal</div>
+        <div class="om-title">Four brothers in Building. One in Expansion. Mom as the origin anchor. The system is rising.</div>
+        <div class="om-body">The family alignment signal reflects season compatibility, collective readiness, and wiring complementarity. The Nkuindji family shows a rare pattern — four siblings with different wiring profiles that cover each other's natural blind spots. This is not common. It is the infrastructure for something generational.</div>
+        <div class="family-chips">
+          <span class="fchip">Season: Building dominant</span>
+          <span class="fchip">Complementarity: 81% avg</span>
+          <span class="fchip">Aloys: Expansion signals</span>
+          <span class="fchip">Mom: Origin anchor active</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEMBER CARDS -->
+  <div class="sec-rule">Family members · Consented meaning profiles</div>
+  <div class="members-grid">
+    <div class="member-card mc-samuel" onclick="openD('Samuel','You','Your full User Model is active. What your family sees is your consented meaning profile: wiring type, orientation, and current season. Your scores, sub-scores, Life Journey events, and AI conversations are private to you.',['Role','3rd born · Builder'],['Wiring','Organizer · Realist'],['Orientation','Truth-Seeker · Builder'],['Season','Building'],['Shared','Tier 2: Wiring + Season'])">
+      <div class="mc-you">You</div>
+      <div class="member-avatar av-samuel">S</div>
+      <div class="mc-role">3rd born</div>
+      <div class="mc-name">Samuel</div>
+      <div class="mc-wiring">Organizer · Realist<br>Paradigm Challenger</div>
+      <div class="mc-season"><div class="mc-season-dot" style="background:var(--gold2)"></div>Building</div>
+      <div class="mc-privacy">Tier 2 shared</div>
+    </div>
+    <div class="member-card mc-aloys" onclick="openD('Aloys','1st born · Eldest','Aloys has connected his Family360 profile and is sharing Tier 2: wiring type, orientation, and current season. His assessment scores, sub-scores, Life Journey events, and AI persona conversations are private to him.',['Role','1st born · Eldest'],['Wiring','Visionary · Creator'],['Orientation','Visionary · Builder'],['Season','Expansion'],['Shared','Tier 2: Wiring + Season'])">
+      <div class="member-avatar av-aloys">A</div>
+      <div class="mc-role">1st born · Eldest</div>
+      <div class="mc-name">Aloys</div>
+      <div class="mc-wiring">Visionary · Creator<br>Pioneer Architect</div>
+      <div class="mc-season"><div class="mc-season-dot" style="background:#4EA8F5"></div>Expansion</div>
+      <div class="mc-privacy">Tier 2 shared</div>
+    </div>
+    <div class="member-card mc-kiki" onclick="openD('Kiki','2nd born','Kiki has connected and is sharing Tier 1: wiring type and orientation only. Season is private to Kiki. This is Kiki\'s choice and is respected fully.',['Role','2nd born'],['Wiring','Supporter · Connector'],['Orientation','Connector · Truth-Seeker'],['Season','Private — Tier 1 only'],['Shared','Tier 1: Wiring only'])">
+      <div class="member-avatar av-kiki">K</div>
+      <div class="mc-role">2nd born</div>
+      <div class="mc-name">Kiki</div>
+      <div class="mc-wiring">Supporter · Connector<br>Bridge Builder</div>
+      <div class="mc-season"><div class="mc-season-dot" style="background:rgba(255,255,255,.3)"></div>Private</div>
+      <div class="mc-privacy">Tier 1 shared</div>
+    </div>
+    <div class="member-card mc-alain" onclick="openD('Alain','4th born · Youngest','Alain has connected and is sharing Tier 3: full meaning profile — wiring, orientation, season, and primary strength signal. Alain chose the most open sharing option.',['Role','4th born · Youngest'],['Wiring','Realist · Doer'],['Orientation','Builder · Steward'],['Season','Building'],['Shared','Tier 3: Full meaning'])">
+      <div class="member-avatar av-alain">A</div>
+      <div class="mc-role">4th born · Youngest</div>
+      <div class="mc-name">Alain</div>
+      <div class="mc-wiring">Realist · Doer<br>Execution Engine</div>
+      <div class="mc-season"><div class="mc-season-dot" style="background:#D4A0FF"></div>Building</div>
+      <div class="mc-privacy">Tier 3 shared</div>
+    </div>
+    <div class="member-card mc-mom" onclick="openD('Mom','Origin anchor · Nkuindji family','Mom has connected as the family\'s origin anchor. She is sharing Tier 1 only — wiring type and orientation. Her presence makes generational pattern analysis possible. She is the reference point from which the family system can be understood.',['Role','Origin anchor · Mother'],['Wiring','Supporter · Organizer'],['Orientation','Connector · Steward'],['Season','Private'],['Shared','Tier 1: Origin anchor'])">
+      <div class="member-avatar av-mom">M</div>
+      <div class="mc-role">Origin anchor</div>
+      <div class="mc-name">Mom</div>
+      <div class="mc-wiring">Supporter · Organizer<br>Family Architect</div>
+      <div class="mc-season"><div class="mc-season-dot" style="background:var(--famgold)"></div>Origin</div>
+      <div class="mc-privacy">Tier 1 · Origin anchor</div>
+    </div>
+  </div>
+
+  <!-- GENERATIONAL PATTERNS -->
+  <div class="sec-rule">Generational patterns · What the family system produced</div>
+  <div class="pattern-card" onclick="openD('Generational Pattern Analysis','','What emerges when five wiring profiles from the same origin are compared. These patterns are derived from consented meaning profiles — not from scores or personal history. They represent what the Nkuindji family system produced across two generations.',['Origin anchor','Mom: Supporter · Organizer'],['Pattern','Execution across all wiring types'],['Gift','Each brother covers a blind spot'],['Generation signal','Builders and Visionaries'])">
+    <div class="pc-label">Generational intelligence · Nkuindji family system</div>
+    <div class="pc-title">Mom built connectors, organizers, and visionaries. The four brothers cover every dimension of what it takes to build something lasting.</div>
+    <div class="pc-body">The Supporter-Organizer origin (Mom) produced four children with distinct but complementary profiles: a Visionary-Creator (Aloys), a Supporter-Connector (Kiki), a Organizer-Realist (Samuel), and a Realist-Doer (Alain). This is the rarest family wiring pattern — full coverage of the build-execute-connect-vision cycle across four siblings. The family system did not produce duplicates. It produced a complete architecture.</div>
+    <div class="pattern-rows">
+      <div class="pr-row"><div class="pr-icon">◈</div><div class="pr-text"><strong>The vision-execution gap is closed within the family.</strong> Aloys sees what could be. Alain executes without hesitation. Samuel builds the system that makes both sustainable. Kiki connects what would otherwise remain isolated.</div></div>
+      <div class="pr-row"><div class="pr-icon">◇</div><div class="pr-text"><strong>The family carries a Supporter origin.</strong> Mom's wiring produced children who know how to support each other. The Belonging signal across all four brothers is consistently high — this is not coincidence, it is origin pattern.</div></div>
+      <div class="pr-row"><div class="pr-icon">○</div><div class="pr-text"><strong>Generational advancement pattern: each brother is in a more active building season than the last.</strong> Aloys (Expansion), Samuel and Alain (Building), Kiki (meaning unknown but wiring suggests high relational investment). The family is rising systematically.</div></div>
+    </div>
+  </div>
+
+  <!-- COMPLEMENTARITY -->
+  <div class="sec-rule">Complementarity map · Highest-value pairings</div>
+  <div class="comp-grid">
+    <div class="comp-card" onclick="openD('Samuel + Aloys','91% complementarity','The Organizer-Realist and the Visionary-Creator are the highest complementarity pairing in the family. Aloys sees the future. Samuel builds the system that makes it real. Neither produces the other\'s contribution. Together they produce something neither can produce alone.',['Pairing','Organizer + Visionary'],['Strength','Vision + system architecture'],['Gap covered','Both sides of execution'],['Opportunity','Joint venture potential'])">
+      <div class="cc-label">Highest pairing</div>
+      <div class="cc-pair">
+        <div class="cc-av av-samuel" style="width:28px;height:28px;font-size:11px">S</div>
+        <div class="cc-connector">+</div>
+        <div class="cc-av av-aloys" style="width:28px;height:28px;font-size:11px">A</div>
+      </div>
+      <div class="cc-score" style="color:var(--gold2)">91%</div>
+      <div class="cc-insight">Organizer-Realist + Visionary-Creator. Samuel builds the system. Aloys sees what it becomes. Highest complementarity in the family.</div>
+    </div>
+    <div class="comp-card" onclick="openD('Samuel + Kiki','84% complementarity','The Organizer and the Connector. Samuel builds principled systems. Kiki ensures those systems reach people. The Truth-Seeker and the Connector produce trust at scale — which is what makes the system spread.',['Pairing','Organizer + Connector'],['Strength','Systems that connect'],['Gap covered','Distribution and belonging'],['Opportunity','Community and network reach'])">
+      <div class="cc-label">Strong pairing</div>
+      <div class="cc-pair">
+        <div class="cc-av av-samuel" style="width:28px;height:28px;font-size:11px">S</div>
+        <div class="cc-connector">+</div>
+        <div class="cc-av av-kiki" style="width:28px;height:28px;font-size:11px">K</div>
+      </div>
+      <div class="cc-score" style="color:#5EE8A0">84%</div>
+      <div class="cc-insight">Organizer + Supporter-Connector. Samuel builds what matters. Kiki connects it to people. Trust at scale.</div>
+    </div>
+    <div class="comp-card" onclick="openD('Aloys + Alain','88% complementarity','The Visionary and the Execution Engine. Aloys sees the destination. Alain moves toward it without hesitation. The oldest and youngest brother are the family\'s most action-oriented pairing — vision and velocity.',['Pairing','Visionary + Realist-Doer'],['Strength','Vision and execution speed'],['Gap covered','Action without overthinking'],['Opportunity','Fast-moving initiatives'])">
+      <div class="cc-label">Highest velocity pairing</div>
+      <div class="cc-pair">
+        <div class="cc-av av-aloys" style="width:28px;height:28px;font-size:11px">A</div>
+        <div class="cc-connector">+</div>
+        <div class="cc-av av-alain" style="width:28px;height:28px;font-size:11px">A</div>
+      </div>
+      <div class="cc-score" style="color:#7BC5F5">88%</div>
+      <div class="cc-insight">Visionary + Doer. Aloys sees it. Alain moves. The family\'s fastest pairing for execution on a clear vision.</div>
+    </div>
+    <div class="comp-card" onclick="openD('All four brothers','Combined signal','When all four wiring profiles are combined, the family produces a complete build-connect-execute-vision cycle. No gap in the architecture. This is the rarest family configuration Align360 has encountered.',['Coverage','Full build cycle'],['Vision','Aloys'],['Connection','Kiki'],['Architecture','Samuel'],['Execution','Alain'])">
+      <div class="cc-label">Full family combined</div>
+      <div class="cc-pair">
+        <div class="cc-av av-aloys" style="width:22px;height:22px;font-size:9px">A</div>
+        <div class="cc-av av-kiki" style="width:22px;height:22px;font-size:9px">K</div>
+        <div class="cc-av av-samuel" style="width:22px;height:22px;font-size:9px">S</div>
+        <div class="cc-av av-alain" style="width:22px;height:22px;font-size:9px">A</div>
+      </div>
+      <div class="cc-score" style="color:var(--famgold2)">Full cycle</div>
+      <div class="cc-insight">Visionary + Connector + Organizer + Executor. The four brothers together produce what no outside team can replicate — shared origin, distinct wiring, complete coverage.</div>
+    </div>
+  </div>
+
+  <!-- WELLBEING -->
+  <div class="sec-rule">Family wellbeing · Collective capacity signal</div>
+  <div class="wellbeing-row">
+    <div class="wb-cell" onclick="openD('Samuel · Capacity','A Day','Full capacity today. This is Samuel\'s personal B3 state — visible here because Samuel has consented to share his capacity signal with the family context. Family members can see whether now is a good time to engage Samuel on significant matters.',['State','A Day'],['Capacity','Full'],['Shared by','Samuel — consented'],['Meaning','High engagement window open'])">
+      <div class="wb-av av-samuel">S</div>
+      <div class="wb-name">Samuel</div>
+      <div class="wb-state wb-a">A Day</div>
+      <div class="wb-private">You · shared</div>
+    </div>
+    <div class="wb-cell" onclick="openD('Aloys · Capacity','B Day','Aloys is showing moderate capacity today. He has consented to share his capacity signal with the family. This is not medical or personal data — it is a pacing signal that helps the family know when significant conversations are well-timed.',['State','B Day'],['Capacity','Moderate'],['Shared by','Aloys — consented'],['Meaning','Moderate engagement — timing matters'])">
+      <div class="wb-av av-aloys">A</div>
+      <div class="wb-name">Aloys</div>
+      <div class="wb-state wb-b">B Day</div>
+      <div class="wb-private">consented</div>
+    </div>
+    <div class="wb-cell" onclick="openD('Kiki · Capacity','Private','Kiki has not consented to share capacity signals with the family context. This is fully respected — Kiki\'s B3 state is private. The family wellbeing signal accounts for this gap without making assumptions.',['State','Private'],['Shared','No — not consented'],['Family signal','Excluded from aggregate'],['Action','None required'])">
+      <div class="wb-av av-kiki">K</div>
+      <div class="wb-name">Kiki</div>
+      <div class="wb-state" style="background:rgba(255,255,255,.05);color:rgba(255,255,255,.3);border:1px solid var(--line2)">Private</div>
+      <div class="wb-private">not shared</div>
+    </div>
+    <div class="wb-cell" onclick="openD('Alain · Capacity','A Day','Alain is at full capacity today. He has consented to share his capacity signal. Two family members at A Day simultaneously is a strong signal for meaningful family decisions, significant conversations, or collaborative work.',['State','A Day'],['Capacity','Full'],['Shared by','Alain — consented'],['Meaning','High engagement window'])">
+      <div class="wb-av av-alain">A</div>
+      <div class="wb-name">Alain</div>
+      <div class="wb-state wb-a">A Day</div>
+      <div class="wb-private">consented</div>
+    </div>
+    <div class="wb-cell" onclick="openD('Mom · Capacity','Private','Mom has not consented to share capacity signals. Her participation as origin anchor is meaningful and complete at Tier 1. Capacity sharing is a separate consent decision she has not made, and that is fully respected.',['State','Private'],['Shared','No'],['Origin anchor','Active at Tier 1'],['Note','Fully respected'])">
+      <div class="wb-av av-mom">M</div>
+      <div class="wb-name">Mom</div>
+      <div class="wb-state" style="background:rgba(255,255,255,.05);color:rgba(255,255,255,.3);border:1px solid var(--line2)">Private</div>
+      <div class="wb-private">not shared</div>
+    </div>
+  </div>
+
+  <!-- OPPORTUNITY -->
+  <div class="sec-rule">Family opportunity · What the four brothers produce together</div>
+  <div class="opp-card" onclick="openD('Family Opportunity Signal','','The four brothers together cover a complete build cycle — vision, connection, architecture, execution. This is the rarest family configuration because it requires four distinct wiring profiles from the same origin. What this produces together is more defensible than any combination of strangers with the same wiring profiles, because it adds shared history, shared language, shared trust, and shared investment in each other\'s success.',['Vision','Aloys — Pioneer Architect'],['Connection','Kiki — Bridge Builder'],['Architecture','Samuel — Paradigm Challenger'],['Execution','Alain — Execution Engine'],['Opportunity type','Family venture potential'])">
+    <div class="oc-label">Family Opportunity · Family360 Intelligence</div>
+    <div class="oc-title">The Nkuindji brothers have a complete build architecture. Vision. Connection. System. Execution. In one family.</div>
+    <div class="oc-body">Aloys (Visionary-Creator) sees what could be built. Kiki (Supporter-Connector) ensures it reaches people. Samuel (Organizer-Realist) builds the principled system that makes it sustainable. Alain (Realist-Doer) executes without hesitation once the direction is clear. No professional team assembles this combination by accident. The Nkuindji family has it by origin. The question is not whether this combination is valuable — it is what to build with it.</div>
+    <div class="opp-tags">
+      <span class="otag">Shared trust — no assembly required</span>
+      <span class="otag">Full build cycle in one family</span>
+      <span class="otag">Generational alignment</span>
+      <span class="otag">Open: Family Decision Suite</span>
+    </div>
+  </div>
+
+  <!-- GROWTH TRAJECTORY -->
+  <div class="sec-rule">Growth trajectory · The family is rising</div>
+  <div class="traj-card">
+    <div style="font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Season movement · Last 6 months · Consented signals only</div>
+    <div class="traj-row">
+      <div class="tr-av av-aloys">A</div>
+      <div class="tr-name">Aloys</div>
+      <div class="tr-from" style="font-size:11px;color:var(--muted)">Building</div>
+      <div class="tr-arrow">→</div>
+      <div class="tr-to" style="color:#4EA8F5">Expansion</div>
+      <div class="tr-bar-wrap"><div class="tr-bar-fill" data-w="90%" style="background:linear-gradient(90deg,#0F5E8B,#2E86DE)"></div></div>
+      <div class="tr-event">Leading at scale</div>
+    </div>
+    <div class="traj-row">
+      <div class="tr-av av-samuel">S</div>
+      <div class="tr-name">Samuel</div>
+      <div class="tr-from">Aligning</div>
+      <div class="tr-arrow">→</div>
+      <div class="tr-to" style="color:var(--gold2)">Building</div>
+      <div class="tr-bar-wrap"><div class="tr-bar-fill" data-w="78%" style="background:linear-gradient(90deg,var(--cherry),var(--cherry3))"></div></div>
+      <div class="tr-event">System building</div>
+    </div>
+    <div class="traj-row">
+      <div class="tr-av av-alain">A</div>
+      <div class="tr-name">Alain</div>
+      <div class="tr-from">Discovering</div>
+      <div class="tr-arrow">→</div>
+      <div class="tr-to" style="color:#D4A0FF">Building</div>
+      <div class="tr-bar-wrap"><div class="tr-bar-fill" data-w="65%" style="background:linear-gradient(90deg,#6B1A6B,#9B59B6)"></div></div>
+      <div class="tr-event">Fastest mover</div>
+    </div>
+    <div class="traj-row">
+      <div class="tr-av av-kiki">K</div>
+      <div class="tr-name">Kiki</div>
+      <div class="tr-from">Unknown</div>
+      <div class="tr-arrow">→</div>
+      <div class="tr-to" style="color:rgba(255,255,255,.35)">Private</div>
+      <div class="tr-bar-wrap"><div class="tr-bar-fill" style="width:0%;background:rgba(255,255,255,.1)"></div></div>
+      <div class="tr-event">Season private</div>
+    </div>
+    <div class="traj-row">
+      <div class="tr-av av-mom">M</div>
+      <div class="tr-name">Mom</div>
+      <div class="tr-from">Origin</div>
+      <div class="tr-arrow">→</div>
+      <div class="tr-to" style="color:var(--famgold2)">Anchor</div>
+      <div class="tr-bar-wrap"><div class="tr-bar-fill" data-w="100%" style="background:linear-gradient(90deg,var(--fam),var(--famgold))"></div></div>
+      <div class="tr-event">Foundation of all</div>
+    </div>
+  </div>
+
+  <!-- MILESTONE FEED -->
+  <div class="sec-rule">Family milestones · Shared moments</div>
+  <div class="milestone-feed">
+    <div class="mf-item achievement" onclick="openD('Aloys · Season Transition','Expansion confirmed','Aloys has moved from Building into Expansion season. This milestone was shared with the family context because Aloys consented to season signal sharing. This is a significant family moment — the eldest brother leading at scale is the pattern the family system was built for.',['Member','Aloys'],['Event','Season transition'],['From','Building'],['To','Expansion'])">
+      <div class="mfi-av av-aloys">A</div>
+      <div class="mfi-body">
+        <div class="mfi-type">Family milestone · Aloys</div>
+        <div class="mfi-title">Aloys moved into Expansion season</div>
+        <div class="mfi-sub">The eldest brother is leading at scale. The family's Visionary-Creator is in his highest season. This is the pattern the family was built for.</div>
+        <div class="mfi-time">This week</div>
+      </div>
+    </div>
+    <div class="mf-item" onclick="openD('Alain · Season Transition','Building confirmed','Alain has moved from Discovering into Building season — the fastest season progression in the family. The youngest brother is executing. The Realist-Doer profile in a Building season is the highest-velocity combination.',['Member','Alain'],['Event','Season transition'],['From','Discovering'],['To','Building'])">
+      <div class="mfi-av av-alain">A</div>
+      <div class="mfi-body">
+        <div class="mfi-type">Family milestone · Alain</div>
+        <div class="mfi-title">Alain entered Building season — fastest progression in the family</div>
+        <div class="mfi-sub">The youngest brother is executing. Realist-Doer in Building season — the highest-velocity combination the family has produced.</div>
+        <div class="mfi-time">2 weeks ago</div>
+      </div>
+    </div>
+    <div class="mf-item" onclick="openD('Family · Complementarity confirmed','Samuel + Aloys · 91%','The Samuel-Aloys pairing has been confirmed as the highest complementarity pairing in the family. This was surfaced when both completed their Layer 1 assessments and connected their Family360 profiles.',['Pairing','Samuel + Aloys'],['Score','91%'],['Type','Organizer + Visionary'],['Implication','Highest joint potential in family'])">
+      <div class="mfi-av" style="background:rgba(255,255,255,.06);border:1px solid var(--line2);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px">◎</div>
+      <div class="mfi-body">
+        <div class="mfi-type">Family intelligence</div>
+        <div class="mfi-title">Samuel + Aloys: 91% complementarity confirmed</div>
+        <div class="mfi-sub">The highest pairing in the family. Organizer meets Visionary. System meets vision. This is not a coincidence — it is origin pattern.</div>
+        <div class="mfi-time">This month</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer" id="drawer">
+  <button class="drawer-close" onclick="closeD()">Close ×</button>
+  <div class="drawer-eye">Family360 · Detail</div>
+  <div class="drawer-title" id="d-title"></div>
+  <div class="drawer-body" id="d-body"></div>
+  <div class="drawer-grid" id="d-grid"></div>
+</div>
+
+<script>
+setTimeout(()=>document.querySelectorAll('.tr-bar-fill[data-w]').forEach(el=>el.style.width=el.dataset.w),400);
+function openD(title,val,body,cells){
+  const arr = Array.isArray(cells) ? cells : [];
+  document.getElementById('d-title').textContent=title+(val?' · '+val:'');
+  document.getElementById('d-body').textContent=body||'';
+  const g=document.getElementById('d-grid');g.innerHTML='';
+  // cells can be array of strings (pairs) or array of arrays
+  if(arr.length){
+    const pairs = typeof arr[0]==='string' ? [];
+    const arrPairs = typeof arr[0]==='string' ? 
+      arr.reduce((acc,v,i)=>{ if(i%2===0)acc.push([v,arr[i+1]||'']); return acc; },[]) :
+      arr;
+    arrPairs.forEach(([l,v])=>{
+      const d=document.createElement('div');d.className='dg-cell';
+      d.innerHTML=`<div class="dgc-lbl">${l}</div><div class="dgc-val">${v||''}</div>`;
+      g.appendChild(d);
+    });
+  }
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('ov').classList.add('open');
+}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('ov').classList.remove('open')}
+</script>
+</body>
+</html>

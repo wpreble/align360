@@ -51,6 +51,20 @@ export function clearProfile() {
   }
 }
 
+/** Wipe ALL of this device's Align360 data (onboarding, name, answers, profile,
+ *  chats, prefs). Used by the "Reset my data" control so each tester starts fresh. */
+export function resetAll() {
+  if (typeof window === 'undefined') return;
+  try {
+    Object.keys(localStorage)
+      .filter((k) => k.startsWith('align360:'))
+      .forEach((k) => localStorage.removeItem(k));
+    window.dispatchEvent(new Event(STORE_EVENT));
+  } catch {
+    /* ignore */
+  }
+}
+
 /* ── Name (personalization) ── */
 export function getName(): string {
   if (typeof window === 'undefined') return '';

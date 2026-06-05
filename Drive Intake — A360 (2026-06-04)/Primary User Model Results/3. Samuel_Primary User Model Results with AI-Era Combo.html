@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Align360 — Full Identity Profile · Samuel</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500;1,600;1,700&family=Cinzel:wght@400;500;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+:root{
+  --void:#050508;--obsidian:#0C0C14;--midnight:#111120;--dusk:#181828;
+  --gold:#C8A96E;--gold2:#E8C97E;--goldd:#8A6E3A;
+  --silver:#B8B4A8;--silverd:#6A6660;--ivory:#F2EDE4;--ivoryd:#C8C4BC;
+  --border:rgba(200,169,110,.14);--borderm:rgba(200,169,110,.28);
+  --teal:#2ABAAA;--crimson:#C04040;--plum:#9A5AC8;--amber:#D4901A;--blue:#3A7ADD;
+  --green:#27AE60;--greenm:#1A6B3A;
+  --ai:#1A4A7A;--ai2:#2E6ECC;--ai3:#E8F1FB;--ai4:#B8D4F8;
+  --legacy:#4A1A1A;--legacy2:#8C3A3A;--legacy3:#FBE8E8;
+}
+body{font-family:'Crimson Pro',Georgia,serif;background:var(--void);color:var(--ivoryd);overflow-x:hidden;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.7}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:var(--void)}::-webkit-scrollbar-thumb{background:var(--goldd)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:6rem 2rem;position:relative;overflow:hidden;text-align:center}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 55% 65% at 50% 45%,rgba(58,26,74,.35),transparent 60%),radial-gradient(ellipse 35% 35% at 12% 72%,rgba(10,50,50,.2),transparent 55%)}
+.constellation{position:absolute;inset:0;pointer-events:none}
+.rings{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.ring{position:absolute;border-radius:50%;border:1px solid var(--border);transform:translate(-50%,-50%);animation:breathe 9s ease-in-out infinite}
+.ring:nth-child(1){width:140px;height:140px}.ring:nth-child(2){width:300px;height:300px;animation-delay:.5s;border-color:rgba(200,169,110,.09)}.ring:nth-child(3){width:480px;height:480px;animation-delay:1s;border-color:rgba(200,169,110,.06)}.ring:nth-child(4){width:680px;height:680px;animation-delay:1.5s;border-color:rgba(200,169,110,.03)}
+@keyframes breathe{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.02)}}
+.hero-inner{position:relative;z-index:2;max-width:860px;margin:0 auto}
+.hero-eye{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--goldd);margin-bottom:2.5rem;display:flex;align-items:center;justify-content:center;gap:1.5rem}
+.hero-eye::before,.hero-eye::after{content:'';width:36px;height:1px;background:var(--goldd)}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,9vw,88px);font-weight:300;font-style:italic;color:var(--ivory);line-height:.93;margin-bottom:.3em;text-shadow:0 0 80px rgba(200,169,110,.12)}
+.hero-title em{color:var(--gold2);display:block}
+.hero-title .sub{display:block;font-size:clamp(16px,2.8vw,28px);color:var(--silverd);font-weight:300;margin-top:.3em;letter-spacing:.06em;font-style:normal}
+.gold-rule{width:72px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:2rem auto}
+.hero-desc{font-size:17px;font-weight:300;color:var(--silverd);line-height:1.8;max-width:520px;margin:0 auto 2.5rem}
+.hero-pills{display:flex;justify-content:center;gap:1.25rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.pill{border:1px solid var(--border);padding:.5rem 1.25rem;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--silverd)}
+.pill.gold{border-color:rgba(200,169,110,.3);color:var(--goldd)}
+.hero-latin{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;color:rgba(200,169,110,.28);margin-top:1rem}
+.scroll-cue{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;opacity:.22;animation:scf 3s ease-in-out infinite}
+.scroll-cue-line{width:1px;height:36px;background:linear-gradient(to bottom,var(--gold),transparent)}
+.scroll-cue-text{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.18em;color:var(--gold)}
+@keyframes scf{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.hero-inner>*{animation:fadeUp 1.1s cubic-bezier(.16,1,.3,1) both}
+.hero-inner>*:nth-child(1){animation-delay:.1s}.hero-inner>*:nth-child(2){animation-delay:.25s}.hero-inner>*:nth-child(3){animation-delay:.4s}.hero-inner>*:nth-child(4){animation-delay:.55s}.hero-inner>*:nth-child(5){animation-delay:.7s}.hero-inner>*:nth-child(6){animation-delay:.85s}
+
+/* LAYOUT */
+.page{max-width:960px;margin:0 auto;padding:0 2rem}
+.chapter{padding:5rem 0}
+.ck{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:var(--goldd);display:flex;align-items:center;gap:1.25rem;margin-bottom:1.25rem}
+.ck::after{content:'';flex:1;height:1px;background:var(--border)}
+.ct{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,4.5vw,48px);font-weight:300;font-style:italic;color:var(--ivory);line-height:1.1;margin-bottom:.5rem}
+.cs{font-size:15px;font-weight:300;color:var(--silverd);line-height:1.75;max-width:580px;margin-bottom:2.5rem}
+.ornament{text-align:center;padding:3.5rem 0;color:rgba(200,169,110,.2);font-size:12px;letter-spacing:.6em;position:relative}
+.ornament::before,.ornament::after{content:'';position:absolute;top:50%;width:25%;height:1px;background:linear-gradient(90deg,transparent,var(--border));left:8%}
+.ornament::after{left:auto;right:8%;background:linear-gradient(90deg,var(--border),transparent)}
+
+/* THREE SIGNALS */
+.signal-trio{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem}
+.sig{background:var(--obsidian);padding:2rem 1.75rem;position:relative;overflow:hidden;transition:background .3s}
+.sig:hover{background:var(--midnight)}
+.sig::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,169,110,.3),transparent)}
+.sig-n{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;color:var(--goldd);margin-bottom:1rem}
+.sig-cat{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--silverd);margin-bottom:.4rem}
+.sig-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--ivory);margin-bottom:.75rem;line-height:1.1}
+.sig-pct{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:200;color:var(--gold);line-height:1}
+.sig-pct sup{font-size:20px;vertical-align:top;margin-top:6px}
+.sig-desc{font-size:13px;font-weight:300;color:var(--silverd);line-height:1.7;margin-top:.875rem;padding-top:.875rem;border-top:1px solid var(--border)}
+
+/* EDGE */
+.edge{border:1px solid var(--borderm);background:var(--obsidian);padding:3.5rem;margin-bottom:3.5rem;text-align:center;position:relative;overflow:hidden}
+.edge::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(200,169,110,.04),transparent 70%)}
+.edge::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.4}
+.edge-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--goldd);margin-bottom:1.25rem}
+.edge-title{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,4vw,38px);font-weight:300;color:var(--ivory);line-height:1.2;margin-bottom:1rem;position:relative}
+.edge-title em{font-style:italic;color:var(--gold2)}
+.edge-body{font-size:15px;font-weight:300;color:var(--silverd);line-height:1.85;max-width:620px;margin:0 auto;position:relative}
+
+/* RADAR */
+.radar-wrap{display:grid;grid-template-columns:1fr 280px;gap:2.5rem;background:var(--obsidian);border:1px solid var(--border);padding:2.5rem;margin-bottom:3rem;align-items:center}
+.rl-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:var(--ivory);margin-bottom:.2rem}
+.rl-sub{font-size:12px;color:var(--silverd);font-style:italic;margin-bottom:1.5rem}
+.rl-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.rl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.rl-name{font-size:13px;font-style:italic;flex:1;color:var(--silverd)}
+.rl-pct{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:200}
+
+/* PSR */
+.psr-trio{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem}
+.psr{border:1px solid var(--border);padding:2rem;position:relative}
+.psr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+.psr.p::after{background:linear-gradient(90deg,transparent,rgba(42,186,170,.5),transparent)}
+.psr.s::after{background:linear-gradient(90deg,transparent,rgba(192,64,64,.5),transparent)}
+.psr.r::after{background:linear-gradient(90deg,transparent,rgba(200,169,110,.5),transparent)}
+.psr-l{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.75rem}
+.psr.p .psr-l{color:var(--teal);opacity:.7}.psr.s .psr-l{color:var(--crimson)}.psr.r .psr-l{color:var(--goldd)}
+.psr-h{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:var(--ivory);margin-bottom:.6rem;line-height:1.2}
+.psr-b{font-size:13px;font-weight:300;color:var(--silverd);line-height:1.7}
+.psr-m{height:1px;background:rgba(200,169,110,.08);margin-top:1.25rem;position:relative}
+.psr-mf{height:100%;position:absolute;top:0;left:0}
+.psr.p .psr-mf{background:rgba(42,186,170,.45);width:65%}.psr.s .psr-mf{background:rgba(192,64,64,.4);width:28%}.psr.r .psr-mf{background:rgba(200,169,110,.5);width:55%}
+.psr-ml{display:flex;justify-content:space-between;margin-top:.4rem;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.07em;color:var(--silverd)}
+
+/* CURRENCY */
+.currency{background:var(--obsidian);border:1px solid var(--border);padding:2.5rem;margin-bottom:3rem}
+.cur-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:var(--ivory);margin-bottom:.2rem}
+.cur-sub{font-size:12px;color:var(--silverd);font-style:italic;margin-bottom:2rem}
+.cur-rows{display:flex;flex-direction:column;gap:14px}
+.cr{display:flex;align-items:center;gap:1.25rem}
+.cr-name{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--silverd);min-width:110px}
+.cr-track{flex:1;height:1px;background:rgba(200,169,110,.08);position:relative}
+.cr-fill{position:absolute;top:0;left:0;height:100%;transition:width 1.4s cubic-bezier(.16,1,.3,1)}
+.cr-dot{width:7px;height:7px;border-radius:50%;position:absolute;right:-3.5px;top:50%;transform:translateY(-50%)}
+.cr-pct{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:200;color:var(--gold);min-width:48px;text-align:right}
+.cr-ctx{font-size:12px;color:var(--silverd);min-width:90px;font-style:italic}
+.cur-note{font-size:13px;color:var(--silverd);font-style:italic;line-height:1.7;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+
+/* ── LEGACY SIGNALS (2022 market) ── */
+.legacy-signals{margin-bottom:1rem}
+.legacy-header{background:linear-gradient(135deg,var(--legacy),#2A0A0A);border:1px solid rgba(140,58,58,.3);padding:1.25rem 2rem;display:flex;align-items:center;gap:1.25rem}
+.lh-badge{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:4px 12px;border:1px solid rgba(140,58,58,.4);color:rgba(200,140,140,.7);flex-shrink:0}
+.lh-text{font-size:13px;color:rgba(255,255,255,.45);font-style:italic;line-height:1.55}
+.lh-text strong{color:rgba(255,200,200,.7);font-weight:400}
+.opp-legacy{display:flex;flex-direction:column;gap:1px;border:1px solid rgba(140,58,58,.2);background:rgba(140,58,58,.08);margin-bottom:3rem}
+.opp{background:var(--obsidian);padding:1.5rem 2rem;display:flex;align-items:center;gap:1.75rem;position:relative;overflow:hidden;transition:background .3s}
+.opp:hover{background:var(--midnight)}
+.opp::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px}
+.opp-legacy .opp::before{background:rgba(140,58,58,.5)}
+.opp-s{text-align:center;min-width:64px}
+.opp-sv{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:200;line-height:1}
+.opp-legacy .opp-sv{color:rgba(200,140,140,.6)}
+.opp-sl{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;color:var(--silverd)}
+.opp-b{flex:1}
+.opp-t{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;color:var(--ivoryd);margin-bottom:.3rem}
+.opp-bar{height:1px;background:rgba(200,169,110,.1);position:relative;margin-bottom:.35rem}
+.opp-bf{height:100%;position:absolute;top:0;left:0;transition:width 1.4s cubic-bezier(.16,1,.3,1)}
+.opp-legacy .opp-bf{background:linear-gradient(90deg,rgba(140,58,58,.4),rgba(200,140,140,.5))}
+.opp-tag{font-size:12px;color:var(--silverd);font-style:italic}
+.opp-risk{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;text-transform:uppercase;margin-top:.4rem;color:rgba(200,140,140,.55)}
+
+/* ── AI SIGNALS ── */
+.ai-header{background:linear-gradient(135deg,#060E1E,#0A1A30);border:1px solid rgba(46,110,204,.35);padding:1.5rem 2rem;display:flex;align-items:flex-start;gap:1.5rem}
+.ai-badge{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:4px 12px;border:1px solid rgba(46,110,204,.4);color:rgba(140,180,255,.7);flex-shrink:0;margin-top:2px}
+.ai-header-body{}
+.ai-header-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:var(--ivory);margin-bottom:.4rem}
+.ai-header-text{font-size:13px;color:rgba(255,255,255,.45);font-style:italic;line-height:1.6}
+.ai-header-text strong{color:rgba(140,180,255,.7);font-weight:400}
+.opp-ai{display:flex;flex-direction:column;gap:1px;border:1px solid rgba(46,110,204,.25);background:rgba(46,110,204,.04);margin-bottom:3rem}
+.opp-ai .opp::before{background:linear-gradient(to bottom,var(--blue),var(--ai2))}
+.opp-ai .opp-sv{color:var(--ai2)}
+.opp-ai .opp-bf{background:linear-gradient(90deg,var(--ai),var(--ai2))}
+.opp-ai .opp-t{color:var(--ivory)}
+.opp-ai-why{font-size:12px;color:rgba(140,180,255,.55);font-style:italic;margin-top:.3rem;line-height:1.5}
+.job-chips{display:flex;flex-wrap:wrap;gap:6px;margin:.875rem 0 .25rem}
+.jc{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.jc.ai{background:rgba(46,110,204,.12);border:1px solid rgba(46,110,204,.3);color:rgba(140,180,255,.8)}
+.jc.legacy{background:rgba(140,58,58,.1);border:1px solid rgba(140,58,58,.25);color:rgba(200,140,140,.7)}
+.jc.pivot{background:rgba(200,169,110,.08);border:1px solid rgba(200,169,110,.2);color:rgba(200,169,110,.7)}
+
+/* ── AI REFRAME CHAPTER ── */
+.ai-reframe{background:linear-gradient(145deg,#060E1E,#04080C);border:1px solid rgba(46,110,204,.3);padding:3.5rem;margin-bottom:3rem;position:relative;overflow:hidden}
+.ai-reframe::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 40%,rgba(46,110,204,.06),transparent 70%)}
+.ai-reframe::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(46,110,204,.5),transparent)}
+.air-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(140,180,255,.5);margin-bottom:1.25rem}
+.air-title{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,4vw,38px);font-weight:300;color:var(--ivory);line-height:1.15;margin-bottom:1rem;position:relative}
+.air-title em{font-style:italic;color:var(--gold2)}
+.air-body{font-size:15px;font-weight:300;color:rgba(255,255,255,.5);line-height:1.85;max-width:680px;margin-bottom:2.5rem;position:relative}
+.air-body strong{color:rgba(255,255,255,.8);font-weight:400}
+
+/* Three AI insight cards */
+.ai-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(46,110,204,.15);position:relative}
+.ai-card{background:#060E1E;padding:2rem 1.75rem;border-bottom:2px solid transparent;transition:background .3s}
+.ai-card:hover{background:#0A1A30}
+.ai-card.rising{border-bottom-color:rgba(39,174,96,.5)}
+.ai-card.holding{border-bottom-color:rgba(200,169,110,.4)}
+.ai-card.pivot{border-bottom-color:rgba(46,110,204,.5)}
+.ac-status{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.75rem}
+.ai-card.rising .ac-status{color:rgba(39,174,96,.7)}
+.ai-card.holding .ac-status{color:rgba(200,169,110,.6)}
+.ai-card.pivot .ac-status{color:rgba(140,180,255,.6)}
+.ac-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:var(--ivory);margin-bottom:.6rem;line-height:1.2}
+.ac-body{font-size:13px;font-weight:300;color:rgba(255,255,255,.45);line-height:1.7}
+
+/* The three moves */
+.ai-moves{display:flex;flex-direction:column;gap:1px;margin-top:2.5rem;border:1px solid rgba(46,110,204,.2);background:rgba(46,110,204,.08);position:relative}
+.ai-move{padding:1.5rem 2rem;display:flex;gap:1.5rem;align-items:flex-start;background:#060E1E;border-bottom:1px solid rgba(46,110,204,.1);transition:background .3s}
+.ai-move:hover{background:#0A1A30}
+.ai-move:last-child{border-bottom:none}
+.am-num{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:200;color:rgba(46,110,204,.2);line-height:1;flex-shrink:0;min-width:48px}
+.am-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:rgba(140,180,255,.5);margin-bottom:.3rem}
+.am-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:var(--ivory);margin-bottom:.35rem;line-height:1.2}
+.am-body{font-size:13px;font-weight:300;color:rgba(255,255,255,.45);line-height:1.7}
+
+/* What AI cannot replicate */
+.irreplaceable{background:linear-gradient(145deg,var(--obsidian),#04080C);border:1px solid var(--borderm);padding:3rem;margin-bottom:3rem;position:relative;overflow:hidden}
+.irr-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--goldd);margin-bottom:.75rem}
+.irr-title{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3.5vw,34px);font-weight:300;color:var(--ivory);line-height:1.2;margin-bottom:1.5rem}
+.irr-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+.irr-cell{background:var(--obsidian);padding:1.5rem 1.75rem}
+.irr-cell-lbl{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--goldd);margin-bottom:.35rem}
+.irr-cell-cap{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;color:var(--ivory);margin-bottom:.35rem;font-style:italic}
+.irr-cell-body{font-size:13px;font-weight:300;color:var(--silverd);line-height:1.65}
+.irr-cell-ai{font-size:11px;color:rgba(140,180,255,.4);margin-top:.5rem;font-style:italic}
+
+/* STACK */
+.stack{margin-bottom:3rem}
+.stack-item{display:flex;gap:1.5rem;padding:1.5rem 0;border-bottom:1px solid var(--border)}
+.stack-item:last-child{border:none}
+.stack-n{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:200;color:rgba(200,169,110,.12);line-height:1;flex-shrink:0;min-width:56px}
+.stack-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--goldd);margin-bottom:.3rem}
+.stack-val{font-size:16px;font-weight:300;color:var(--ivoryd);line-height:1.5}
+
+/* CLOSING */
+.closing{text-align:center;padding:8rem 2rem;position:relative;overflow:hidden}
+.closing-bg{position:absolute;inset:0;background:radial-gradient(ellipse 55% 50% at 50% 50%,rgba(58,26,74,.2),transparent 70%)}
+.closing-sigil{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.4em;color:var(--goldd);margin-bottom:2.5rem}
+.closing-name{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,5vw,48px);font-weight:300;font-style:italic;color:var(--ivory);margin-bottom:.75rem}
+.closing-title{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.5vw,20px);font-style:italic;color:var(--gold);margin-bottom:1.75rem}
+.closing-latin{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;color:var(--silverd)}
+.closing-note{margin-top:2.5rem;font-size:13px;color:var(--silverd);font-style:italic;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.8}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .85s ease,transform .85s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:700px){
+  .signal-trio,.psr-trio,.radar-wrap,.ai-cards,.irr-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="constellation" id="const"></div>
+  <div class="rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
+  <div class="hero-inner">
+    <div class="hero-eye">Align360 · DesignSuite · Full Identity Profile</div>
+    <h1 class="hero-title">The Visionary<em>Architect</em><span class="sub">of Principled Systems</span></h1>
+    <div class="gold-rule"></div>
+    <p class="hero-desc">Three assessments. One convergence. Your strategic identity — and what it means in a world where AI is rewriting who creates value and how.</p>
+    <div class="hero-pills">
+      <span class="pill gold">Wiring · Principled Organizer</span>
+      <span class="pill gold">Orientation · Principled Builder</span>
+      <span class="pill gold">Gift · Paradigm Challenger</span>
+    </div>
+    <div class="hero-latin">Veritas ante structura · Structura ante progressus</div>
+  </div>
+  <div class="scroll-cue"><span class="scroll-cue-text">Descend</span><div class="scroll-cue-line"></div></div>
+</div>
+
+<div class="page">
+
+<!-- I. THREE SIGNALS -->
+<div class="chapter reveal">
+  <div class="ck">I · The Three Signals</div>
+  <h2 class="ct">How the picture was formed</h2>
+  <p class="cs">Each assessment illuminates a different dimension. No single tool produces the full picture. The identity emerges only in the convergence of all three.</p>
+  <div class="signal-trio">
+    <div class="sig"><div class="sig-n">I</div><div class="sig-cat">Wiring for Impact</div><div class="sig-name">The Principled Organizer</div><div class="sig-pct">78<sup>%</sup></div><div class="sig-desc">You build structures that are honest, not just functional. You diagnose before you build — you will not reorganize around the wrong problem.</div></div>
+    <div class="sig"><div class="sig-n">II</div><div class="sig-cat">Orientation for Impact</div><div class="sig-name">The Principled Builder</div><div class="sig-pct">42<sup>%</sup></div><div class="sig-desc">Truth-Seeker and Builder in near-equal measure. You assess whether something is worth building before you build it — and refuse to build on a faulty premise.</div></div>
+    <div class="sig"><div class="sig-n">III</div><div class="sig-cat">Rejection Gift</div><div class="sig-name">Paradigm Challenger</div><div class="sig-pct">50<sup>%</sup></div><div class="sig-desc">What rejection gave you is the ability to see when the whole frame is wrong — not just the answer. Most people operate inside paradigms. You question the paradigm itself.</div></div>
+  </div>
+  <div class="edge reveal">
+    <div class="edge-label">Combined Signal · Your Strategic Edge</div>
+    <div class="gold-rule"></div>
+    <div class="edge-title">You build <em>principled systems</em> that challenge <em>broken paradigms</em></div>
+    <div class="gold-rule"></div>
+    <p class="edge-body">Most organizations have people who can organize, or build, or challenge the frame. Very few have someone who does all three simultaneously — and deploys each at the right moment. That is the rarest profile in the room. It is also the profile AI cannot replicate.</p>
+  </div>
+</div>
+
+<div class="ornament">· · ·</div>
+
+<!-- II. WIRING RADAR -->
+<div class="chapter reveal">
+  <div class="ck">II · Wiring Profile — All Nine Gifts</div>
+  <h2 class="ct">Where your contribution concentrates</h2>
+  <div class="radar-wrap">
+    <svg viewBox="0 0 460 400" width="100%" style="max-width:420px">
+      <defs><radialGradient id="rg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="rgba(200,169,110,.22)"/><stop offset="100%" stop-color="rgba(200,169,110,.03)"/></radialGradient></defs>
+      <circle cx="230" cy="200" r="170" fill="none" stroke="rgba(200,169,110,.07)" stroke-width="1"/>
+      <circle cx="230" cy="200" r="120" fill="none" stroke="rgba(200,169,110,.06)" stroke-width="1"/>
+      <circle cx="230" cy="200" r="70"  fill="none" stroke="rgba(200,169,110,.05)" stroke-width="1"/>
+      <circle cx="230" cy="200" r="28"  fill="none" stroke="rgba(200,169,110,.04)" stroke-width="1"/>
+      <line x1="230" y1="30"  x2="230" y2="370" stroke="rgba(200,169,110,.05)" stroke-width="1"/>
+      <line x1="230" y1="200" x2="379" y2="113" stroke="rgba(200,169,110,.05)" stroke-width="1"/>
+      <line x1="230" y1="200" x2="400" y2="220" stroke="rgba(200,169,110,.05)" stroke-width="1"/>
+      <line x1="230" y1="200" x2="360" y2="336" stroke="rgba(200,169,110,.05)" stroke-width="1"/>
+      <line x1="230" y1="200" x2="100" y2="336" stroke="rgba(200,169,110,.05)" stroke-width="1"/>
+      <line x1="230" y1="200" x2="60"  y2="220" stroke="rgba(200,169,110,.05)" stroke-width="1"/>
+      <line x1="230" y1="200" x2="81"  y2="113" stroke="rgba(200,169,110,.05)" stroke-width="1"/>
+      <polygon points="230,67 308,107 328,183 306,244 258,277 206,267 186,226 194,194 210,176" fill="url(#rg)" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round"/>
+      <circle cx="230" cy="67"  r="5" fill="var(--gold)"/>
+      <circle cx="308" cy="107" r="4" fill="var(--crimson)"/>
+      <circle cx="328" cy="183" r="3.5" fill="var(--teal)"/>
+      <circle cx="306" cy="244" r="3.5" fill="var(--plum)"/>
+      <circle cx="258" cy="277" r="3" fill="var(--amber)"/>
+      <text x="230" y="56"  text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="var(--gold)" letter-spacing="2">ORGANIZER</text>
+      <text x="318" y="104" font-family="Cinzel,serif" font-size="8" fill="var(--crimson)" letter-spacing="1">REALIST</text>
+      <text x="334" y="182" font-family="Cinzel,serif" font-size="8" fill="var(--teal)" letter-spacing="1">DOER</text>
+      <text x="310" y="248" font-family="Cinzel,serif" font-size="8" fill="var(--plum)" letter-spacing="1">WISE OBS.</text>
+      <text x="250" y="296" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="rgba(200,169,110,.6)" letter-spacing="1">EXPLAINER</text>
+    </svg>
+    <div>
+      <div class="rl-title">Gift pattern</div>
+      <div class="rl-sub">Your foundational signature — stable across time</div>
+      <div class="rl-row"><div class="rl-dot" style="background:var(--gold)"></div><span class="rl-name">Organizer</span><span class="rl-pct" style="color:var(--gold)">78%</span></div>
+      <div class="rl-row"><div class="rl-dot" style="background:var(--crimson)"></div><span class="rl-name">Realist</span><span class="rl-pct" style="color:var(--crimson)">72%</span></div>
+      <div class="rl-row"><div class="rl-dot" style="background:var(--teal)"></div><span class="rl-name">Doer</span><span class="rl-pct" style="color:var(--teal)">58%</span></div>
+      <div class="rl-row"><div class="rl-dot" style="background:var(--plum)"></div><span class="rl-name">Wise Observer</span><span class="rl-pct" style="color:var(--plum)">52%</span></div>
+      <div class="rl-row"><div class="rl-dot" style="background:var(--amber)"></div><span class="rl-name">Explainer</span><span class="rl-pct" style="color:var(--amber)">48%</span></div>
+      <div class="rl-row"><div class="rl-dot" style="background:var(--silverd)"></div><span class="rl-name">Supporter</span><span class="rl-pct" style="color:var(--silverd)">42%</span></div>
+      <div class="rl-row"><div class="rl-dot" style="background:rgba(100,100,100,.4)"></div><span class="rl-name">Encourager</span><span class="rl-pct" style="color:var(--silverd)">30%</span></div>
+      <div class="rl-row"><div class="rl-dot" style="background:rgba(100,100,100,.3)"></div><span class="rl-name">Integrator</span><span class="rl-pct" style="color:var(--silverd)">22%</span></div>
+      <div class="rl-row"><div class="rl-dot" style="background:rgba(100,100,100,.2)"></div><span class="rl-name">Enterpriser</span><span class="rl-pct" style="color:var(--silverd)">18%</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="ornament">· · ·</div>
+
+<!-- III. PSR -->
+<div class="chapter reveal">
+  <div class="ck">III · Behavioral Intelligence</div>
+  <h2 class="ct">How you operate when it's hard</h2>
+  <p class="cs">This is where self-knowledge pays the highest dividend — knowing how you respond before the pressure arrives.</p>
+  <div class="psr-trio">
+    <div class="psr p"><div class="psr-l">Under Pressure</div><div class="psr-h">You organize, diagnose, then reframe</div><div class="psr-b">All three signals converge: Organizer takes charge of structure, Truth-Seeker checks the premise, Paradigm Challenger asks whether the goal itself needs rethinking. Exceptionally effective in genuine crises. Occasionally slow in manufactured urgency. Name the process before others misread it as hesitation.</div><div class="psr-m"><div class="psr-mf"></div></div><div class="psr-ml"><span>Deliberate</span><span>Reactive</span></div></div>
+    <div class="psr s"><div class="psr-l">Under Stress</div><div class="psr-h">You go internal before external</div><div class="psr-b">Under stress you pull back, process internally, and seek a trusted voice before acting. Your decisions under stress are almost always structurally sound. The risk: isolation. The strength: far less regret than decisions made from reactive urgency.</div><div class="psr-m"><div class="psr-mf"></div></div><div class="psr-ml"><span>Low tolerance</span><span>High tolerance</span></div></div>
+    <div class="psr r"><div class="psr-l">Risk Posture</div><div class="psr-h">Calibrated at the paradigm level</div><div class="psr-b">You assess risk at the framework level first — "is this the right paradigm?" — before the conventional "what's the probability of success?" This produces non-consensus judgments that are often correct — and occasionally lonely. You have learned to trust yourself when the consensus says no.</div><div class="psr-m"><div class="psr-mf"></div></div><div class="psr-ml"><span>Conventional ←</span><span>→ Paradigm</span></div></div>
+  </div>
+</div>
+
+<div class="ornament">· · ·</div>
+
+<!-- IV. CURRENCY -->
+<div class="chapter reveal">
+  <div class="ck">IV · True Riches Currency Map</div>
+  <h2 class="ct">How opportunity flows to you</h2>
+  <p class="cs">Money sits last — it is a product of deeper currencies, not the source of them. These are the seven currencies through which your actual value moves in the world.</p>
+  <div class="currency">
+    <div class="cur-title">Currency constellation</div>
+    <div class="cur-sub">The primary currencies are structural — they remain strong regardless of market conditions or AI disruption</div>
+    <div class="cur-rows" id="cur-rows">
+      <div class="cr"><span class="cr-name">Knowledge</span><div class="cr-track"><div class="cr-fill" style="width:0%;background:linear-gradient(90deg,var(--goldd),var(--gold))" data-w="92"><div class="cr-dot" style="background:var(--gold)"></div></div></div><span class="cr-pct">92%</span><span class="cr-ctx">Primary currency</span></div>
+      <div class="cr"><span class="cr-name">Integrity</span><div class="cr-track"><div class="cr-fill" style="width:0%;background:linear-gradient(90deg,rgba(200,169,110,.4),var(--gold2))" data-w="84"><div class="cr-dot" style="background:var(--gold2)"></div></div></div><span class="cr-pct">84%</span><span class="cr-ctx">Irreplaceable by AI</span></div>
+      <div class="cr"><span class="cr-name">Honor</span><div class="cr-track"><div class="cr-fill" style="width:0%;background:linear-gradient(90deg,rgba(200,169,110,.3),rgba(200,169,110,.7))" data-w="72"><div class="cr-dot" style="background:rgba(200,169,110,.8)"></div></div></div><span class="cr-pct">72%</span><span class="cr-ctx">Strong</span></div>
+      <div class="cr"><span class="cr-name">Relationships</span><div class="cr-track"><div class="cr-fill" style="width:0%;background:linear-gradient(90deg,rgba(200,169,110,.2),rgba(200,169,110,.5))" data-w="65"><div class="cr-dot" style="background:rgba(200,169,110,.6)"></div></div></div><span class="cr-pct">65%</span><span class="cr-ctx">Moderate</span></div>
+      <div class="cr"><span class="cr-name">Favor</span><div class="cr-track"><div class="cr-fill" style="width:0%;background:rgba(100,100,100,.28)" data-w="44"><div class="cr-dot" style="background:var(--silverd)"></div></div></div><span class="cr-pct" style="color:var(--silverd)">44%</span><span class="cr-ctx">Developing</span></div>
+      <div class="cr"><span class="cr-name">Money</span><div class="cr-track"><div class="cr-fill" style="width:0%;background:rgba(100,100,100,.18)" data-w="28"><div class="cr-dot" style="background:rgba(100,100,100,.4)"></div></div></div><span class="cr-pct" style="color:var(--silverd)">28%</span><span class="cr-ctx">Output, not source</span></div>
+    </div>
+    <div class="cur-note">Samuel generates opportunity primarily through Knowledge and Integrity — two currencies AI cannot replicate and cannot depreciate. In an AI-accelerated world, the currencies that flow from human judgment, ethical standing, and trusted relationships become <em>more</em> valuable as AI floods the market with capable but characterless output. His highest-leverage growth strategy: deepen Knowledge and Integrity intentionally. The rest follows.</div>
+  </div>
+</div>
+
+<div class="ornament">· · ·</div>
+
+<!-- V. OPPORTUNITY SIGNALS — LEGACY + AI-ERA SIDE BY SIDE -->
+<div class="chapter reveal">
+  <div class="ck">V · Opportunity Signals — Two Calibrations</div>
+  <h2 class="ct">The market has changed. Your signals should too.</h2>
+  <p class="cs">What follows is honest. The first set of signals reflects a 2022 professional landscape — the world as it was when most assessment tools were designed. The second set reflects where the value is actually concentrating in an AI-accelerated world. Both are built from the same profile. The difference is the world they're speaking into.</p>
+
+  <!-- LEGACY -->
+  <div class="legacy-signals reveal">
+    <div class="legacy-header">
+      <div class="lh-badge">2022 Job Market</div>
+      <div class="lh-text"><strong>These signals are not wrong — they are incomplete.</strong> They describe opportunities that exist in a stable professional landscape. They do not account for what AI is doing to each category right now. Read them as a baseline. Do not plan from them alone.</div>
+    </div>
+    <div class="opp-legacy" id="opps-legacy">
+      <div class="opp">
+        <div class="opp-s"><div class="opp-sv">93</div><div class="opp-sl">Alignment</div></div>
+        <div class="opp-b">
+          <div class="opp-t">Strategic advisory &amp; consulting</div>
+          <div class="opp-bar"><div class="opp-bf" style="width:0%" data-w="93%"></div></div>
+          <div class="opp-tag">Organizer wiring · Truth-Seeker · Paradigm Challenger gift</div>
+          <div class="job-chips">
+            <span class="jc legacy">Management Consultant</span>
+            <span class="jc legacy">Strategy Consultant</span>
+            <span class="jc legacy">Business Advisor</span>
+            <span class="jc legacy">Independent Consultant</span>
+          </div>
+          <div class="opp-risk">⚠ AI risk: Generic consulting is being automated. This signal holds only if repositioned toward judgment-level work.</div>
+        </div>
+      </div>
+      <div class="opp">
+        <div class="opp-s"><div class="opp-sv">89</div><div class="opp-sl">Alignment</div></div>
+        <div class="opp-b">
+          <div class="opp-t">Leadership development &amp; executive coaching</div>
+          <div class="opp-bar"><div class="opp-bf" style="width:0%" data-w="89%"></div></div>
+          <div class="opp-tag">Realist supporting gift · relational processing · Insight secondary</div>
+          <div class="job-chips">
+            <span class="jc legacy">Executive Coach</span>
+            <span class="jc legacy">Leadership Trainer</span>
+            <span class="jc legacy">L&amp;D Manager</span>
+            <span class="jc legacy">HR Business Partner</span>
+          </div>
+          <div class="opp-risk">⚠ AI risk: Commodity coaching (frameworks, templates, accountability apps) is being replaced. Survival requires a positioning shift.</div>
+        </div>
+      </div>
+      <div class="opp">
+        <div class="opp-s"><div class="opp-sv">85</div><div class="opp-sl">Alignment</div></div>
+        <div class="opp-b">
+          <div class="opp-t">Organizational strategy &amp; systems reform</div>
+          <div class="opp-bar"><div class="opp-bf" style="width:0%" data-w="85%"></div></div>
+          <div class="opp-tag">Builder orientation · Organizer wiring · high Knowledge currency</div>
+          <div class="job-chips">
+            <span class="jc pivot">Chief Operating Officer</span>
+            <span class="jc pivot">VP Strategy &amp; Operations</span>
+            <span class="jc pivot">Organizational Effectiveness Lead</span>
+            <span class="jc pivot">Change Management Director</span>
+          </div>
+          <div class="opp-risk">↑ AI opportunity: This category is actually growing under AI disruption — organizations need principled redesign, not just faster execution.</div>
+        </div>
+      </div>
+      <div class="opp">
+        <div class="opp-s"><div class="opp-sv">78</div><div class="opp-sl">Alignment</div></div>
+        <div class="opp-b">
+          <div class="opp-t">Teaching, curriculum design &amp; mentoring</div>
+          <div class="opp-bar"><div class="opp-bf" style="width:0%" data-w="78%"></div></div>
+          <div class="opp-tag">Explainer tertiary · analogy communication · Knowledge primary</div>
+          <div class="job-chips">
+            <span class="jc legacy">Corporate Trainer</span>
+            <span class="jc legacy">Instructional Designer</span>
+            <span class="jc legacy">Curriculum Developer</span>
+            <span class="jc legacy">University Lecturer</span>
+          </div>
+          <div class="opp-risk">⚠ AI risk: Content delivery is being automated. The value of a human teacher is no longer what they know — it is how they develop judgment in others.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI-ERA SIGNALS -->
+  <div class="reveal" style="margin-top:2.5rem">
+    <div class="ai-header">
+      <div class="ai-badge">AI-Era Calibration</div>
+      <div class="ai-header-body">
+        <div class="ai-header-title">The same profile. A different world. A different reading.</div>
+        <div class="ai-header-text">These signals are built from the same three assessments — recalibrated for what AI is actually doing to the value of each capability. <strong>For this specific profile, AI does not reduce the opportunity. It concentrates and amplifies it.</strong> Here is why, and where.</div>
+      </div>
+    </div>
+    <div class="opp-ai" id="opps-ai">
+      <div class="opp">
+        <div class="opp-s"><div class="opp-sv">96</div><div class="opp-sl">AI-era</div></div>
+        <div class="opp-b">
+          <div class="opp-t">Paradigm diagnosis for AI-era organizations</div>
+          <div class="opp-bar"><div class="opp-bf" style="width:0%" data-w="96%"></div></div>
+          <div class="job-chips">
+            <span class="jc ai">Chief Strategy Officer</span>
+            <span class="jc ai">Transformation Lead</span>
+            <span class="jc ai">AI Governance Advisor</span>
+            <span class="jc ai">Board-level Strategic Counsel</span>
+            <span class="jc ai">Organizational Diagnostician</span>
+            <span class="jc ai">Fractional CSO</span>
+          </div>
+          <div class="opp-ai-why">AI gives every organization the same information and the same analysis. What it cannot give them is the question that exposes when the whole framework is wrong. That is exactly what the Paradigm Challenger produces. As AI floods markets with capable frame-executors, the ability to challenge the frame itself becomes the rarest and most expensive capability available.</div>
+        </div>
+      </div>
+      <div class="opp">
+        <div class="opp-s"><div class="opp-sv">94</div><div class="opp-sl">AI-era</div></div>
+        <div class="opp-b">
+          <div class="opp-t">Principled systems architecture under disruption</div>
+          <div class="opp-bar"><div class="opp-bf" style="width:0%" data-w="94%"></div></div>
+          <div class="job-chips">
+            <span class="jc ai">AI Ethics &amp; Governance Consultant</span>
+            <span class="jc ai">Organizational Design Architect</span>
+            <span class="jc ai">Systems Reform Director</span>
+            <span class="jc ai">Operating Model Redesign Lead</span>
+            <span class="jc ai">Chief of Staff (AI-disrupted orgs)</span>
+            <span class="jc ai">Independent Advisor — Board / Exec</span>
+          </div>
+          <div class="opp-ai-why">Organizations are adopting AI rapidly and chaotically. The failure mode is not capability gaps — it is governance and integrity gaps. Systems are being built that are fast and wrong. The Principled Organizer who insists on diagnosing before building, and the Principled Builder who refuses to build on a faulty premise, is the correction the market will overpay for.</div>
+        </div>
+      </div>
+      <div class="opp">
+        <div class="opp-s"><div class="opp-sv">91</div><div class="opp-sl">AI-era</div></div>
+        <div class="opp-b">
+          <div class="opp-t">High-stakes human judgment in AI-assisted decisions</div>
+          <div class="opp-bar"><div class="opp-bf" style="width:0%" data-w="91%"></div></div>
+          <div class="job-chips">
+            <span class="jc ai">Executive Coach (C-suite / Board)</span>
+            <span class="jc ai">Senior Advisor — M&amp;A / Restructuring</span>
+            <span class="jc ai">Ethics Review Panel Lead</span>
+            <span class="jc ai">Strategic Decision Facilitator</span>
+            <span class="jc ai">Crisis &amp; Complexity Consultant</span>
+            <span class="jc ai">Venture Partner / Operating Partner</span>
+          </div>
+          <div class="opp-ai-why">The decisions AI cannot and should not make — involving values, irreversible consequences, ethical weight, cultural complexity — are concentrating in fewer humans. The people who survive the compression of middle management will be those whose judgment is trusted precisely because it cannot be replicated by a model. The Realist gift paired with intuition-based decision logic produces exactly that.</div>
+        </div>
+      </div>
+      <div class="opp">
+        <div class="opp-s"><div class="opp-sv">88</div><div class="opp-sl">AI-era</div></div>
+        <div class="opp-b">
+          <div class="opp-t">Developing the thinking AI cannot teach</div>
+          <div class="opp-bar"><div class="opp-bf" style="width:0%" data-w="88%"></div></div>
+          <div class="job-chips">
+            <span class="jc ai">Leadership Academy Founder / Director</span>
+            <span class="jc ai">Executive Education Faculty</span>
+            <span class="jc ai">Mentor-in-Residence (Accelerators / VCs)</span>
+            <span class="jc ai">Judgment &amp; Decision-Making Coach</span>
+            <span class="jc ai">Author / Keynote (AI-era leadership)</span>
+            <span class="jc ai">Cohort-based Learning Designer</span>
+          </div>
+          <div class="opp-ai-why">Content is free and AI-generated. The ability to think under uncertainty, challenge assumptions, navigate complexity without a map, and see what others cannot see — that is what humans will pay to learn from humans. The Paradigm Challenger who was forged through rejection has the exact experience base that produces this kind of teaching. Not curriculum. Not frameworks. Judgment by proximity.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ornament">· · ·</div>
+
+<!-- VI. AI-ERA REFRAME -->
+<div class="chapter reveal">
+  <div class="ck">VI · AI-Era Intelligence — What This Means for You</div>
+  <h2 class="ct">The reframe, the pivot, the work ahead</h2>
+
+  <div class="ai-reframe reveal">
+    <div class="air-label">The honest picture</div>
+    <div class="air-title">AI is not your threat.<br><em>Generic positioning is.</em></div>
+    <p class="air-body">AI is automating the middle of every professional market — the competent, reliable, credential-holding layer that has always been the majority. <strong>What it cannot automate is the edge: the judgment that comes from having been through something, the wisdom that sees when the whole frame is wrong, the integrity that refuses to build what isn't right.</strong> Your profile sits precisely at that edge. The danger is not that AI replaces you. The danger is that you position yourself at the middle, where AI is most aggressive, instead of at the edge, where it is least capable and the premium is highest.</p>
+
+    <!-- Three categories -->
+    <div class="ai-cards">
+      <div class="ai-card rising">
+        <div class="ac-status">↑ Rising in AI world</div>
+        <div class="ac-title">Paradigm-level thinking</div>
+        <div class="ac-body">AI executes brilliantly inside a frame. It cannot see when the frame is wrong. Your Paradigm Challenger gift becomes more valuable as AI floods the market with frame-executors. The rarer thing is rarer still.</div>
+        <div class="job-chips" style="margin-top:.875rem">
+          <span class="jc ai">CSO</span>
+          <span class="jc ai">Transformation Lead</span>
+          <span class="jc ai">Board Advisor</span>
+        </div>
+      </div>
+      <div class="ai-card holding">
+        <div class="ac-status">→ Holding — if repositioned</div>
+        <div class="ac-title">Leadership development</div>
+        <div class="ac-body">The commodity end (frameworks, templates, accountability apps) is being replaced. What holds is the mentor who has been through something — who developed judgment through adversity, not through a certification. Your Rejection Gift is the differentiator.</div>
+        <div class="job-chips" style="margin-top:.875rem">
+          <span class="jc pivot">Executive Coach</span>
+          <span class="jc pivot">Mentor-in-Residence</span>
+          <span class="jc pivot">Leadership Faculty</span>
+        </div>
+      </div>
+      <div class="ai-card pivot">
+        <div class="ac-status">⟳ Needs a pivot</div>
+        <div class="ac-title">Content and curriculum</div>
+        <div class="ac-body">Teaching what you know is being automated. Teaching how to think — how to navigate uncertainty, challenge assumptions, build under pressure — is not. The pivot is from content delivery to judgment development.</div>
+        <div class="job-chips" style="margin-top:.875rem">
+          <span class="jc pivot">Judgment Coach</span>
+          <span class="jc pivot">Cohort Facilitator</span>
+          <span class="jc pivot">Learning Architect</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Three moves -->
+  <div class="ai-moves reveal" id="ai-moves">
+    <div class="ai-move">
+      <div class="am-num">I</div>
+      <div>
+        <div class="am-label">Move to make — now</div>
+        <div class="am-title">Position as a paradigm diagnostician, not a strategic advisor</div>
+        <div class="am-body">The title "strategic advisor" is everywhere. It positions you in a crowded middle. The specific positioning that AI makes more valuable: "I see when the whole framework is wrong before anyone else does — and I help organizations build what actually needs to be built." That is not a job title. It is a capability statement. It is irreplaceable. Lead with it.</div>
+        <div class="job-chips" style="margin-top:1rem">
+          <span class="jc ai">Fractional CSO</span>
+          <span class="jc ai">Transformation Advisor</span>
+          <span class="jc ai">AI Governance Counsel</span>
+          <span class="jc ai">Board Strategic Advisor</span>
+          <span class="jc ai">Organizational Diagnostician</span>
+        </div>
+      </div>
+    </div>
+    <div class="ai-move">
+      <div class="am-num">II</div>
+      <div>
+        <div class="am-label">Work to prioritize — next 12 months</div>
+        <div class="am-title">Seek out organizations mid-disruption, not post-disruption</div>
+        <div class="am-body">Organizations that have already figured out their AI transition don't need your profile. Organizations that are actively being disrupted — where the operating model is being invalidated and leadership doesn't yet know what to build next — that is where the Principled Organizer + Paradigm Challenger combination is most acutely needed and most generously compensated. Find the ones in the middle of the fire, not the ones who have already rebuilt.</div>
+        <div class="job-chips" style="margin-top:1rem">
+          <span class="jc ai">Interim Executive (disrupted sector)</span>
+          <span class="jc ai">Operating Model Redesign Lead</span>
+          <span class="jc ai">Restructuring Advisor</span>
+          <span class="jc ai">Private Equity Operating Partner</span>
+          <span class="jc ai">VC Advisor / Entrepreneur-in-Residence</span>
+        </div>
+      </div>
+    </div>
+    <div class="ai-move">
+      <div class="am-num">III</div>
+      <div>
+        <div class="am-label">Identity to protect — always</div>
+        <div class="am-title">Your Rejection Gift is the moat AI cannot cross</div>
+        <div class="am-body">The Paradigm Challenger was forged through being called unrealistic. That is not a soft story. It is a hard-won capability that AI cannot generate, simulate, or replicate — because AI has never been wrong about what the market would accept, never been dismissed, never had to rebuild from being misunderstood. The depth of your perspective comes precisely from having been through what you've been through. In an AI world, that lived intelligence is the scarcest raw material available. Do not commoditize it. Do not undercharge for it. Do not explain it away.</div>
+        <div class="job-chips" style="margin-top:1rem">
+          <span class="jc ai">Author / Keynote Speaker</span>
+          <span class="jc ai">Podcast Host / Thought Leader</span>
+          <span class="jc ai">Founder — Advisory Firm</span>
+          <span class="jc ai">Executive Mentor (senior-level only)</span>
+          <span class="jc ai">Judgment &amp; Decision-Making Coach</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- What AI cannot replicate -->
+  <div class="irreplaceable reveal">
+    <div class="irr-label">What AI cannot replicate — in this profile specifically</div>
+    <div class="irr-title">Three capabilities that become more valuable as AI advances</div>
+    <div class="irr-grid">
+      <div class="irr-cell">
+        <div class="irr-cell-lbl">Capability I</div>
+        <div class="irr-cell-cap">Frame diagnosis under real stakes</div>
+        <div class="irr-cell-body">Seeing when the premise itself is wrong — not the execution, not the strategy, but the foundational assumption that makes the whole system produce the wrong output. This requires having been inside enough broken systems to recognize the pattern before it completes.</div>
+        <div class="job-chips" style="margin-top:.75rem">
+          <span class="jc ai">Strategic Turnaround Advisor</span>
+          <span class="jc ai">Organizational Diagnostician</span>
+          <span class="jc ai">AI Strategy Auditor</span>
+        </div>
+        <div class="irr-cell-ai">AI can analyze a frame. It cannot see when the frame itself is the error.</div>
+      </div>
+      <div class="irr-cell">
+        <div class="irr-cell-lbl">Capability II</div>
+        <div class="irr-cell-cap">Principled system design under pressure</div>
+        <div class="irr-cell-body">Building structures that are honest, not just functional — that hold under scrutiny, that don't collapse when the premise is challenged, that produce the right outcome not just the fast one. This is the Principled Organizer + Truth-Seeker combination at its most rare.</div>
+        <div class="job-chips" style="margin-top:.75rem">
+          <span class="jc ai">AI Ethics &amp; Governance Lead</span>
+          <span class="jc ai">Operating Model Architect</span>
+          <span class="jc ai">Chief of Staff (disrupted org)</span>
+        </div>
+        <div class="irr-cell-ai">AI can generate systems. It cannot insist on integrity as a non-negotiable design constraint.</div>
+      </div>
+      <div class="irr-cell">
+        <div class="irr-cell-lbl">Capability III</div>
+        <div class="irr-cell-cap">Intuition-based judgment with structural integrity</div>
+        <div class="irr-cell-body">Decisions from pattern recognition and inner sense — backed by a Realist gift that insists on checking the structure before committing. This is the combination that produces non-consensus calls that are more often right than the consensus. AI optimizes for the consensus. This profile sees past it.</div>
+        <div class="job-chips" style="margin-top:.75rem">
+          <span class="jc ai">Senior Advisor — M&amp;A / Board</span>
+          <span class="jc ai">Decision Facilitator</span>
+          <span class="jc ai">Venture / Operating Partner</span>
+        </div>
+        <div class="irr-cell-ai">AI produces consensus intelligence. This profile produces post-consensus judgment.</div>
+      </div>
+      <div class="irr-cell">
+        <div class="irr-cell-lbl">Capability IV</div>
+        <div class="irr-cell-cap">Lived perspective that cannot be trained</div>
+        <div class="irr-cell-body">The Rejection Gift is not a skill. It is a forged perspective — developed through having been wrong about the world, having been told the vision was unrealistic, and having been proven right by time. No amount of data training produces this. It is the exclusive product of having been through something real.</div>
+        <div class="job-chips" style="margin-top:.75rem">
+          <span class="jc ai">Author / Keynote Speaker</span>
+          <span class="jc ai">Executive Mentor</span>
+          <span class="jc ai">Founder — Thought Leadership Firm</span>
+        </div>
+        <div class="irr-cell-ai">AI has read about failure. It has never experienced it. That is the gap that cannot be closed.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ornament">· · ·</div>
+
+<!-- VII. LIFE POSITIONING MAP -->
+<div class="chapter reveal">
+  <div class="ck">VII · Life Positioning Map</div>
+  <h2 class="ct">The five layers — calibrated for where the world is going</h2>
+  <div class="stack">
+    <div class="stack-item"><div class="stack-n">I</div><div><div class="stack-label">Identity Layer · Wiring &amp; Orientation</div><div class="stack-val">Principled Organizer · Principled Builder — you create structured, honest systems. In an AI world, "structured and honest" is the rarest combination available.</div></div></div>
+    <div class="stack-item"><div class="stack-n">II</div><div><div class="stack-label">Transformation Layer · Rejection Gift</div><div class="stack-val">Paradigm Challenger · Misunderstood Visionary — what adversity forged in you is now a strategic moat. AI cannot acquire it. It can only be lived.</div></div></div>
+    <div class="stack-item"><div class="stack-n">III</div><div><div class="stack-label">Value Layer · True Riches Currency</div><div class="stack-val">Knowledge → Integrity → Honor → Relationships — the top two are AI-proof. They are the currencies most concentrated in fewest people as AI compresses the middle of every market.</div></div></div>
+    <div class="stack-item"><div class="stack-n">IV</div><div><div class="stack-label">Advantage Layer · Combined Edge</div><div class="stack-val">You build principled systems that challenge broken paradigms — simultaneously structured and transformative. This specific combination is what organizations in mid-disruption are searching for and cannot find at scale.</div></div></div>
+    <div class="stack-item"><div class="stack-n">V</div><div><div class="stack-label">Opportunity Layer · AI-Era Calibration</div><div class="stack-val">Paradigm diagnosis · Principled systems architecture · High-stakes human judgment · Developing judgment in others — in that order, with that framing. Not "advisory." Not "coaching." Judgment at the level AI cannot reach.</div></div></div>
+  </div>
+</div>
+
+<!-- CLOSING -->
+<div class="closing reveal">
+  <div class="closing-bg"></div>
+  <div style="position:relative;z-index:1">
+    <div class="closing-sigil">✦ · · · ✦</div>
+    <div class="gold-rule"></div>
+    <div class="closing-name">Samuel</div>
+    <div class="closing-title">The Visionary Architect of Principled Systems</div>
+    <div class="gold-rule"></div>
+    <div class="closing-latin">Veritas ante structura · Structura ante progressus</div>
+    <div style="margin-top:.75rem;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.18em;color:rgba(200,169,110,.22)">Truth before structure · Structure before progress</div>
+    <div class="closing-note">These patterns describe who you are when you are at your best. In a world where AI is making the competent interchangeable, the rare is what remains. Your profile sits at the rare end. Position there. Charge accordingly. The paradigm challengers who were called unrealistic are the ones who tend to be proven right — not despite the world changing, but because of it.</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const ce=document.getElementById('const');
+for(let i=0;i<80;i++){const s=document.createElement('div');const sz=Math.random()>.92?2:1;s.style.cssText=`position:absolute;width:${sz}px;height:${sz}px;background:#fff;border-radius:50%;left:${Math.random()*100}%;top:${Math.random()*100}%;opacity:${.02+Math.random()*.1}`;ce.appendChild(s);}
+
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting)return;
+    e.target.classList.add('visible');
+  });
+},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+const cobs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){const t=[92,84,72,65,44,28];x.target.querySelectorAll('.cr-fill').forEach((b,i)=>setTimeout(()=>{b.style.width=t[i]+'%'},i*110));cobs.disconnect()}})},{threshold:.2});
+const cr=document.getElementById('cur-rows');if(cr)cobs.observe(cr);
+
+['opps-legacy','opps-ai'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(!el)return;
+  const o=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){el.querySelectorAll('.opp-bf').forEach(b=>{b.style.width=b.dataset.w});o.disconnect()}})},{threshold:.15});
+  o.observe(el);
+});
+</script>
+</body>
+</html>

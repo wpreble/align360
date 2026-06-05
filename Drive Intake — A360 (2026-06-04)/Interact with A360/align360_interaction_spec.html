@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Align360 · Interaction Architecture · Dev Spec</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:#07050A;--cherry:#2A122E;--cherry2:#4E0230;
+  --gold:#C9A96E;--gold2:#E8C97E;
+  --white:#FFFFFF;--stone:#EDECEC;
+  --green:#0F6E56;--green2:#27AE60;--greenlight:#4EC87A;
+  --blue:#1A3A6B;--blue2:#2E6AC8;--bluelight:#5B9FE8;
+  --teal:#0D6B6B;--teallight:#4EC9C8;
+  --amber:#C97A1A;--amberlight:#E8A850;
+  --muted:rgba(255,255,255,.45);--dim:rgba(255,255,255,.22);
+  --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.04);
+  --glass:rgba(255,255,255,.05);--glass2:rgba(255,255,255,.08);
+  --mono:'IBM Plex Mono',monospace;
+  --display:'Syne',sans-serif;
+  --body:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--obsidian);color:rgba(255,255,255,.8);overflow-x:hidden;line-height:1.6}
+
+/* SCANLINES TEXTURE */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.008) 2px,rgba(255,255,255,.008) 4px);pointer-events:none;z-index:1000}
+
+/* AMBIENT */
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0}
+.amb-1{position:absolute;top:-20%;left:-10%;width:60%;height:60%;background:radial-gradient(ellipse,rgba(42,18,46,.7),transparent 70%)}
+.amb-2{position:absolute;bottom:-20%;right:-10%;width:50%;height:50%;background:radial-gradient(ellipse,rgba(13,107,107,.15),transparent 70%)}
+.amb-3{position:absolute;top:40%;left:40%;width:40%;height:40%;background:radial-gradient(ellipse,rgba(26,58,107,.1),transparent 70%)}
+
+/* LAYOUT */
+.page{max-width:1200px;margin:0 auto;padding:0 48px;position:relative;z-index:1}
+
+/* HEADER */
+header{padding:52px 0 60px;border-bottom:1px solid var(--line)}
+.doc-meta{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.doc-tag{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.14em;border:1px solid var(--line);padding:4px 10px}
+.doc-tag.live{color:var(--greenlight);border-color:rgba(78,200,122,.2)}
+.header-grid{display:grid;grid-template-columns:1fr auto;gap:48px;align-items:end}
+h1{font-family:var(--display);font-size:clamp(32px,5vw,56px);font-weight:800;color:var(--white);line-height:1;letter-spacing:-.02em}
+h1 .accent{color:var(--gold2)}
+.header-desc{font-size:14px;color:var(--muted);line-height:1.75;max-width:520px;margin-top:14px}
+.doc-stats{display:flex;flex-direction:column;gap:8px;text-align:right}
+.ds-item{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.ds-item span{color:rgba(255,255,255,.6);margin-left:8px}
+
+/* TOC */
+.toc{padding:32px 0;border-bottom:1px solid var(--line);display:flex;gap:6px;flex-wrap:wrap}
+.toc-link{font-family:var(--mono);font-size:10px;color:var(--dim);padding:5px 12px;border:1px solid var(--line);text-decoration:none;transition:all .2s;letter-spacing:.08em}
+.toc-link:hover{color:var(--gold2);border-color:rgba(201,169,110,.3);background:rgba(201,169,110,.06)}
+
+/* SECTION */
+.spec-section{padding:72px 0;border-bottom:1px solid var(--line)}
+.spec-section:last-child{border:none}
+.sec-label{font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.18em;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sec-label::before{content:'';width:20px;height:1px;background:var(--gold)}
+.sec-label span{opacity:.4}
+h2{font-family:var(--display);font-size:clamp(22px,3vw,34px);font-weight:700;color:var(--white);margin-bottom:10px;letter-spacing:-.01em;line-height:1.15}
+.sec-sub{font-size:14px;color:var(--muted);line-height:1.75;max-width:680px;margin-bottom:40px}
+
+/* DAILY FLOW TIMELINE */
+.timeline{display:flex;flex-direction:column;gap:0;position:relative}
+.timeline::before{content:'';position:absolute;left:28px;top:20px;bottom:20px;width:1px;background:linear-gradient(180deg,rgba(201,169,110,.4),rgba(201,169,110,.08) 80%,transparent)}
+.tl-item{display:flex;gap:24px;align-items:flex-start;padding:20px 0}
+.tl-dot{width:56px;height:56px;flex-shrink:0;border-radius:0;display:flex;align-items:center;justify-content:center;border:1px solid;position:relative;z-index:1}
+.tl-dot.morning{background:rgba(201,169,110,.08);border-color:rgba(201,169,110,.25);color:var(--gold2)}
+.tl-dot.midday{background:rgba(46,106,200,.08);border-color:rgba(46,106,200,.25);color:var(--bluelight)}
+.tl-dot.afternoon{background:rgba(78,2,48,.15);border-color:rgba(78,2,48,.4);color:rgba(200,140,200,.8)}
+.tl-dot.evening{background:rgba(13,107,107,.08);border-color:rgba(13,107,107,.25);color:var(--teallight)}
+.tl-dot.night{background:rgba(255,255,255,.04);border-color:var(--line);color:var(--dim)}
+.tl-dot-icon{font-size:18px}
+.tl-body{flex:1;padding-top:10px}
+.tl-time{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.12em;margin-bottom:5px}
+.tl-title{font-family:var(--display);font-size:16px;font-weight:600;color:var(--white);margin-bottom:6px}
+.tl-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:10px}
+.tl-interactions{display:flex;flex-direction:column;gap:5px}
+.ti{display:flex;align-items:flex-start;gap:10px;padding:8px 12px;background:var(--glass);border:1px solid var(--line2);font-size:12px;color:rgba(255,255,255,.55);line-height:1.5}
+.ti-type{font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 7px;border-radius:0;flex-shrink:0;margin-top:1px;letter-spacing:.08em}
+.ti.prompt .ti-type{background:rgba(201,169,110,.12);color:var(--gold2);border:1px solid rgba(201,169,110,.2)}
+.ti.update .ti-type{background:rgba(39,174,96,.08);color:var(--greenlight);border:1px solid rgba(39,174,96,.15)}
+.ti.trigger .ti-type{background:rgba(46,106,200,.08);color:var(--bluelight);border:1px solid rgba(46,106,200,.15)}
+.ti.passive .ti-type{background:rgba(255,255,255,.05);color:var(--dim);border:1px solid var(--line)}
+.ti-text{flex:1}
+.ti-text code{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.06);padding:1px 5px}
+
+/* UPDATE MODEL TABLE */
+.update-table{width:100%;border-collapse:collapse;margin-bottom:0}
+.update-table th{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:12px 16px;text-align:left;border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)}
+.update-table td{padding:12px 16px;border-bottom:1px solid var(--line2);font-size:13px;color:rgba(255,255,255,.6);vertical-align:top}
+.update-table tr:hover td{background:rgba(255,255,255,.02)}
+.update-table td:first-child{font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.8);white-space:nowrap}
+.badge{font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 8px;letter-spacing:.08em;display:inline-block}
+.badge.yes{background:rgba(39,174,96,.1);color:var(--greenlight);border:1px solid rgba(39,174,96,.2)}
+.badge.partial{background:rgba(201,169,110,.1);color:var(--gold2);border:1px solid rgba(201,169,110,.2)}
+.badge.passive{background:rgba(255,255,255,.05);color:var(--dim);border:1px solid var(--line)}
+.update-note{font-size:11px;color:var(--dim);margin-top:3px;font-style:italic}
+
+/* PROMPT PATTERNS */
+.prompt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.prompt-card{background:var(--glass);border:1px solid var(--line2);padding:20px;position:relative;overflow:hidden;transition:all .25s}
+.prompt-card:hover{background:var(--glass2);border-color:rgba(255,255,255,.1)}
+.prompt-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.pc-morning::before{background:linear-gradient(90deg,var(--cherry2),var(--gold))}
+.pc-check::before{background:linear-gradient(90deg,var(--green),var(--greenlight))}
+.pc-decision::before{background:linear-gradient(90deg,var(--blue),var(--bluelight))}
+.pc-event::before{background:linear-gradient(90deg,var(--teal),var(--teallight))}
+.pc-enterprise::before{background:linear-gradient(90deg,#521F58,#9B59B6)}
+.pc-aiera::before{background:linear-gradient(90deg,var(--amber),var(--amberlight))}
+.pc-tag{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.14em;margin-bottom:10px}
+.pc-title{font-family:var(--display);font-size:14px;font-weight:600;color:var(--white);margin-bottom:8px}
+.pc-prompt{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.55);line-height:1.6;padding:10px;background:rgba(255,255,255,.04);border-left:2px solid var(--line);margin-bottom:10px;font-style:italic}
+.pc-trigger{font-size:11px;color:var(--dim);line-height:1.5}
+.pc-trigger strong{color:rgba(255,255,255,.5);font-weight:500}
+
+/* ENTERPRISE SECTION */
+.ent-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.ent-card{background:var(--glass);border:1px solid var(--line2);padding:24px}
+.ent-card-label{font-family:var(--mono);font-size:9px;color:rgba(155,89,182,.7);letter-spacing:.16em;margin-bottom:10px}
+.ent-card-title{font-family:var(--display);font-size:16px;font-weight:600;color:var(--white);margin-bottom:8px}
+.ent-card-body{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:14px}
+.ent-rules{display:flex;flex-direction:column;gap:5px}
+.er{display:flex;gap:8px;font-size:12px;color:var(--dim);line-height:1.5;align-items:flex-start}
+.er::before{content:'→';color:rgba(155,89,182,.5);flex-shrink:0;font-family:var(--mono)}
+
+/* AI AMPLIFICATION */
+.amp-layers{display:flex;flex-direction:column;gap:1px;background:var(--line2)}
+.amp-layer{background:var(--obsidian);display:grid;grid-template-columns:200px 1fr auto;gap:0;align-items:stretch}
+.al-num{font-family:var(--mono);font-size:11px;color:var(--dim);padding:20px;border-right:1px solid var(--line2);display:flex;align-items:center;justify-content:center;writing-mode:horizontal-tb;font-weight:500}
+.al-body{padding:20px 24px;border-right:1px solid var(--line2)}
+.al-label{font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:.14em;margin-bottom:5px}
+.al-title{font-family:var(--display);font-size:15px;font-weight:600;color:var(--white);margin-bottom:6px}
+.al-desc{font-size:13px;color:var(--muted);line-height:1.6}
+.al-apis{padding:20px;display:flex;flex-direction:column;gap:5px;min-width:200px}
+.api-tag{font-family:var(--mono);font-size:10px;color:var(--dim);padding:4px 8px;border:1px solid var(--line);letter-spacing:.06em;white-space:nowrap}
+.api-tag.active{color:var(--greenlight);border-color:rgba(78,200,122,.25);background:rgba(78,200,122,.06)}
+
+/* UPDATE FLOW DIAGRAM */
+.flow-diagram{display:grid;grid-template-columns:repeat(6,1fr);gap:0;background:var(--line2);margin-bottom:20px}
+.fd-node{background:var(--obsidian);padding:20px 14px;text-align:center;position:relative}
+.fd-node::after{content:'→';position:absolute;right:-12px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:14px;color:var(--dim);z-index:2}
+.fd-node:last-child::after{display:none}
+.fd-icon{font-size:20px;margin-bottom:8px}
+.fd-title{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.6);margin-bottom:4px;letter-spacing:.06em}
+.fd-sub{font-size:10px;color:var(--dim);line-height:1.4}
+.fd-node.active{background:rgba(78,2,48,.15)}
+.fd-node.active .fd-title{color:var(--gold2)}
+
+/* NARRATIVE LAYER */
+.narrative-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.narrative-col{background:var(--glass);border:1px solid var(--line2);padding:24px}
+.nc-label{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.14em;margin-bottom:14px}
+.nc-items{display:flex;flex-direction:column;gap:4px}
+.nc-item{font-size:13px;color:rgba(255,255,255,.55);padding:7px 12px;border-left:2px solid var(--line);display:flex;align-items:center;gap:8px}
+.nc-item.quantitative{border-color:rgba(46,106,200,.4)}
+.nc-item.narrative{border-color:rgba(201,169,110,.4)}
+.nc-item-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+
+/* CODE BLOCK */
+.code-block{background:rgba(255,255,255,.03);border:1px solid var(--line);padding:20px 24px;font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.55);line-height:1.8;overflow-x:auto;margin-bottom:16px}
+.code-block .key{color:var(--bluelight)}
+.code-block .val{color:var(--greenlight)}
+.code-block .comment{color:var(--dim);font-style:italic}
+.code-block .str{color:var(--gold2)}
+
+/* RULE CARDS */
+.rule-strip{display:flex;flex-direction:column;gap:8px}
+.rule{display:flex;gap:16px;padding:14px 16px;background:var(--glass);border:1px solid var(--line2);align-items:flex-start}
+.rule-num{font-family:var(--mono);font-size:12px;color:var(--dim);min-width:24px}
+.rule-body{flex:1}
+.rule-title{font-size:13px;font-weight:500;color:rgba(255,255,255,.75);margin-bottom:3px}
+.rule-desc{font-size:12px;color:var(--dim);line-height:1.55}
+.rule-code{font-family:var(--mono);font-size:11px;color:var(--gold2);background:rgba(201,169,110,.06);padding:1px 6px;border:1px solid rgba(201,169,110,.15);margin-top:4px;display:inline-block}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .page{padding:0 24px}
+  .prompt-grid{grid-template-columns:1fr}
+  .ent-grid{grid-template-columns:1fr}
+  .narrative-grid{grid-template-columns:1fr}
+  .amp-layer{grid-template-columns:1fr}
+  .al-num{writing-mode:horizontal-tb;border-right:none;border-bottom:1px solid var(--line2)}
+  .al-apis{border-top:1px solid var(--line2)}
+  .flow-diagram{grid-template-columns:repeat(3,1fr)}
+  .header-grid{grid-template-columns:1fr}
+  .doc-stats{text-align:left}
+}
+</style>
+</head>
+<body>
+<div class="ambient"><div class="amb-1"></div><div class="amb-2"></div><div class="amb-3"></div></div>
+
+<div class="page">
+
+<!-- HEADER -->
+<header>
+  <div class="doc-meta">
+    <span class="doc-tag">INTERNAL</span>
+    <span class="doc-tag">DEV SPEC</span>
+    <span class="doc-tag live">v1.0 · LIVE</span>
+    <span class="doc-tag">ALIGN360 · INTERACTION ARCHITECTURE</span>
+  </div>
+  <div class="header-grid">
+    <div>
+      <h1>How People Live<br>Inside <span class="accent">Align.</span></h1>
+      <p class="header-desc">Daily interaction patterns, prompt architecture, User Model update triggers, enterprise engagement flows, the Narrative Layer™, and AI amplification via external APIs. For engineering and product teams.</p>
+    </div>
+    <div class="doc-stats">
+      <div class="ds-item">SECTIONS <span>08</span></div>
+      <div class="ds-item">INTERACTION TYPES <span>11</span></div>
+      <div class="ds-item">UPDATE SOURCES <span>10</span></div>
+      <div class="ds-item">API LAYERS <span>6</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- TOC -->
+<nav class="toc">
+  <a class="toc-link" href="#daily">01 · Daily Flow</a>
+  <a class="toc-link" href="#prompts">02 · Prompt Patterns</a>
+  <a class="toc-link" href="#updates">03 · Model Updates</a>
+  <a class="toc-link" href="#narrative">04 · Narrative Layer™</a>
+  <a class="toc-link" href="#enterprise">05 · Enterprise</a>
+  <a class="toc-link" href="#amplification">06 · AI Amplification</a>
+  <a class="toc-link" href="#apis">07 · API Architecture</a>
+  <a class="toc-link" href="#rules">08 · Interaction Rules</a>
+</nav>
+
+<!-- 01 DAILY FLOW -->
+<section class="spec-section" id="daily">
+  <div class="sec-label">01 <span>/ 08</span></div>
+  <h2>How an individual lives inside Align — every day.</h2>
+  <p class="sec-sub">The daily interaction loop is not a rigid schedule. It is a set of lightweight touchpoints that collectively update the User Model, surface relevant intelligence, and deepen the AI companion's context without requiring significant effort from the user. Every touchpoint is optional. Every touchpoint matters.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot morning"><div class="tl-dot-icon">◎</div></div>
+      <div class="tl-body">
+        <div class="tl-time">MORNING · 6–9AM · OPTIONAL · 60 SECONDS</div>
+        <div class="tl-title">B3 Daily Check-in</div>
+        <div class="tl-desc">9 questions across Biological, Psychological, and Spiritual domains. Tap interface — one question visible at a time. Completes automatically on the 9th answer. Produces A/B/C Day classification. Master Chief loads this before the first conversation of the day.</div>
+        <div class="tl-interactions">
+          <div class="ti prompt"><span class="ti-type">PROMPT</span><span class="ti-text">Master Chief surfaces proactively if B3 not yet completed and user opens the app before 10am. One tap to begin — never a modal interrupt.</span></div>
+          <div class="ti update"><span class="ti-type">MODEL UPDATE</span><span class="ti-text">B3 state written to <code>rhythmOS.currentDayState</code>. Affects AI persona pacing for entire day. Suppresses high-stakes prompts on C Days.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot morning"><div class="tl-dot-icon">✦</div></div>
+      <div class="tl-body">
+        <div class="tl-time">MORNING · FIRST OPEN · CONTEXT-AWARE</div>
+        <div class="tl-title">Master Chief morning signal</div>
+        <div class="tl-desc">Master Chief pre-loads the full PersonaContext — User Model, B3 state, season, recent Conviction Events, active decisions, Life Journey entries — and surfaces one morning signal calibrated to the day. Not a notification. A framing. The first thing the person sees when they open Align.</div>
+        <div class="tl-interactions">
+          <div class="ti prompt"><span class="ti-type">PROMPT</span><span class="ti-text">Auto-generated from PersonaContext. A Day: surfaces Release Threshold practice or active decision. B Day: surfaces one moderate recommendation. C Day: surfaces rest, recovery, or support signal. Never urgent framing.</span></div>
+          <div class="ti passive"><span class="ti-type">PASSIVE</span><span class="ti-text">User can dismiss or respond. If they respond, opens full Master Chief conversation with full context already loaded.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot midday"><div class="tl-dot-icon">◈</div></div>
+      <div class="tl-body">
+        <div class="tl-time">ANYTIME · ACTIVE SESSIONS · VARIABLE LENGTH</div>
+        <div class="tl-title">Master Chief conversations</div>
+        <div class="tl-desc">User initiates. Master Chief has already loaded the full PersonaContext before the conversation begins. Every response is calibrated to wiring profile, current season, B3 state, primary gap, active decisions, and recent Conviction Events. The conversation feels like talking to someone who already knows you — because the system does.</div>
+        <div class="tl-interactions">
+          <div class="ti update"><span class="ti-type">MODEL UPDATE</span><span class="ti-text">Conversation signals analyzed in background. Conviction Event detector runs. Decision resolutions, boundary narratives, lesson statements flagged for Life Journey logging prompt at conversation end.</span></div>
+          <div class="ti prompt"><span class="ti-type">PROMPT</span><span class="ti-text">At conversation end: if Life Journey logging signals detected, system surfaces bottom-sheet prompt. Never modal. Always optional. "Something worth capturing happened — want to log it?" User selects: Conviction Event / Lesson / Life Event / Not now.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot afternoon"><div class="tl-dot-icon">◇</div></div>
+      <div class="tl-body">
+        <div class="tl-time">ANYTIME · 2–5 MINUTES · HIGH MODEL VALUE</div>
+        <div class="tl-title">Journal, voice note, or quick capture</div>
+        <div class="tl-desc">User writes, speaks, or types what is happening — a decision, a hard moment, a win, a lesson. The Narrative Layer™ receives it. AI processes for semantic signals: Conviction Event patterns, season language, belonging signals, purpose connection. Updates propagate to User Model based on detected signals.</div>
+        <div class="tl-interactions">
+          <div class="ti update"><span class="ti-type">MODEL UPDATE</span><span class="ti-text">Narrative Layer stores the entry. AI extracts: entity type (person/org/decision), emotional valence, temporal marker (season), domain relevance (which of 5 IR domains affected). Sub-score update flags generated where thresholds met.</span></div>
+          <div class="ti trigger"><span class="ti-type">TRIGGER</span><span class="ti-text">If audio: transcribed via speech-to-text API, then processed identically to text journal. Audio stored in Narrative Layer alongside transcript. Master Chief can reference "what you said in the voice note on Tuesday" in future sessions.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot evening"><div class="tl-dot-icon">○</div></div>
+      <div class="tl-body">
+        <div class="tl-time">EVENING · OPTIONAL · 3–5 MINUTES</div>
+        <div class="tl-title">Decision Suite or active product session</div>
+        <div class="tl-desc">User brings a real decision, a career navigation question, a design challenge, or a financial scenario. The product reads from the current User Model state. Output is calibrated to their wiring, season, and B3 state. Not generic advice. The system knows who is asking.</div>
+        <div class="tl-interactions">
+          <div class="ti update"><span class="ti-type">MODEL UPDATE</span><span class="ti-text">Decision resolution — if user confirms a decision made — flags as Conviction Event candidate. System asks: "Want to log this as a Conviction Event? It will update your Release Threshold and Opportunity Readiness scores."</span></div>
+          <div class="ti passive"><span class="ti-type">PASSIVE</span><span class="ti-text">All product sessions logged to interaction history. Frequency and type of product use feeds engagement signal. Surfaces in coach portal if coach context active.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot night"><div class="tl-dot-icon">◉</div></div>
+      <div class="tl-body">
+        <div class="tl-time">BACKGROUND · ALWAYS · ZERO USER EFFORT</div>
+        <div class="tl-title">Passive signal intake</div>
+        <div class="tl-desc">Wearable data (HRV, sleep), calendar density (meeting load), and connected integrations (Notion tasks, Slack metadata) feed into RhythmOS continuously. No user action required. B3 classification becomes more accurate as passive signals accumulate. The model improves while the user sleeps.</div>
+        <div class="tl-interactions">
+          <div class="ti passive"><span class="ti-type">PASSIVE</span><span class="ti-text">All passive signals require explicit user consent during onboarding. Each integration is independently revocable. None produce outbound data from Align to the connected service.</span></div>
+          <div class="ti update"><span class="ti-type">MODEL UPDATE</span><span class="ti-text">RhythmOS re-classifies B3 day type each morning using accumulated signals. <code>rhythmOS.confidence</code> increases as passive signals accumulate. Low confidence = B3 shown as tentative in UI.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 PROMPT PATTERNS -->
+<section class="spec-section" id="prompts">
+  <div class="sec-label">02 <span>/ 08</span></div>
+  <h2>How Align checks in and works with people.</h2>
+  <p class="sec-sub">Align uses a structured prompt architecture — not push notifications. Every system-initiated touchpoint is calibrated to the individual's User Model state, B3 classification, and active context. None are urgent. None are generic. Each is produced from a specific trigger condition.</p>
+
+  <div class="prompt-grid">
+    <div class="prompt-card pc-morning">
+      <div class="pc-tag">INDIVIDUAL · DAILY · MORNING</div>
+      <div class="pc-title">B3-calibrated morning frame</div>
+      <div class="pc-prompt">"Today is an A Day. Full capacity across all three domains. Your Release Threshold practice window is open. The partnership decision is in your queue. This is the moment."</div>
+      <div class="pc-trigger"><strong>Trigger:</strong> First app open after B3 check-in completion, B3 state = A, active decision in Decision Suite, primary gap = Release Threshold</div>
+    </div>
+    <div class="prompt-card pc-check">
+      <div class="pc-tag">INDIVIDUAL · WEEKLY · SEASON CHECK</div>
+      <div class="pc-title">Season alignment check</div>
+      <div class="pc-prompt">"You have been in Building season for 6 weeks. Master Chief: the Organizer runs the diagnostic continuously past the point where the evaluation is useful. You named what done looks like. Has it arrived?"</div>
+      <div class="pc-trigger"><strong>Trigger:</strong> 6 weeks in same season without Life Journey season transition event, wiring = Organizer, Commitment Depth = 7</div>
+    </div>
+    <div class="prompt-card pc-decision">
+      <div class="pc-tag">INDIVIDUAL · EVENT-DRIVEN · DECISION</div>
+      <div class="pc-title">Pre-delivery coaching</div>
+      <div class="pc-prompt">"You are about to send the offer. Before you do: does it have a qualifier in it? A softener before they push back? State it. Then stop. They will respond."</div>
+      <div class="pc-trigger"><strong>Trigger:</strong> User opens Decision Suite, primary gap = Release Threshold ≤ 3, decision type = partnership/pricing/offer</div>
+    </div>
+    <div class="prompt-card pc-event">
+      <div class="pc-tag">INDIVIDUAL · EVENT-DRIVEN · MILESTONE</div>
+      <div class="pc-title">Conviction Event detection</div>
+      <div class="pc-prompt">"Something significant just happened in your conversation. Want to capture it? This looks like a Conviction Event — it would update your Capability domain. One tap to log."</div>
+      <div class="pc-trigger"><strong>Trigger:</strong> Conversation end, Conviction Event detector fires (decision resolution, boundary narrative, or achievement mention detected)</div>
+    </div>
+    <div class="prompt-card pc-enterprise">
+      <div class="pc-tag">ENTERPRISE · WEEKLY · ADMIN</div>
+      <div class="pc-title">Org capacity signal summary</div>
+      <div class="pc-prompt">"This week: 7 of 12 team members at high capacity. Expansion season signals emerging in leadership. Q3 initiative window is open. Strategic Alignment Score: 74. One capacity gap identified."</div>
+      <div class="pc-trigger"><strong>Trigger:</strong> Weekly org signal computation complete, admin has Strategic Alignment Score enabled, min 5 consented members in aggregation pool</div>
+    </div>
+    <div class="prompt-card pc-aiera">
+      <div class="pc-tag">INDIVIDUAL · CONTEXTUAL · AI-ERA</div>
+      <div class="pc-title">AI-Era disruption signal</div>
+      <div class="pc-prompt">"A significant AI capability shift dropped this week. Based on your AI-Era Readiness (94%) and your Skill Confidence (10/10): here is where this amplifies your edge rather than threatens it."</div>
+      <div class="pc-trigger"><strong>Trigger:</strong> Significant AI news event detected via API, user has AI-Era Readiness score on file, score ≥ 70 (surfaces amplification angle, not threat framing)</div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 MODEL UPDATES -->
+<section class="spec-section" id="updates">
+  <div class="sec-label">03 <span>/ 08</span></div>
+  <h2>Everything updates the model.</h2>
+  <p class="sec-sub">The User Model is not static after assessment completion. Every interaction source below is capable of updating sub-scores, domain signals, and Narrative Layer entries. The model compounds continuously. The more a person uses Align, the more accurately it knows them.</p>
+
+  <!-- UPDATE FLOW -->
+  <div class="flow-diagram">
+    <div class="fd-node active">
+      <div class="fd-icon">📋</div>
+      <div class="fd-title">Assessment</div>
+      <div class="fd-sub">Baseline scores<br>set on completion</div>
+    </div>
+    <div class="fd-node">
+      <div class="fd-icon">📓</div>
+      <div class="fd-title">Journal / Voice</div>
+      <div class="fd-sub">Narrative signals<br>extracted by AI</div>
+    </div>
+    <div class="fd-node">
+      <div class="fd-icon">✦</div>
+      <div class="fd-title">AI Conversations</div>
+      <div class="fd-sub">Conviction Event<br>detector runs</div>
+    </div>
+    <div class="fd-node">
+      <div class="fd-icon">⚡</div>
+      <div class="fd-title">Conviction Event</div>
+      <div class="fd-sub">Sub-score moves<br>3→7 or 7→10</div>
+    </div>
+    <div class="fd-node">
+      <div class="fd-icon">◎</div>
+      <div class="fd-title">B3 Check-in</div>
+      <div class="fd-sub">Pacing layer<br>updated daily</div>
+    </div>
+    <div class="fd-node">
+      <div class="fd-icon">∞</div>
+      <div class="fd-title">Compounds</div>
+      <div class="fd-sub">Model more accurate<br>every session</div>
+    </div>
+  </div>
+
+  <table class="update-table">
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>Updates User Model?</th>
+        <th>What it updates</th>
+        <th>Mechanism</th>
+        <th>Requires user action?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Assessments (IR, VS, Wiring, etc.)</td>
+        <td><span class="badge yes">YES · DIRECT</span></td>
+        <td>All layer scores — baseline establishment</td>
+        <td>Scoring engine → User Model write</td>
+        <td>Yes — assessment completion</td>
+      </tr>
+      <tr>
+        <td>Journals (text)</td>
+        <td><span class="badge yes">YES · SEMANTIC</span></td>
+        <td>Narrative Layer + Conviction Event flags</td>
+        <td>AI semantic extraction → flag generation → user confirmation</td>
+        <td>Write journal. Confirm flag if prompted.</td>
+      </tr>
+      <tr>
+        <td>Voice / Audio notes</td>
+        <td><span class="badge yes">YES · SEMANTIC</span></td>
+        <td>Narrative Layer + same as journal</td>
+        <td>STT → transcript → same as journal pipeline</td>
+        <td>Record voice note. Confirm flag if prompted.</td>
+      </tr>
+      <tr>
+        <td>AI Conversations</td>
+        <td><span class="badge yes">YES · DETECTED</span></td>
+        <td>Conviction Event flags + Narrative Layer prompt</td>
+        <td>Conversation end analysis → Life Journey prompt</td>
+        <td>Respond to end-of-conversation logging prompt</td>
+      </tr>
+      <tr>
+        <td>Goals</td>
+        <td><span class="badge yes">YES · INDIRECT</span></td>
+        <td>Direction domain context + Decision Suite inputs</td>
+        <td>Goal completion events → Conviction Event candidate</td>
+        <td>Mark goal complete</td>
+      </tr>
+      <tr>
+        <td>Habits</td>
+        <td><span class="badge partial">YES · PACING</span></td>
+        <td>RhythmOS context + behavioral baseline calibration</td>
+        <td>Habit streak data → B3 confidence modifier</td>
+        <td>Habit logging (if tracking enabled)</td>
+      </tr>
+      <tr>
+        <td>Projects</td>
+        <td><span class="badge partial">YES · INDIRECT</span></td>
+        <td>Conviction Event candidates on completion</td>
+        <td>Project milestone → Conviction Event flag</td>
+        <td>Mark milestone complete</td>
+      </tr>
+      <tr>
+        <td>Coaching Sessions</td>
+        <td><span class="badge yes">YES · COACH-FLAGGED</span></td>
+        <td>Narrative Layer + Conviction Events (coach-initiated)</td>
+        <td>Coach logs session note → AI extracts signals → flags for user confirmation</td>
+        <td>User confirms any sub-score updates</td>
+      </tr>
+      <tr>
+        <td>Community Activity</td>
+        <td><span class="badge partial">YES · BELONGING</span></td>
+        <td>Belonging domain context signal</td>
+        <td>Community engagement → Belonging domain modifier (not direct score change)</td>
+        <td>No — passive from connected community context</td>
+      </tr>
+      <tr>
+        <td>B3 Check-ins</td>
+        <td><span class="badge yes">YES · PACING</span></td>
+        <td>RhythmOS state — affects AI pacing, not assessment scores</td>
+        <td>B3 answers → classification → PersonaContext update</td>
+        <td>Yes — 9 questions, 60 seconds</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:20px;padding:16px 20px;border:1px solid rgba(201,169,110,.15);background:rgba(201,169,110,.04)">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.14em;margin-bottom:8px">CRITICAL RULE · SUB-SCORE UPDATE LOGIC</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.7">B3 check-ins and passive signals <strong style="color:rgba(255,255,255,.7)">never directly modify assessment sub-scores.</strong> Only Conviction Events (user-confirmed) and formal reassessments update the IR/VS scoring layer. B3 and passive signals update the pacing and context layers only. This distinction must be enforced at the API layer.</div>
+  </div>
+</section>
+
+<!-- 04 NARRATIVE LAYER -->
+<section class="spec-section" id="narrative">
+  <div class="sec-label">04 <span>/ 08</span></div>
+  <h2>The Narrative Layer™</h2>
+  <p class="sec-sub">Every other layer of the User Model is quantitative. The Narrative Layer is where meaning lives. It stores what cannot be scored — and feeds back into every product, every AI conversation, and every coaching session.</p>
+
+  <div class="narrative-grid" style="margin-bottom:24px">
+    <div class="narrative-col">
+      <div class="nc-label">QUANTITATIVE LAYER — Scores, metrics, readiness signals</div>
+      <div class="nc-items">
+        <div class="nc-item quantitative"><div class="nc-item-dot" style="background:var(--bluelight)"></div>Conviction Score™ — 0 to 100</div>
+        <div class="nc-item quantitative"><div class="nc-item-dot" style="background:var(--bluelight)"></div>Value Score™ — 0 to 100</div>
+        <div class="nc-item quantitative"><div class="nc-item-dot" style="background:var(--bluelight)"></div>Sub-scores — 0, 3, 7, or 10</div>
+        <div class="nc-item quantitative"><div class="nc-item-dot" style="background:var(--bluelight)"></div>AI-Era Readiness — composite %</div>
+        <div class="nc-item quantitative"><div class="nc-item-dot" style="background:var(--bluelight)"></div>B3 Day classification — A / B / C</div>
+        <div class="nc-item quantitative"><div class="nc-item-dot" style="background:var(--bluelight)"></div>Domain scores — Identity, Capability, etc.</div>
+        <div class="nc-item quantitative"><div class="nc-item-dot" style="background:var(--bluelight)"></div>Growth velocity — score change / day</div>
+        <div class="nc-item quantitative"><div class="nc-item-dot" style="background:var(--bluelight)"></div>Wiring profile — type weights</div>
+      </div>
+    </div>
+    <div class="narrative-col">
+      <div class="nc-label">NARRATIVE LAYER™ — Story, meaning, turning points</div>
+      <div class="nc-items">
+        <div class="nc-item narrative"><div class="nc-item-dot" style="background:var(--gold)"></div>Life events — named, dated, typed</div>
+        <div class="nc-item narrative"><div class="nc-item-dot" style="background:var(--gold)"></div>Lessons — extracted from journals and conversations</div>
+        <div class="nc-item narrative"><div class="nc-item-dot" style="background:var(--gold)"></div>Turning points — season transitions, major decisions</div>
+        <div class="nc-item narrative"><div class="nc-item-dot" style="background:var(--gold)"></div>Milestones — completed, logged, celebrated</div>
+        <div class="nc-item narrative"><div class="nc-item-dot" style="background:var(--gold)"></div>Wins — behavioral evidence of growth</div>
+        <div class="nc-item narrative"><div class="nc-item-dot" style="background:var(--gold)"></div>Failures — reframed as source material</div>
+        <div class="nc-item narrative"><div class="nc-item-dot" style="background:var(--gold)"></div>Relationships — named people, type, impact</div>
+        <div class="nc-item narrative"><div class="nc-item-dot" style="background:var(--gold)"></div>Season story — what this season is building toward</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <span class="comment">// NarrativeEntry schema — stored in Life Journey, feeds PersonaContext</span><br>
+    <span class="key">NarrativeEntry</span> {<br>
+    &nbsp;&nbsp;<span class="key">entryId</span>: UUID<br>
+    &nbsp;&nbsp;<span class="key">userId</span>: UUID<br>
+    &nbsp;&nbsp;<span class="key">createdAt</span>: timestamp<br>
+    &nbsp;&nbsp;<span class="key">entryType</span>: <span class="str">LifeEvent | Lesson | TurningPoint | Milestone | Win | Failure | Relationship</span><br>
+    &nbsp;&nbsp;<span class="key">source</span>: <span class="str">Journal | VoiceNote | AIConversation | ManualEntry | CoachSession</span><br>
+    &nbsp;&nbsp;<span class="key">content</span>: string  <span class="comment">// The raw text or transcript</span><br>
+    &nbsp;&nbsp;<span class="key">aiExtractedSignals</span>: {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">convictionEventCandidate</span>: boolean<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">affectedDomain</span>: Domain | null<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">seasonLanguageDetected</span>: boolean<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">belongingSignal</span>: boolean<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">purposeSignal</span>: boolean<br>
+    &nbsp;&nbsp;}<br>
+    &nbsp;&nbsp;<span class="key">userConfirmed</span>: boolean  <span class="comment">// Conviction Event only applied if confirmed</span><br>
+    &nbsp;&nbsp;<span class="key">season</span>: Season  <span class="comment">// Season active at time of entry</span><br>
+    &nbsp;&nbsp;<span class="key">personaContextFeed</span>: boolean  <span class="comment">// Whether MC loads this in PersonaContext</span><br>
+    }
+  </div>
+
+  <div style="padding:16px 20px;border:1px solid rgba(255,255,255,.06);background:var(--glass)">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.14em;margin-bottom:8px">WHY THE NARRATIVE LAYER EXISTS</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.75">Humans think in stories, not scores. A person who reads their Conviction Score of 86 processes it intellectually. A person who reads "the moment you sent the offer without the qualifier, and they said yes without pushing back" processes it emotionally. The Narrative Layer™ stores the behavioral evidence that makes scores meaningful — and gives Master Chief the specific references that make responses feel like they come from someone who was in the room. <strong style="color:rgba(255,255,255,.6)">Quantitative without narrative is a dashboard. Narrative with quantitative is a companion.</strong></div>
+  </div>
+</section>
+
+<!-- 05 ENTERPRISE -->
+<section class="spec-section" id="enterprise">
+  <div class="sec-label">05 <span>/ 08</span></div>
+  <h2>How enterprises interact with Align daily.</h2>
+  <p class="sec-sub">Enterprise interaction is governed by the semantic bridge architecture. Individual data never crosses. What crosses is meaning. The enterprise's daily interaction with Align is at the aggregated organizational signal level — never at the individual level.</p>
+
+  <div class="ent-grid" style="margin-bottom:24px">
+    <div class="ent-card">
+      <div class="ent-card-label">ENTERPRISE · ADMIN · DAILY DRIVER</div>
+      <div class="ent-card-title">Strategic Alignment Score™ dashboard</div>
+      <div class="ent-card-body">Admin opens StrategyOS each morning. Sees the org-level Strategic Alignment Score (0–100), season distribution across the team, capacity signal (High/Moderate/Low), and any initiative flags. Master Chief surfaces one org-level signal calibrated to the admin's own User Model and the org's current state.</div>
+      <div class="ent-rules">
+        <div class="er">Score computed from semantic signals only — never from individual sub-scores</div>
+        <div class="er">Min 5 consented members for aggregation. Below 5: preliminary signal only with caveat flag</div>
+        <div class="er">Admin's own Master Chief reads both their personal User Model AND the org signal layer</div>
+        <div class="er">No individual is identifiable in any enterprise view — even to the admin</div>
+      </div>
+    </div>
+    <div class="ent-card">
+      <div class="ent-card-label">ENTERPRISE · WEEKLY · STRATEGIC</div>
+      <div class="ent-card-title">Capacity Planning Intelligence™ prompt</div>
+      <div class="ent-card-body">StrategyOS generates a weekly prompt to the admin synthesizing team capacity signals against active strategic initiatives. Surfaces mismatches between what the strategy demands and what the team's current season and readiness signals can support. Gives a specific recommendation, not a report.</div>
+      <div class="ent-rules">
+        <div class="er">Prompt generated from: org capacity signal + active initiatives + Strategic Alignment Score trend</div>
+        <div class="er">Recommendation framed as strategic timing, not people assessment</div>
+        <div class="er">Admin can bring prompt into their own Master Chief conversation for deeper exploration</div>
+        <div class="er">All recommendations logged to org Decision Suite for tracking</div>
+      </div>
+    </div>
+    <div class="ent-card">
+      <div class="ent-card-label">ENTERPRISE · INDIVIDUAL MEMBER · DAILY</div>
+      <div class="ent-card-title">Individual inside the enterprise context</div>
+      <div class="ent-card-body">From the individual's perspective, the enterprise context is just a context badge — it adds org season signals to their feed and allows their meaning profile (consented tier) to contribute to the org aggregate. Their daily Align experience is unchanged. Their privacy is unchanged.</div>
+      <div class="ent-rules">
+        <div class="er">Individual's User Model is unaffected by enterprise context activation</div>
+        <div class="er">Enterprise context adds signals to the individual's feed — never removes or overrides</div>
+        <div class="er">Individual can disconnect the enterprise context at any time — immediate and atomic</div>
+        <div class="er">What they see in their context feed: org season, team capacity, relevant strategic signals</div>
+      </div>
+    </div>
+    <div class="ent-card">
+      <div class="ent-card-label">ENTERPRISE · COACH PORTAL · SESSION-DRIVEN</div>
+      <div class="ent-card-title">Coach as enterprise interface</div>
+      <div class="ent-card-body">For enterprise accounts with coach portals active, coaches interact with Align through a session-prep interface that surfaces semantic signals about their clients — never raw scores without consent. The coach's own Master Chief also reads from their personal User Model, making them a better coach while using the platform.</div>
+      <div class="ent-rules">
+        <div class="er">Coach sees: session preparation signals, client season, capacity signal (if consented), recent Narrative Layer themes (if shared)</div>
+        <div class="er">Coach never sees: assessment scores, sub-scores, B3 state, AI conversations</div>
+        <div class="er">Coach can log session notes → AI extracts signals → flags for client confirmation</div>
+        <div class="er">Coach portal white-label available — coach can brand as their own product</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 AI AMPLIFICATION -->
+<section class="spec-section" id="amplification">
+  <div class="sec-label">06 <span>/ 08</span></div>
+  <h2>How Align amplifies every other tool you use.</h2>
+  <p class="sec-sub">Align is not a closed system. The User Model is the intelligence layer that makes every other tool smarter. When Align connects to external systems, it brings the user's identity, season, and readiness context to those tools — making them produce more relevant outputs than they could produce from the user's data alone.</p>
+
+  <div class="amp-layers">
+    <div class="amp-layer">
+      <div class="al-num">LAYER 1</div>
+      <div class="al-body">
+        <div class="al-label">FOUNDATION · ALWAYS ACTIVE</div>
+        <div class="al-title">The User Model as prompt context</div>
+        <div class="al-desc">Master Chief pre-loads the full PersonaContext before every AI conversation. This means every conversation with Align is already better than any conversation with ChatGPT, Claude, or Gemini for this person — because the AI already knows their wiring, their primary gap, their season, their B3 state, and their active decisions. The User Model is the amplification that requires no external API. It is the default state.</div>
+      </div>
+      <div class="al-apis">
+        <div class="api-tag active">Anthropic API · claude-sonnet</div>
+        <div class="api-tag active">Internal PersonaContext loader</div>
+        <div class="api-tag active">User Model read layer</div>
+      </div>
+    </div>
+    <div class="amp-layer">
+      <div class="al-num">LAYER 2</div>
+      <div class="al-body">
+        <div class="al-label">WELLNESS AMPLIFICATION · OPT-IN</div>
+        <div class="al-title">Physiological data makes the User Model biologically aware</div>
+        <div class="al-desc">When a user connects a wearable (Oura, Whoop, Apple Watch, Garmin), the User Model gains a physiological dimension. HRV, sleep quality, recovery score, and activity data feed into RhythmOS. The B3 classification becomes more accurate. Master Chief knows not just that the user said they feel good — it knows their HRV is optimal and their sleep staging was deep. The persona becomes a genuinely intelligent health-aware companion.</div>
+      </div>
+      <div class="al-apis">
+        <div class="api-tag active">Apple HealthKit API</div>
+        <div class="api-tag active">Oura API</div>
+        <div class="api-tag active">Garmin Connect API</div>
+        <div class="api-tag">Whoop API · planned</div>
+      </div>
+    </div>
+    <div class="amp-layer">
+      <div class="al-num">LAYER 3</div>
+      <div class="al-body">
+        <div class="al-label">BEHAVIORAL AMPLIFICATION · OPT-IN</div>
+        <div class="al-title">Calendar and task data makes the User Model capacity-aware</div>
+        <div class="al-desc">Google Calendar density — how many meetings, how much white space, when back-to-back blocks occur — feeds into the RhythmOS pacing layer. Notion/Asana task completion events become Conviction Event candidates. When a user closes a major project milestone, Master Chief notices and surfaces the logging prompt. The behavioral signal from what they are actually doing amplifies what the User Model knows about where they are in their season.</div>
+      </div>
+      <div class="al-apis">
+        <div class="api-tag active">Google Calendar API</div>
+        <div class="api-tag active">Notion API</div>
+        <div class="api-tag active">Asana API</div>
+        <div class="api-tag">Linear API · planned</div>
+      </div>
+    </div>
+    <div class="amp-layer">
+      <div class="al-num">LAYER 4</div>
+      <div class="al-body">
+        <div class="al-label">HEALTH AMPLIFICATION · DIAGNOSTICOS · OPT-IN</div>
+        <div class="al-title">Lab data and health records make the User Model clinically-adjacent</div>
+        <div class="al-desc">DiagnosticOS receives lab results, practitioner notes, medication lists, and health history (all user-consented). The Root Cause Engine cross-references against the User Model — a person in Building season with high stress signal and low ferritin gets a different recommendation than a person in Healing season with the same ferritin. The User Model context makes health intelligence personalized in a way no standard lab interpretation tool can match.</div>
+      </div>
+      <div class="al-apis">
+        <div class="api-tag active">Lab integrations (FHIR)</div>
+        <div class="api-tag active">DiagnosticOS engine</div>
+        <div class="api-tag">Epic FHIR · planned</div>
+        <div class="api-tag">Levels CGM · planned</div>
+      </div>
+    </div>
+    <div class="amp-layer">
+      <div class="al-num">LAYER 5</div>
+      <div class="al-body">
+        <div class="al-label">STRATEGIC AMPLIFICATION · STRATEGIOS · ENTERPRISE</div>
+        <div class="al-title">Market intelligence meets organizational identity</div>
+        <div class="al-desc">StrategyOS connects to market intelligence sources (news APIs, SEC filings, industry databases) and cross-references findings against the organization's User Model aggregate — team season, capacity signals, Strategic Alignment Score. A competitive threat that arrives when the team is at high capacity in Building season gets a different StrategyOS recommendation than the same threat arriving when the org is in Healing season at low capacity. The User Model makes strategy human-aware.</div>
+      </div>
+      <div class="al-apis">
+        <div class="api-tag active">News API</div>
+        <div class="api-tag active">SEC EDGAR API</div>
+        <div class="api-tag">Crunchbase API · planned</div>
+        <div class="api-tag">LinkedIn API · planned</div>
+      </div>
+    </div>
+    <div class="amp-layer">
+      <div class="al-num">LAYER 6</div>
+      <div class="al-body">
+        <div class="al-label">AGENT AMPLIFICATION · FULL DEPLOYMENT · IN PROGRESS</div>
+        <div class="al-title">The User Model as the intelligence layer for AI agents</div>
+        <div class="al-desc">At full deployment, the Align User Model becomes the context layer for AI agents operating on the user's behalf. An agent scheduling a meeting knows from the User Model that today is an A Day — it schedules the high-stakes conversation now. An agent drafting an email knows the user's Release Threshold is 3/10 — it flags any qualifiers in the draft before sending. An agent preparing a pitch deck knows the user's wiring is Organizer-Realist — it structures the deck with the precision and evidence density that matches both the user's output style and the audience's decision style. The User Model is not a profile. It is the intelligence backbone for every agent that operates in the user's world.</div>
+      </div>
+      <div class="al-apis">
+        <div class="api-tag">Anthropic Tool Use API</div>
+        <div class="api-tag">MCP Server architecture</div>
+        <div class="api-tag">Gmail Agent · planned</div>
+        <div class="api-tag">Calendar Agent · planned</div>
+        <div class="api-tag">Drafting Agent · planned</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 API ARCHITECTURE -->
+<section class="spec-section" id="apis">
+  <div class="sec-label">07 <span>/ 08</span></div>
+  <h2>API architecture overview.</h2>
+  <p class="sec-sub">How the layers connect. All external APIs are intake-only — data flows into the User Model, never out. The semantic bridge enforces this at the infrastructure layer.</p>
+
+  <div class="code-block">
+<span class="comment">// External API intake flow — all opt-in, all intake-only</span><br><br>
+<span class="comment">// Layer 2 — Wellness intake</span><br>
+<span class="key">WellnessIntake</span>.<span class="val">receive</span>(source: AppleHealth | Oura | Garmin) → <span class="val">RhythmOS</span>.calibrate()<br><br>
+<span class="comment">// Layer 3 — Behavioral intake</span><br>
+<span class="key">BehavioralIntake</span>.<span class="val">receive</span>(source: GoogleCalendar | Notion | Asana) → <span class="val">ConvictionEventDetector</span>.scan()<br><br>
+<span class="comment">// Layer 4 — Health intake (DiagnosticOS)</span><br>
+<span class="key">HealthIntake</span>.<span class="val">receive</span>(source: FHIR | LabResult | PractitionerNote) → <span class="val">DiagnosticOS</span>.process()<br><br>
+<span class="comment">// Layer 5 — Market intake (StrategyOS)</span><br>
+<span class="key">MarketIntake</span>.<span class="val">receive</span>(source: NewsAPI | EDGAR | CrunchBase) → <span class="val">StrategyOS</span>.crossReference()<br><br>
+<span class="comment">// Layer 6 — Agent output (writes user data, reads User Model as context)</span><br>
+<span class="key">AgentLayer</span>.<span class="val">loadContext</span>(userId) → PersonaContext → <span class="val">Agent</span>.execute(task)<br><br>
+<span class="comment">// HARD RULE — enforced at API gateway, not application code</span><br>
+<span class="key">UserModel</span>.<span class="val">export</span>() → <span class="val">BLOCKED</span>  <span class="comment">// User Model never leaves Align systems</span><br>
+<span class="key">SemanticBridge</span>.<span class="val">pass</span>(rawScore) → <span class="val">BLOCKED</span>  <span class="comment">// Scores never cross to enterprise</span><br>
+<span class="key">SemanticBridge</span>.<span class="val">pass</span>(meaning) → <span class="val">ALLOWED</span>   <span class="comment">// Meaning crosses with consent</span>
+  </div>
+</section>
+
+<!-- 08 RULES -->
+<section class="spec-section" id="rules">
+  <div class="sec-label">08 <span>/ 08</span></div>
+  <h2>Non-negotiable interaction rules.</h2>
+  <p class="sec-sub">These rules govern every interaction surface — individual, enterprise, coach, and agent. They are not guidelines. They are architectural constraints that must be enforced at the API and data layer.</p>
+
+  <div class="rule-strip">
+    <div class="rule">
+      <div class="rule-num">R1</div>
+      <div class="rule-body">
+        <div class="rule-title">Master Chief is context-aware, not query-aware</div>
+        <div class="rule-desc">The full PersonaContext must be loaded before every conversation begins. A response generated without PersonaContext is not an Align response. There is no "quick reply" mode that bypasses context loading.</div>
+        <div class="rule-code">PersonaContext.load(userId) → REQUIRED before claude.messages.create()</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">R2</div>
+      <div class="rule-body">
+        <div class="rule-title">Prompts are calibrated, never broadcast</div>
+        <div class="rule-desc">No system-initiated prompt is generic. Every prompt must derive from at least one specific User Model signal. A prompt that would be identical for any user is not an Align prompt.</div>
+        <div class="rule-code">Prompt.generate(template, userSignals) → must include ≥1 user-specific signal</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">R3</div>
+      <div class="rule-body">
+        <div class="rule-title">B3 check-ins never update assessment sub-scores</div>
+        <div class="rule-desc">B3 state updates only <code>rhythmOS.currentDayState</code> and the pacing layer. It never writes to IR or VS sub-scores. These are separate data namespaces and must remain so at the schema level.</div>
+        <div class="rule-code">B3State → rhythmOS namespace only. Never → layer2.impactReadiness.domains</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">R4</div>
+      <div class="rule-body">
+        <div class="rule-title">Conviction Events require user confirmation</div>
+        <div class="rule-desc">The system can detect, flag, and surface Conviction Event candidates. It cannot apply a sub-score update without explicit user confirmation. Detection and application are two separate steps with user action required between them.</div>
+        <div class="rule-code">ConvictionEvent.detect() → flag. ConvictionEvent.apply() → requires userConfirmed === true</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">R5</div>
+      <div class="rule-body">
+        <div class="rule-title">Life Journey logging prompt appears at conversation end, never beginning</div>
+        <div class="rule-desc">The logging prompt is a reward for a meaningful conversation, not a pre-commitment. It surfaces as a bottom sheet — never a modal. It is dismissable without friction. "Not now" is always available and never followed by a repeat prompt in the same session.</div>
+        <div class="rule-code">LifeJourney.promptTiming === 'conversationEnd'. Modal === false. RepeatInSession === false</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">R6</div>
+      <div class="rule-body">
+        <div class="rule-title">Enterprise aggregation minimum: 5 members</div>
+        <div class="rule-desc">No aggregate signal is computed or surfaced for groups below 5 consented members. Below 5: return <code>isPreliminary: true</code> with explicit UI caveat. Below 2: return null.</div>
+        <div class="rule-code">aggregateOrgSignals(members) → if members.length &lt; 2: return null. if &lt; 5: isPreliminary: true</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">R7</div>
+      <div class="rule-body">
+        <div class="rule-title">C Day suppression is non-negotiable</div>
+        <div class="rule-desc">When B3 classification is C Day, all high-stakes prompts (Release Threshold, Ask Capacity, partnership decisions, visibility challenges) are suppressed from proactive surfacing. The suppression list is maintained as a constant and is not overridden by any product logic.</div>
+        <div class="rule-code">if (B3State === 'C') { filterPrompts(HIGHSTAKES_SUPPRESSION_LIST); }</div>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-num">R8</div>
+      <div class="rule-body">
+        <div class="rule-title">All external API intake is inbound-only</div>
+        <div class="rule-desc">No external API integration produces outbound data from Align to the connected service. Apple Health, Google Calendar, Oura, Notion — all receive zero data from Align. The semantic bridge guard applies to all API connections, not just enterprise outputs.</div>
+        <div class="rule-code">ExternalAPI.request().method === 'GET' | 'READ' only. POST to external → BLOCKED at gateway</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:40px;padding:24px;border:1px solid rgba(201,169,110,.15);background:rgba(201,169,110,.04);text-align:center">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.18em;margin-bottom:10px">THE NORTH STAR FOR EVERY INTERACTION DECISION</div>
+    <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:600;color:var(--white);line-height:1.5;max-width:640px;margin:0 auto">"Does this interaction make the User Model more accurate — or does it make the person feel seen by what the User Model already knows? If the answer to either is yes, ship it."</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:12px;letter-spacing:.12em">ALIGN360 · PRODUCT PRINCIPLE · INTERACTION LAYER</div>
+  </div>
+</section>
+
+</div><!-- page -->
+</body>
+</html>

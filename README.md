@@ -27,6 +27,13 @@ Samuel NGU/
 ├── Demo/              ← reference HTML demo (open in browser; superseded by align360-app/)
 │   └── Archive/       ← past demo versions
 │
+├── Drive Intake — A360 (2026-06-04)/  ← curated mirror of Samuel's 2026-06-04 Drive upload
+│   ├── INTAKE NOTES.md                ← ★ vocabulary, R-rules, file index, dev-plan diff
+│   ├── Interact with A360/
+│   │   └── align360_interaction_spec.html  ← ★★ canonical interaction contract
+│   ├── Landing Pages + Onboarding/
+│   └── Primary User Model Results/
+│
 ├── Project Log/       ← operational notes, Slack dumps, open-issues working docs  [gitignored]
 │
 └── R&D/               ← governance, addenda, supplementary research (by recency)  [gitignored]
@@ -34,6 +41,12 @@ Samuel NGU/
     │   └── Reference outputs & marketing/
     └── Pre-2026-05-23 — Earlier iterations/
 ```
+
+## Canonical sources outside this repo
+
+- **Google Drive — Samuel's working artifacts:** `My Drive / War Room / VENTURES / zsecondary / A360` · <https://drive.google.com/drive/folders/1EQkVfN_vrZr-HFEyPItjIeQDNLjo1JjN>. Mockups (individual / family / coach / enterprise / health / strategic planning / mobile), brand assets, full Samuel-and-Drew result samples, the `align360_interaction_spec.html` master spec, and the new Clarity Layer reference outputs (Impact Readiness, Value Spectrum, Integrated User Model). `Drive Intake — A360 (2026-06-04)/` is the build-relevant local subset; everything else stays in Drive. Re-pull recipe is in the intake notes §9.
+- **Jason's framework (live site):** <https://gtm.align360.io/hub> · /primitive-map · /how-to-apply · /alpha-sprint-brief · /samuel-sprint
+- **Slack:** workspace `masteryos` · primary channel `#align360`
 
 ## Repo scope
 

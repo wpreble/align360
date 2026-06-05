@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Align Nutrition™ · DiagnosticOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep:#07050A;--white:#fff;
+  --glass:rgba(255,255,255,.055);--glass2:rgba(255,255,255,.09);
+  --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.04);
+  --muted:#8A7E8E;--text:rgba(255,255,255,.82);
+  /* Nutrition palette — warm sage green */
+  --nut:#1A4A2A;--nutfade:rgba(26,74,42,.15);--nutborder:rgba(26,74,42,.4);
+  --nut2:#2A6640;--nutlight:#4EC87A;--nutbright:#62D98A;
+  --warm:#8B5E1A;--warmfade:rgba(139,94,26,.12);--warmborder:rgba(139,94,26,.3);
+  --warm2:#C97A2A;--warmlight:#E8A850;
+  --berry:#6B1A42;--berryfade:rgba(107,26,66,.12);--berryborder:rgba(107,26,66,.3);
+  --red2:#C94040;--amber:#C97A1A;
+  --gold:#C9A96E;--gold2:#E8C97E;
+  --cherry:#2A122E;--cherry3:#521F58;
+  --sidebar:210px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--deep);color:var(--text);min-height:100vh;display:flex}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 55% 55% at 15% 0%,rgba(26,74,42,.2),transparent 55%),
+  radial-gradient(ellipse 40% 40% at 85% 100%,rgba(42,18,46,.4),transparent 60%);
+  pointer-events:none;z-index:0}
+
+/* NAV */
+nav{width:var(--sidebar);flex-shrink:0;background:rgba(7,5,10,.84);border-right:1px solid var(--line2);display:flex;flex-direction:column;padding:22px 16px;position:sticky;top:0;height:100vh;z-index:10;overflow:auto}
+.logo-row{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.logo-word{font-family:'Playfair Display',serif;font-size:16px;font-weight:500;letter-spacing:.07em;color:var(--white)}
+.logo-tag{font-size:8px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(78,200,122,.4);margin-bottom:18px}
+.nut-badge{background:var(--nutfade);border:1px solid var(--nutborder);border-radius:10px;padding:10px 12px;margin-bottom:20px}
+.nb-label{font-size:8px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:rgba(78,200,122,.7);margin-bottom:3px}
+.nb-name{font-size:13px;font-weight:500;color:var(--white);margin-bottom:1px}
+.nb-sub{font-size:10px;color:var(--muted)}
+.nb-score{display:flex;align-items:center;gap:6px;margin-top:6px}
+.nb-num{font-family:'Playfair Display',serif;font-size:22px;color:var(--nutlight);line-height:1}
+.nb-stage{font-size:10px;color:var(--muted)}
+.nav-section{font-size:8px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:12px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:12px;transition:all .18s;margin-bottom:1px;border:1px solid transparent;text-decoration:none}
+.nav-item:hover{background:var(--nutfade);color:rgba(78,200,122,.9);border-color:var(--nutborder)}
+.nav-item.active{background:rgba(26,74,42,.22);color:rgba(100,225,140,.95);border-color:rgba(78,200,122,.3)}
+.nav-icon{font-size:12px;width:14px;text-align:center;flex-shrink:0}
+.nav-footer{margin-top:auto;padding-top:14px;border-top:1px solid var(--line2)}
+.nav-footer-item{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;color:var(--muted);font-size:11px}
+.engine-tag{font-size:9px;color:rgba(255,255,255,.14);text-align:center;margin-top:8px;font-style:italic}
+
+/* TAB NAV */
+.tab-bar{display:flex;gap:6px;margin-bottom:24px;border-bottom:1px solid var(--line2);padding-bottom:16px}
+.tab-btn{font-size:12px;font-weight:500;letter-spacing:.06em;color:var(--muted);padding:7px 14px;border-radius:8px;cursor:pointer;transition:all .2s;border:1px solid transparent;background:none;font-family:'DM Sans',sans-serif}
+.tab-btn:hover{color:var(--white);background:var(--glass)}
+.tab-btn.active{color:rgba(100,225,140,.95);background:var(--nutfade);border-color:var(--nutborder)}
+
+/* VIEWS */
+.view{display:none}
+.view.active{display:block}
+
+/* ── HOME ── */
+.main{flex:1;padding:32px 40px;overflow:auto;position:relative;z-index:1}
+.page-eye{font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(78,200,122,.6);margin-bottom:8px}
+.page-title{font-family:'Playfair Display',serif;font-size:clamp(24px,3.5vw,38px);font-weight:500;color:var(--white);margin-bottom:5px;line-height:1.05}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.6;max-width:580px}
+.sec-rule{font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(78,200,122,.32);display:flex;align-items:center;gap:12px;margin-bottom:14px;margin-top:24px}
+.sec-rule::after{content:'';flex:1;height:1px;background:rgba(26,74,42,.3)}
+
+/* PULSE CHECK */
+.pulse-card{background:linear-gradient(135deg,var(--nutfade),rgba(26,74,42,.04));border:1px solid var(--nutborder);border-radius:18px;padding:20px;margin-bottom:18px}
+.pc-label{font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(78,200,122,.65);margin-bottom:10px}
+.pc-title{font-family:'Playfair Display',serif;font-size:17px;color:var(--white);margin-bottom:4px}
+.pc-sub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.55}
+.pulse-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px}
+.pulse-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s}
+.pulse-item:hover{background:var(--nutfade);border-color:var(--nutborder)}
+.pulse-item.selected{background:rgba(26,74,42,.3);border-color:rgba(78,200,122,.4)}
+.pi-icon{font-size:18px;margin-bottom:4px}
+.pi-label{font-size:10px;font-weight:500;color:var(--muted);margin-bottom:6px;letter-spacing:.04em}
+.pi-options{display:flex;gap:3px;justify-content:center;flex-wrap:wrap}
+.pi-opt{font-size:9px;font-weight:500;padding:2px 6px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.35);transition:all .18s}
+.pi-opt:hover{border-color:var(--nutborder);color:rgba(78,200,122,.7)}
+.pi-opt.active{background:var(--nutfade);border-color:rgba(78,200,122,.4);color:var(--nutlight)}
+.pulse-submit{background:var(--nut2);border:none;color:var(--white);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:.75rem 1.5rem;border-radius:9px;cursor:pointer;transition:all .22s;width:100%}
+.pulse-submit:hover{background:var(--nut)}
+
+/* SCORE BAND */
+.score-band{background:var(--glass);border:1px solid var(--line2);border-radius:20px;padding:22px;margin-bottom:18px;display:flex;align-items:center;gap:28px;cursor:pointer;transition:all .25s}
+.score-band:hover{background:var(--glass2)}
+.score-ring{position:relative;flex-shrink:0}
+.score-ring svg{transform:rotate(-90deg);display:block}
+.sr-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.sr-num{font-family:'Playfair Display',serif;font-size:30px;color:var(--nutlight);line-height:1}
+.sr-lbl{font-size:8px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.score-meta{flex:1}
+.sm-label{font-size:9px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:rgba(78,200,122,.6);margin-bottom:5px}
+.sm-stage{font-family:'Playfair Display',serif;font-size:19px;color:var(--white);margin-bottom:4px}
+.sm-body{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px}
+.score-chips{display:flex;flex-wrap:wrap;gap:5px}
+.sc-chip{font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px;border:1px solid var(--nutborder);color:rgba(78,200,122,.7);background:var(--nutfade)}
+.sc-chip.warn{border-color:var(--warmborder);color:var(--warmlight);background:var(--warmfade)}
+
+/* DIM CARDS */
+.dim-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.dim-card{background:var(--glass);border:1px solid var(--line2);border-radius:14px;padding:14px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.dim-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .22s}
+.dim-card:hover{background:var(--glass2);transform:translateY(-2px)}
+.dim-card:hover::before{opacity:1}
+.dc-fuel::before{background:linear-gradient(90deg,var(--nut),var(--nut2))}
+.dc-goal::before{background:linear-gradient(90deg,#185FA5,#2E86DE)}
+.dc-rec::before{background:linear-gradient(90deg,#521F58,#9B59B6)}
+.dc-ns::before{background:linear-gradient(90deg,var(--warm),var(--warm2))}
+.dc-sust::before{background:linear-gradient(90deg,var(--nut2),var(--nutbright))}
+.dc-symp::before{background:linear-gradient(90deg,var(--berry),#C04080)}
+.dc-label{font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.dc-name{font-size:13px;font-weight:500;color:var(--white);margin-bottom:6px}
+.dc-score{font-family:'Playfair Display',serif;font-size:30px;color:var(--white);margin-bottom:4px;line-height:1}
+.dc-bar{height:2px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden;margin-bottom:4px}
+.dc-fill{height:100%;border-radius:1px;transition:width 1.3s cubic-bezier(.16,1,.3,1)}
+.dc-q{font-size:11px;color:var(--muted);font-style:italic;line-height:1.4}
+
+/* ACTION CARD */
+.action-card{background:linear-gradient(135deg,var(--nutfade),rgba(26,74,42,.03));border:1px solid var(--nutborder);border-radius:18px;padding:20px;margin-bottom:18px;cursor:pointer;transition:all .25s}
+.action-card:hover{background:rgba(26,74,42,.22)}
+.ac-label{font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(78,200,122,.65);margin-bottom:8px}
+.ac-title{font-family:'Playfair Display',serif;font-size:19px;color:var(--white);margin-bottom:5px;line-height:1.25}
+.ac-body{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:12px}
+.ac-forecast{display:flex;gap:10px;flex-wrap:wrap}
+.af-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;text-align:center;flex:1;min-width:80px}
+.afi-val{font-family:'Playfair Display',serif;font-size:18px;color:var(--nutlight)}
+.afi-lbl{font-size:9px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.af-note{font-size:10px;color:rgba(255,255,255,.2);margin-top:8px;font-style:italic;line-height:1.45}
+
+/* ── TODAY TAB ── */
+.today-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.today-card{background:var(--glass);border:1px solid var(--line2);border-radius:16px;padding:18px;cursor:pointer;transition:all .22s}
+.today-card:hover{background:var(--glass2)}
+.tc-label{font-size:9px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.tc-title{font-family:'Playfair Display',serif;font-size:17px;color:var(--white);margin-bottom:5px;line-height:1.25}
+.tc-body{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px}
+.tc-tags{display:flex;flex-wrap:wrap;gap:5px}
+.tc-tag{font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px;border:1px solid var(--nutborder);color:rgba(78,200,122,.7);background:var(--nutfade)}
+.tc-tag.warm{border-color:var(--warmborder);color:var(--warmlight);background:var(--warmfade)}
+
+.meal-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.meal-item{background:var(--glass);border:1px solid var(--line2);border-radius:14px;padding:16px;cursor:pointer;transition:all .22s;display:flex;gap:14px;align-items:flex-start}
+.meal-item:hover{background:var(--glass2)}
+.mi-time{font-size:11px;font-weight:500;color:var(--muted);min-width:70px;padding-top:2px}
+.mi-body{flex:1}
+.mi-name{font-size:13px;font-weight:500;color:var(--white);margin-bottom:3px}
+.mi-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:6px}
+.mi-tags{display:flex;gap:5px;flex-wrap:wrap}
+.mi-tag{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px}
+.t-pro{background:rgba(46,106,200,.1);color:#5B9FE8;border:1px solid rgba(46,106,200,.2)}
+.t-rec{background:rgba(26,74,42,.15);color:var(--nutlight);border:1px solid var(--nutborder)}
+.t-ns{background:var(--warmfade);color:var(--warmlight);border:1px solid var(--warmborder)}
+.t-cal{background:rgba(255,255,255,.05);color:rgba(255,255,255,.4);border:1px solid var(--line2)}
+
+/* ── GROCERY TAB ── */
+.grocery-section{margin-bottom:20px}
+.pantry-input-card{background:var(--glass);border:1px solid var(--line2);border-radius:16px;padding:18px;margin-bottom:14px}
+.pi-label{font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.pantry-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.p-chip{font-size:11px;font-weight:500;padding:5px 12px;border-radius:20px;border:1px solid rgba(78,200,122,.3);color:rgba(78,200,122,.7);background:var(--nutfade);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:5px}
+.p-chip:hover{background:rgba(26,74,42,.3)}
+.p-chip .remove{opacity:.4;font-size:12px}
+.p-chip:hover .remove{opacity:.8}
+.pantry-input-row{display:flex;gap:8px}
+.pantry-input{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:9px;padding:.625rem .875rem;color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;outline:none}
+.pantry-input:focus{border-color:var(--nutborder)}
+.pantry-input::placeholder{color:var(--muted)}
+.pantry-add{background:var(--nut2);border:none;color:var(--white);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.625rem 1rem;border-radius:9px;cursor:pointer;white-space:nowrap}
+.recipe-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.recipe-card{background:var(--glass);border:1px solid var(--line2);border-radius:14px;padding:16px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.recipe-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.rc-pro::before{background:linear-gradient(90deg,#185FA5,#2E86DE)}
+.rc-rec::before{background:linear-gradient(90deg,var(--nut),var(--nut2))}
+.rc-ns::before{background:linear-gradient(90deg,var(--warm),var(--warm2))}
+.recipe-card:hover{background:var(--glass2);transform:translateY(-2px)}
+.rcard-label{font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.rcard-name{font-size:14px;font-weight:500;color:var(--white);margin-bottom:5px;line-height:1.3}
+.rcard-macros{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.rm{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid var(--line2);color:rgba(255,255,255,.5)}
+.rcard-why{font-size:11px;color:rgba(78,200,122,.6);font-style:italic}
+.missing-card{background:var(--warmfade);border:1px solid var(--warmborder);border-radius:14px;padding:16px;margin-bottom:12px}
+.mc-label2{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:rgba(201,122,42,.7);margin-bottom:8px}
+.missing-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.miss-chip{font-size:11px;font-weight:500;padding:4px 11px;border-radius:20px;border:1px solid var(--warmborder);color:var(--warmlight);background:rgba(139,94,26,.08)}
+.delivery-row{display:flex;gap:8px;flex-wrap:wrap}
+.del-btn{font-size:11px;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--line2);color:var(--muted);background:var(--glass);cursor:pointer;transition:all .18s}
+.del-btn:hover{border-color:var(--nutborder);color:rgba(78,200,122,.8);background:var(--nutfade)}
+
+/* ── SUPPLEMENTS TAB ── */
+.supp-list{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.supp-item{background:var(--glass);border:1px solid var(--line2);border-radius:14px;padding:16px;cursor:pointer;transition:all .22s;display:flex;gap:14px;align-items:flex-start}
+.supp-item:hover{background:var(--glass2)}
+.supp-item.priority{border-color:var(--nutborder);background:var(--nutfade)}
+.si-priority{font-size:10px;font-weight:500;padding:3px 8px;border-radius:20px;flex-shrink:0;margin-top:2px}
+.sip-high{background:rgba(26,74,42,.2);color:var(--nutlight);border:1px solid var(--nutborder)}
+.sip-med{background:var(--warmfade);color:var(--warmlight);border:1px solid var(--warmborder)}
+.sip-low{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--line2)}
+.si-body{flex:1}
+.si-name{font-size:14px;font-weight:500;color:var(--white);margin-bottom:3px}
+.si-why{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:6px}
+.si-source{font-size:11px;color:rgba(78,200,122,.55);font-style:italic}
+.si-dose{font-size:11px;color:rgba(255,255,255,.4);margin-top:3px}
+.supp-note{font-size:11px;color:rgba(255,255,255,.2);font-style:italic;margin-top:6px;line-height:1.5;border-top:1px solid var(--line2);padding-top:12px}
+
+/* DRAWER */
+.drawer{position:fixed;right:-580px;top:0;width:560px;max-width:95vw;height:100vh;background:linear-gradient(180deg,#0D0A14,#07050A);border-left:1px solid var(--line);padding:32px;transition:.38s cubic-bezier(.16,1,.3,1);z-index:100;overflow:auto}
+.drawer.open{right:0}
+.drawer-close{background:var(--glass);border:1px solid var(--line2);color:var(--muted);font-size:11px;padding:6px 14px;border-radius:50px;cursor:pointer;float:right;margin-bottom:24px;font-family:'DM Sans',sans-serif}
+.drawer-eye{font-size:9px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(78,200,122,.6);margin-bottom:8px;clear:both}
+.drawer-title{font-family:'Playfair Display',serif;font-size:28px;color:var(--white);margin-bottom:12px;line-height:1.15}
+.drawer-body{font-size:13px;color:var(--muted);line-height:1.78;margin-bottom:16px}
+.drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dg-cell{background:var(--glass);border:1px solid var(--line2);border-radius:12px;padding:14px}
+.dgc-lbl{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.dgc-val{font-size:13px;font-weight:500;color:var(--white)}
+.overlay{position:fixed;inset:0;background:rgba(7,5,10,.62);z-index:99;display:none}
+.overlay.open{display:block}
+</style>
+</head>
+<body>
+<div class="overlay" id="ov" onclick="closeD()"></div>
+
+<nav>
+  <div class="logo-row">
+    <svg width="20" height="20" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="10" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><circle cx="20" cy="20" r="3" fill="white" opacity=".8"/><line x1="20" y1="2" x2="20" y2="10" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><line x1="20" y1="30" x2="20" y2="38" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><line x1="2" y1="20" x2="10" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".55"/><line x1="30" y1="20" x2="38" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".55"/></svg>
+    <span class="logo-word">Align Nutrition™</span>
+  </div>
+  <div class="logo-tag">Align360 Health · DiagnosticOS</div>
+
+  <div class="nut-badge">
+    <div class="nb-label">Samuel · Nutrition profile</div>
+    <div class="nb-name">Optimizing</div>
+    <div class="nb-sub">Building season · Recovery focus</div>
+    <div class="nb-score">
+      <span class="nb-num">72</span>
+      <span class="nb-stage">/ 100 · Nutrition Score™</span>
+    </div>
+  </div>
+
+  <div class="nav-section">Views</div>
+  <a class="nav-item active" onclick="switchView('home',this)"><span class="nav-icon">◎</span>Nutrition Home</a>
+  <a class="nav-item" onclick="switchView('today',this)"><span class="nav-icon">◈</span>Today's Guidance</a>
+  <a class="nav-item" onclick="switchView('grocery',this)"><span class="nav-icon">○</span>Grocery Intelligence</a>
+  <a class="nav-item" onclick="switchView('supps',this)"><span class="nav-icon">◇</span>Supplement Intel</a>
+
+  <div class="nav-section">Profile</div>
+  <a class="nav-item"><span class="nav-icon">⬡</span>Nutrition Profile</a>
+  <a class="nav-item"><span class="nav-icon">⬡</span>Goals</a>
+  <a class="nav-item"><span class="nav-icon">⬡</span>Food Preferences</a>
+  <a class="nav-item"><span class="nav-icon">⬡</span>Health Concerns</a>
+
+  <div class="nav-section">Connect</div>
+  <a class="nav-item"><span class="nav-icon">◉</span>Apple Health</a>
+  <a class="nav-item"><span class="nav-icon">◉</span>Wearable Data</a>
+  <a class="nav-item"><span class="nav-icon">◉</span>Lab Results</a>
+
+  <div class="nav-footer"><div class="nav-footer-item"><span>◐</span>Samuel</div></div>
+  <div class="engine-tag">Powered by DiagnosticOS™<br>Align Nutrition Intelligence</div>
+</nav>
+
+<div class="main">
+  <div class="page-eye" id="page-eye">Align Nutrition™ · Samuel · Building Season · Recovery Focus</div>
+  <h1 class="page-title" id="page-title">Your nutrition, calibrated to who you are.</h1>
+  <p class="page-sub" id="page-sub">Not meal plans. Nutrition intelligence that reads from your User Model, your B3 state, your Life Journey season, and your health signals — and tells you exactly what to eat, why, and when it matters most for what you are building.</p>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchView('home',this)" id="tab-home">Overview</button>
+    <button class="tab-btn" onclick="switchView('today',this)" id="tab-today">Today's Guidance</button>
+    <button class="tab-btn" onclick="switchView('grocery',this)" id="tab-grocery">Grocery Intelligence</button>
+    <button class="tab-btn" onclick="switchView('supps',this)" id="tab-supps">Supplements</button>
+  </div>
+
+  <!-- ══ HOME VIEW ══ -->
+  <div class="view active" id="view-home">
+
+    <!-- DAILY PULSE -->
+    <div class="pulse-card">
+      <div class="pc-label">Daily Nutrition Pulse · 30 seconds · Updates your guidance</div>
+      <div class="pc-title">How are you doing right now?</div>
+      <div class="pc-sub">Tap your state in each area. Your nutrition guidance updates immediately based on your answers. No logging required.</div>
+      <div class="pulse-grid">
+        <div class="pulse-item">
+          <div class="pi-icon">⚡</div>
+          <div class="pi-label">Energy</div>
+          <div class="pi-options">
+            <span class="pi-opt" onclick="togglePulse(this)">Low</span>
+            <span class="pi-opt active" onclick="togglePulse(this)">Med</span>
+            <span class="pi-opt" onclick="togglePulse(this)">High</span>
+          </div>
+        </div>
+        <div class="pulse-item">
+          <div class="pi-icon">🍽</div>
+          <div class="pi-label">Hunger</div>
+          <div class="pi-options">
+            <span class="pi-opt active" onclick="togglePulse(this)">Low</span>
+            <span class="pi-opt" onclick="togglePulse(this)">Med</span>
+            <span class="pi-opt" onclick="togglePulse(this)">High</span>
+          </div>
+        </div>
+        <div class="pulse-item">
+          <div class="pi-icon">🫁</div>
+          <div class="pi-label">Digestion</div>
+          <div class="pi-options">
+            <span class="pi-opt" onclick="togglePulse(this)">Poor</span>
+            <span class="pi-opt active" onclick="togglePulse(this)">OK</span>
+            <span class="pi-opt" onclick="togglePulse(this)">Good</span>
+          </div>
+        </div>
+        <div class="pulse-item">
+          <div class="pi-icon">🧠</div>
+          <div class="pi-label">Focus</div>
+          <div class="pi-options">
+            <span class="pi-opt" onclick="togglePulse(this)">Low</span>
+            <span class="pi-opt" onclick="togglePulse(this)">Med</span>
+            <span class="pi-opt active" onclick="togglePulse(this)">High</span>
+          </div>
+        </div>
+        <div class="pulse-item">
+          <div class="pi-icon">😤</div>
+          <div class="pi-label">Stress</div>
+          <div class="pi-options">
+            <span class="pi-opt" onclick="togglePulse(this)">Low</span>
+            <span class="pi-opt active" onclick="togglePulse(this)">Med</span>
+            <span class="pi-opt" onclick="togglePulse(this)">High</span>
+          </div>
+        </div>
+        <div class="pulse-item">
+          <div class="pi-icon">🔋</div>
+          <div class="pi-label">Recovery</div>
+          <div class="pi-options">
+            <span class="pi-opt active" onclick="togglePulse(this)">Low</span>
+            <span class="pi-opt" onclick="togglePulse(this)">Med</span>
+            <span class="pi-opt" onclick="togglePulse(this)">Full</span>
+          </div>
+        </div>
+      </div>
+      <button class="pulse-submit" onclick="submitPulse()">Update my guidance →</button>
+    </div>
+
+    <!-- SCORE BAND -->
+    <div class="score-band" onclick="openD('Align Nutrition Score™','72 · Optimizing','Your Nutrition Score measures overall nutritional alignment across six dimensions. 72 places you in the Optimizing stage — your nutrition is supporting your goals and performance but has two dimensions with meaningful improvement opportunity. The primary limiter is Nervous System Support (56), driven by meal timing irregularity and stress-linked eating patterns. The primary strength is Sustainability (88) — you have built eating habits you can maintain.',['Score','72 / 100'],['Stage','Optimizing'],['Primary strength','Sustainability · 88'],['Primary limiter','Nervous System Support · 56'],['Season','Building'],['Focus','Recovery nutrition'])">
+      <div class="score-ring">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="6"/>
+          <circle cx="50" cy="50" r="40" fill="none" stroke="url(#nGrad)" stroke-width="6" stroke-dasharray="251.3" stroke-dashoffset="70.4" stroke-linecap="round"/>
+          <defs><linearGradient id="nGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#1A4A2A"/><stop offset="100%" stop-color="#4EC87A"/></linearGradient></defs>
+        </svg>
+        <div class="sr-center"><div class="sr-num">72</div><div class="sr-lbl">Nutrition</div></div>
+      </div>
+      <div class="score-meta">
+        <div class="sm-label">Align Nutrition Score™ · Building Season</div>
+        <div class="sm-stage">Optimizing</div>
+        <div class="sm-body">Nutrition is supporting your goals and performance. Two dimensions need attention — Nervous System Support and Symptom Alignment. One specific action will move the most.</div>
+        <div class="score-chips">
+          <span class="sc-chip">Strength: Sustainability · 88</span>
+          <span class="sc-chip warn">Limiter: Nervous System · 56</span>
+          <span class="sc-chip">Season: Building</span>
+          <span class="sc-chip warn">Recovery: Low</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 DIMENSIONS -->
+    <div class="sec-rule">Six dimensions · Click any to expand</div>
+    <div class="dim-grid">
+      <div class="dim-card dc-fuel" onclick="openD('Fuel Quality','72','Am I eating foods that nourish me? Your fuel quality is solid — whole foods are the majority of your diet, fiber intake is reasonable, and micronutrient diversity is acceptable. The gap: processed convenience foods are appearing more frequently in high-stress windows. DiagnosticOS connection: this correlates with your stress mid-week signal.',['Score','72 / 100'],['Strength','Whole food foundation'],['Gap','Stress-window convenience foods'],['Season note','Building: convenience foods increase'])">
+        <div class="dc-label">Dimension 1</div>
+        <div class="dc-name">Fuel Quality</div>
+        <div class="dc-score" style="color:var(--nutlight)">72</div>
+        <div class="dc-bar"><div class="dc-fill" data-w="72%" style="background:linear-gradient(90deg,var(--nut),var(--nut2))"></div></div>
+        <div class="dc-q">Am I eating foods that nourish me?</div>
+      </div>
+      <div class="dim-card dc-goal" onclick="openD('Goal Alignment','84','Does my nutrition support my goals? Your goal is company launch — Building season execution requiring sustained cognitive output and physical energy. Protein is adequate. Complex carbohydrates for sustained energy are consistent. The gap: the timing of nutrition around high-output work windows is inconsistent.',['Score','84 / 100'],['Goal','Company launch · Building season'],['Strength','Protein and carb quality'],['Gap','Timing around high-output windows'])">
+        <div class="dc-label">Dimension 2</div>
+        <div class="dc-name">Goal Alignment</div>
+        <div class="dc-score" style="color:#4EA8F5">84</div>
+        <div class="dc-bar"><div class="dc-fill" data-w="84%" style="background:linear-gradient(90deg,#185FA5,#2E86DE)"></div></div>
+        <div class="dc-q">Does my nutrition support my goals?</div>
+      </div>
+      <div class="dim-card dc-rec" onclick="openD('Recovery Support','63','Does my nutrition improve recovery? This is the dimension most affected by your current B3 state (recovery low). Protein intake is adequate but timing is suboptimal — you are often not eating enough protein in the first 90 minutes of waking. Hydration is inconsistent. Sleep-supporting foods (magnesium-rich, tryptophan sources) are rare in your current pattern.',['Score','63 / 100'],['Primary gap','Morning protein timing'],['Also gaps','Hydration · Sleep-support foods'],['B3 connection','Recovery low — directly related'])">
+        <div class="dc-label">Dimension 3</div>
+        <div class="dc-name">Recovery Support</div>
+        <div class="dc-score" style="color:#D4A0FF">63</div>
+        <div class="dc-bar"><div class="dc-fill" data-w="63%" style="background:linear-gradient(90deg,#521F58,#9B59B6)"></div></div>
+        <div class="dc-q">Does my nutrition improve recovery?</div>
+      </div>
+      <div class="dim-card dc-ns" onclick="openD('Nervous System Support','56','Does my eating pattern regulate or stress my nervous system? This is your primary limiter. Blood sugar is not stable — you are skipping meals during high-focus windows and then eating large meals, creating blood sugar spikes and crashes. Caffeine timing is extending past 2pm on busy days. These patterns are amplifying your stress signal and working against your B3 A Day capacity.',['Score','56 / 100 · Primary limiter'],['Issue 1','Meal skipping + large meal rebound'],['Issue 2','Late caffeine (past 2pm)'],['Issue 3','Blood sugar instability'],['Season note','Building: nervous system under load'])">
+        <div class="dc-label">Dimension 4 · Limiter</div>
+        <div class="dc-name">Nervous System Support</div>
+        <div class="dc-score" style="color:var(--warmlight)">56</div>
+        <div class="dc-bar"><div class="dc-fill" data-w="56%" style="background:linear-gradient(90deg,var(--warm),var(--warm2))"></div></div>
+        <div class="dc-q">Does eating regulate or stress my nervous system?</div>
+      </div>
+      <div class="dim-card dc-sust" onclick="openD('Sustainability','88','Can I realistically maintain this? Your sustainability score is your highest — 88. Your food preferences are consistent, your budget is stable, and your cooking ability is sufficient for your current pattern. This is the foundation that everything else is built on. The interventions recommended by Align Nutrition are designed to work within what you have already built — not replace it.',['Score','88 / 100 · Top strength'],['Foundation','Consistent preferences + budget'],['Cooking','Sufficient for current pattern'],['Note','Interventions designed to fit this'])">
+        <div class="dc-label">Dimension 5 · Strength</div>
+        <div class="dc-name">Sustainability</div>
+        <div class="dc-score" style="color:var(--nutbright)">88</div>
+        <div class="dc-bar"><div class="dc-fill" data-w="88%" style="background:linear-gradient(90deg,var(--nut2),var(--nutbright))"></div></div>
+        <div class="dc-q">Can I realistically maintain this?</div>
+      </div>
+      <div class="dim-card dc-symp" onclick="openD('Symptom Alignment','61','Is my nutrition helping or worsening symptoms? Mid-afternoon energy crashes are the primary symptom with a nutritional root cause — consistent with the blood sugar instability in Nervous System Support (56). Mild bloating is intermittent and correlates with high-stress eating patterns. Brain fog in the late afternoon aligns with the caffeine-and-crash cycle DiagnosticOS has flagged.',['Score','61 / 100'],['Primary symptom','Afternoon energy crash'],['Nutrition root cause','Blood sugar instability'],['Secondary','Intermittent bloating · Stress eating'],['Brain fog','Late caffeine cycle'])">
+        <div class="dc-label">Dimension 6</div>
+        <div class="dc-name">Symptom Alignment</div>
+        <div class="dc-score" style="color:#E080A0">61</div>
+        <div class="dc-bar"><div class="dc-fill" data-w="61%" style="background:linear-gradient(90deg,var(--berry),#C04080)"></div></div>
+        <div class="dc-q">Is my nutrition helping or worsening symptoms?</div>
+      </div>
+    </div>
+
+    <!-- ONE ACTION -->
+    <div class="action-card" onclick="openD('Today\'s One Action','Protein within 90 minutes of waking','This single change addresses four nutrition dimensions simultaneously: Recovery Support (morning protein timing), Nervous System Support (blood sugar stability from the start of the day), Symptom Alignment (afternoon crash prevention), and Goal Alignment (sustained cognitive performance for Building season output). Your User Model confirms this is an A Day — the best day to establish a new morning routine.',['Dimension addressed','Recovery Support · NS Support'],['Also addresses','Symptom Alignment · Goal Alignment'],['Reason','Blood sugar stability from waking'],['Season note','Building: sustained output requires this'],['B3','A Day — establish now'])">
+      <div class="ac-label">Align Nutrition · One action · Today</div>
+      <div class="ac-title">Eat 30g of protein within 90 minutes of waking.</div>
+      <div class="ac-body">This one change stabilizes blood sugar from the start of the day, eliminates the afternoon crash pattern, supports cognitive performance during Building season output, and begins rebuilding recovery. It addresses your primary limiter (Nervous System Support) and your B3 recovery gap simultaneously. Today is an A Day — the right moment to establish this.</div>
+      <div class="ac-forecast">
+        <div class="af-item"><div class="afi-val" style="color:var(--nutlight)">+12%</div><div class="afi-lbl">Energy signal</div></div>
+        <div class="af-item"><div class="afi-val" style="color:#4EA8F5">+8%</div><div class="afi-lbl">Recovery signal</div></div>
+        <div class="af-item"><div class="afi-val" style="color:var(--warmlight)">-10%</div><div class="afi-lbl">Stress signal</div></div>
+        <div class="af-item"><div class="afi-val" style="color:#D4A0FF">+15%</div><div class="afi-lbl">Focus signal</div></div>
+      </div>
+      <div class="af-note">Directional signal only — not a clinical prediction. Based on your profile, season, and current B3 state. Consistent application over 7 days produces the signal shift.</div>
+    </div>
+  </div>
+
+  <!-- ══ TODAY VIEW ══ -->
+  <div class="view" id="view-today">
+    <div class="sec-rule">Today's nutrition context · Building season · Recovery low · A Day</div>
+    <div class="today-grid">
+      <div class="today-card" onclick="openD('Season Context','Building · Company launch','Your current season is Building — sustained high-output execution toward company launch. Nutrition in Building season prioritizes: cognitive fuel (complex carbs, healthy fats), sustained energy (protein + fiber), stress management (blood sugar stability, reduced stimulants in afternoon), and recovery investment (protein timing, magnesium, sleep-supporting foods).',['Season','Building'],['Goal','Company launch'],['Priority 1','Cognitive fuel'],['Priority 2','Stress management'],['Priority 3','Recovery investment'])">
+        <div class="tc-label">Season context · From Life Journey</div>
+        <div class="tc-title">Building season nutrition</div>
+        <div class="tc-body">High-output execution requires cognitive fuel, sustained energy, and recovery investment. Your B3 recovery signal is low — today\'s nutrition leans toward recovery support.</div>
+        <div class="tc-tags"><span class="tc-tag">Building season</span><span class="tc-tag warn">Recovery: low</span><span class="tc-tag">A Day</span></div>
+      </div>
+      <div class="today-card" onclick="openD('B3 Nutrition Calibration','Recovery low → adjust today','When B3 recovery is low, DiagnosticOS calibrates nutrition guidance toward recovery-priority foods: higher protein, more hydration, magnesium-rich foods, and earlier cutoff for caffeine. Today\'s meal suggestions reflect this calibration.',['B3 state','A Day · Recovery low'],['Calibration','Recovery-priority nutrition'],['Adjustments','Higher protein · More hydration'],['Also','Magnesium focus · Caffeine cutoff 1pm'])">
+        <div class="tc-label">B3 calibration · DiagnosticOS</div>
+        <div class="tc-title">Recovery low → nutrition adjusts</div>
+        <div class="tc-body">Today\'s meals are calibrated for recovery. Higher protein, more hydration, magnesium-rich foods, and a 1pm caffeine cutoff. Your A Day capacity deserves the fuel to match it.</div>
+        <div class="tc-tags"><span class="tc-tag warn">Recovery focus</span><span class="tc-tag">Higher protein</span><span class="tc-tag warn">Caffeine cutoff 1pm</span></div>
+      </div>
+    </div>
+
+    <div class="sec-rule">Today's meal guidance · Calibrated to your profile and B3 state</div>
+    <div class="meal-list">
+      <div class="meal-item" onclick="openD('Breakfast · 7–9am','High-protein recovery start','30g protein within 90 minutes of waking is the priority intervention for your profile. This breakfast hits that target while keeping blood sugar stable — no sugar spike, no mid-morning crash. The meal is designed around what you already have (eggs, chicken, rice are pantry staples from your profile).',['Timing','Within 90 min of waking'],['Protein target','30g'],['Blood sugar','Stable — no spike'],['Prep time','10 minutes'])">
+        <div class="mi-time">Breakfast<br><span style="font-size:10px;color:rgba(255,255,255,.3)">7–9am</span></div>
+        <div class="mi-body">
+          <div class="mi-name">High-Protein Recovery Bowl</div>
+          <div class="mi-desc">3 eggs + 4oz chicken + brown rice + avocado + leafy greens. Simple, fast, hits 35g protein. Blood sugar stable for 3–4 hours of focused work.</div>
+          <div class="mi-tags">
+            <span class="mi-tag t-pro">35g protein</span>
+            <span class="mi-tag t-rec">Recovery priority</span>
+            <span class="mi-tag t-cal">~520 cal</span>
+          </div>
+        </div>
+      </div>
+      <div class="meal-item" onclick="openD('Mid-Morning · Optional','Only if hungry — do not eat on schedule','Your pattern shows meal skipping during high-focus windows followed by large rebound meals. The fix is not more meals — it is not skipping when hunger arrives. If you feel hunger before lunch, this 5-minute option maintains blood sugar without breaking flow.',['Timing','Only if hungry'],['Purpose','Blood sugar maintenance'],['Prep','5 minutes or less'],['Note','Do not eat if not hungry'])">
+        <div class="mi-time">Mid-morning<br><span style="font-size:10px;color:rgba(255,255,255,.3)">Optional</span></div>
+        <div class="mi-body">
+          <div class="mi-name">Greek Yogurt + Handful of Walnuts</div>
+          <div class="mi-desc">Only if hungry. 20g protein, healthy fats, blood sugar stable. 5 minutes. Does not break your focus window. Skip if not hungry — do not eat on a schedule.</div>
+          <div class="mi-tags">
+            <span class="mi-tag t-pro">20g protein</span>
+            <span class="mi-tag t-ns">Blood sugar stable</span>
+            <span class="mi-tag t-cal">~280 cal</span>
+          </div>
+        </div>
+      </div>
+      <div class="meal-item" onclick="openD('Lunch · 12–1pm','Last caffeine window','Lunch is the last caffeine window today — B3 recovery is low, and caffeine after 1pm will delay sleep onset, which is already compromised. Eat lunch before 1pm if possible. This meal is designed for sustained afternoon cognitive output without the 3pm crash.',['Timing','12–1pm'],['Caffeine note','Last window — cutoff at 1pm'],['Goal','Sustained afternoon output'],['Avoid','Large simple carb portion'])">
+        <div class="mi-time">Lunch<br><span style="font-size:10px;color:rgba(255,255,255,.3)">12–1pm</span></div>
+        <div class="mi-body">
+          <div class="mi-name">Salmon + Quinoa + Roasted Broccoli</div>
+          <div class="mi-desc">Omega-3s for inflammation (your watch signal), complete protein, complex carbs for afternoon sustained energy. Last coffee with this meal — nothing after 1pm today given your recovery signal.</div>
+          <div class="mi-tags">
+            <span class="mi-tag t-pro">40g protein</span>
+            <span class="mi-tag t-rec">Anti-inflammatory</span>
+            <span class="mi-tag t-ns">No crash</span>
+            <span class="mi-tag t-cal">~580 cal</span>
+          </div>
+        </div>
+      </div>
+      <div class="meal-item" onclick="openD('Afternoon Snack · 3–4pm','Prevent the crash window','3–4pm is your highest crash-risk window — blood sugar typically drops here when the lunch meal was inadequate or timing was off. This snack prevents the crash without creating a stimulant dependency. No caffeine after this point.',['Timing','3–4pm — crash prevention'],['Purpose','Blood sugar bridge'],['Caffeine','None'],['Note','If lunch was adequate you may not need this'])">
+        <div class="mi-time">Snack<br><span style="font-size:10px;color:rgba(255,255,255,.3)">3–4pm</span></div>
+        <div class="mi-body">
+          <div class="mi-name">Apple + Almond Butter + Protein Shake (optional)</div>
+          <div class="mi-desc">Fiber + fat + protein = no 3pm crash. Skip the shake if lunch was substantial. This is a bridge, not a meal. No caffeine from here — your recovery depends on it tonight.</div>
+          <div class="mi-tags">
+            <span class="mi-tag t-ns">Crash prevention</span>
+            <span class="mi-tag t-cal">~300 cal</span>
+          </div>
+        </div>
+      </div>
+      <div class="meal-item" onclick="openD('Dinner · 6–8pm','Recovery meal · Magnesium + tryptophan','Recovery is low — tonight\'s dinner is designed around sleep support. Magnesium-rich foods (leafy greens, pumpkin seeds) and tryptophan sources (turkey, chicken, eggs) are the priority. Keep it light — a heavy late dinner will disrupt your sleep quality further.',['Timing','6–8pm'],['Priority','Sleep support'],['Key nutrients','Magnesium · Tryptophan'],['Note','Light portion — heavy dinner disrupts sleep'])">
+        <div class="mi-time">Dinner<br><span style="font-size:10px;color:rgba(255,255,255,.3)">6–8pm</span></div>
+        <div class="mi-body">
+          <div class="mi-name">Turkey + Sweet Potato + Spinach + Pumpkin Seeds</div>
+          <div class="mi-desc">Recovery meal. Turkey for tryptophan (sleep), spinach + pumpkin seeds for magnesium (sleep quality), sweet potato for complex carbs. Light portion — heavy dinner undermines sleep recovery tonight.</div>
+          <div class="mi-tags">
+            <span class="mi-tag t-rec">Sleep support</span>
+            <span class="mi-tag t-pro">35g protein</span>
+            <span class="mi-tag t-ns">Magnesium rich</span>
+            <span class="mi-tag t-cal">~480 cal</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GROCERY VIEW ══ -->
+  <div class="view" id="view-grocery">
+    <div class="sec-rule">Grocery Intelligence · Tell me what you have · I'll build meals from it</div>
+    <div class="pantry-input-card">
+      <div class="pi-label">What is in your pantry or fridge right now?</div>
+      <div class="pantry-chips" id="pantry-chips">
+        <div class="p-chip" onclick="removeChip(this)">Chicken <span class="remove">×</span></div>
+        <div class="p-chip" onclick="removeChip(this)">Brown Rice <span class="remove">×</span></div>
+        <div class="p-chip" onclick="removeChip(this)">Broccoli <span class="remove">×</span></div>
+        <div class="p-chip" onclick="removeChip(this)">Eggs <span class="remove">×</span></div>
+        <div class="p-chip" onclick="removeChip(this)">Greek Yogurt <span class="remove">×</span></div>
+        <div class="p-chip" onclick="removeChip(this)">Sweet Potato <span class="remove">×</span></div>
+      </div>
+      <div class="pantry-input-row">
+        <input class="pantry-input" id="pantry-in" type="text" placeholder="Add an ingredient..." onkeydown="if(event.key==='Enter')addChip()">
+        <button class="pantry-add" onclick="addChip()">Add +</button>
+      </div>
+    </div>
+
+    <div class="sec-rule">Recipes from what you have · Calibrated to your profile and B3 state</div>
+    <div class="recipe-grid">
+      <div class="recipe-card rc-pro" onclick="openD('High-Protein Recovery Bowl','35g protein · 10 min','Perfect for your recovery-low B3 state and Building season protein target. Chicken + eggs hit your 30g morning protein goal immediately. Brown rice provides sustained energy without blood sugar spike. Broccoli adds anti-inflammatory fiber.',['Protein','35g'],['Prep time','10 minutes'],['Calories','~480'],['B3 calibration','Recovery: low → protein priority'],['Season fit','Building: sustained cognitive fuel'])">
+        <div class="rcard-label">High protein · Recovery priority</div>
+        <div class="rcard-name">High-Protein Recovery Bowl</div>
+        <div class="rcard-macros"><span class="rm">35g protein</span><span class="rm">480 cal</span><span class="rm">10 min</span></div>
+        <div class="rcard-why">Your recovery signal is low. This hits 35g protein from your pantry — no extra shopping.</div>
+      </div>
+      <div class="recipe-card rc-rec" onclick="openD('Egg + Veggie Recovery Scramble','28g protein · 8 min','All eggs and broccoli from your pantry. Recovery focus means prioritizing protein timing over novelty — this is fast, hits the target, and the broccoli adds sulforaphane for inflammation support (your DiagnosticOS watch signal).',['Protein','28g'],['Prep time','8 minutes'],['Calories','~360'],['Recovery signal','Protein timing hit'],['Inflammation note','Broccoli: sulforaphane support'])">
+        <div class="rcard-label">Recovery · Anti-inflammatory</div>
+        <div class="rcard-name">Egg + Broccoli Recovery Scramble</div>
+        <div class="rcard-macros"><span class="rm">28g protein</span><span class="rm">360 cal</span><span class="rm">8 min</span></div>
+        <div class="rcard-why">Fast and recovery-focused. Broccoli adds anti-inflammatory support for your watch signal.</div>
+      </div>
+      <div class="recipe-card rc-ns" onclick="openD('Blood Sugar Stable Bowl','22g protein · 12 min','Designed specifically for your Nervous System Support gap (56/100). Sweet potato + chicken + yogurt drizzle creates a balanced macronutrient ratio that maintains blood sugar for 3+ hours — eliminating the afternoon crash window.',['Protein','22g'],['Prep time','12 minutes'],['Calories','~520'],['NS support','Blood sugar stable 3+ hours'],['Crash prevention','Primary design goal'])">
+        <div class="rcard-label">Nervous system support</div>
+        <div class="rcard-name">Blood Sugar Stable Bowl</div>
+        <div class="rcard-macros"><span class="rm">22g protein</span><span class="rm">520 cal</span><span class="rm">12 min</span></div>
+        <div class="rcard-why">Specifically for your NS support gap. Prevents the 3pm crash pattern DiagnosticOS flagged.</div>
+      </div>
+    </div>
+
+    <div class="missing-card">
+      <div class="mc-label2">Missing ingredients · Add these to complete your recovery week</div>
+      <div class="missing-chips">
+        <span class="miss-chip">Salmon</span>
+        <span class="miss-chip">Avocado</span>
+        <span class="miss-chip">Spinach</span>
+        <span class="miss-chip">Pumpkin Seeds</span>
+        <span class="miss-chip">Turkey</span>
+        <span class="miss-chip">Walnuts</span>
+        <span class="miss-chip">Quinoa</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.55">These 7 items complete your recovery week meal plan. Salmon adds omega-3s for your inflammation watch signal. Pumpkin seeds and spinach add magnesium for sleep quality. Turkey adds tryptophan for sleep support.</div>
+      <div class="delivery-row">
+        <button class="del-btn">Walmart Grocery</button>
+        <button class="del-btn">Kroger</button>
+        <button class="del-btn">Amazon Fresh</button>
+        <button class="del-btn">Instacart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SUPPLEMENTS VIEW ══ -->
+  <div class="view" id="view-supps">
+    <div class="sec-rule">Supplement Intelligence · Goal + symptoms + diet + health profile</div>
+    <div class="supp-list">
+      <div class="supp-item priority" onclick="openD('Magnesium Glycinate','Priority · Sleep + stress + recovery','Your stress signal is moderate, recovery is low, and sleep quality is suboptimal. Magnesium glycinate is the most bioavailable form and specifically supports: sleep quality (reduces time to sleep onset and improves deep sleep), stress response (HPA axis regulation), and muscle recovery. Your dietary magnesium from current food patterns is insufficient for your Building season output load.',['Priority','High'],['Form','Magnesium glycinate (most absorbable)'],['Dose','400mg · 60 min before bed'],['Why from labs','Correlates with cortisol watch signal'],['Why from B3','Recovery low + stress moderate'],['Why from season','Building: higher magnesium demand'])">
+        <span class="si-priority sip-high">Priority</span>
+        <div class="si-body">
+          <div class="si-name">Magnesium Glycinate</div>
+          <div class="si-why">Your recovery is low, stress is moderate, and sleep quality is suboptimal. Magnesium glycinate supports sleep onset, deep sleep quality, stress regulation, and muscle recovery. Your dietary intake is insufficient for your Building season output load.</div>
+          <div class="si-source">Source: B3 recovery signal + cortisol watch (DiagnosticOS) + stress pattern + Building season demand</div>
+          <div class="si-dose">400mg · 60 min before bed</div>
+        </div>
+      </div>
+      <div class="supp-item priority" onclick="openD('Vitamin D3 + K2','Priority · Lab confirmed','Your DiagnosticOS lab shows Vitamin D at 52 ng/mL — sufficient but at the lower end of optimal for your activity level and sun exposure pattern. D3 with K2 ensures proper calcium utilization and supports immune function, mood regulation (relevant to Building season stress), and inflammation modulation.',['Priority','High'],['Current lab','52 ng/mL — lower optimal range'],['Target','60–80 ng/mL'],['Form','D3 + K2 combined'],['Dose','3,000–5,000 IU D3 · 100mcg K2 · with fat'])">
+        <span class="si-priority sip-high">Priority</span>
+        <div class="si-body">
+          <div class="si-name">Vitamin D3 + K2</div>
+          <div class="si-why">Lab confirmed: your Vitamin D is 52 — sufficient but lower-optimal for your activity profile. D3 + K2 together support calcium utilization, immune function, mood (relevant to Building season stress), and inflammation modulation.</div>
+          <div class="si-source">Source: DiagnosticOS lab interpretation · 52 ng/mL confirmed</div>
+          <div class="si-dose">3,000–5,000 IU D3 · 100mcg K2 · take with your fattiest meal</div>
+        </div>
+      </div>
+      <div class="supp-item" onclick="openD('Omega-3 Fish Oil','Recommended · Inflammation watch signal','Your DiagnosticOS inflammation pattern is low-grade and stress-linked. Omega-3 (EPA + DHA) is the most evidence-supported dietary intervention for low-grade inflammation reduction. 2–3g combined EPA + DHA daily reduces inflammatory markers and supports cognitive function — both relevant to your Building season output goals.',['Priority','Recommended'],['Target','Low-grade inflammation signal'],['Also','Cognitive function for Building season'],['Form','High-EPA fish oil'],['Dose','2–3g EPA+DHA · with meals'])">
+        <span class="si-priority sip-med">Recommended</span>
+        <div class="si-body">
+          <div class="si-name">Omega-3 Fish Oil (EPA + DHA)</div>
+          <div class="si-why">Your inflammation signal is low-grade and stress-linked. Omega-3 is the most evidence-supported dietary intervention. Also supports cognitive function — directly relevant to Building season output.</div>
+          <div class="si-source">Source: DiagnosticOS inflammation watch signal + Building season cognitive demand</div>
+          <div class="si-dose">2–3g combined EPA + DHA · with meals · high-EPA formulation</div>
+        </div>
+      </div>
+      <div class="supp-item" onclick="openD('Ferritin Iron Support','Recommended · Lab watch','Your ferritin is 28 ng/mL — low-normal for your activity profile. Before supplementing iron (which has risks if not needed), increase dietary iron first: red meat, legumes, leafy greens with Vitamin C. Retest in 60 days. If ferritin does not improve, consider supplementation with physician guidance.',['Priority','Recommended — food first'],['Current','28 ng/mL — low-normal'],['Approach','Food first: 60 days'],['Then','Retest before supplementing'],['Physician','Required for iron supplementation'])">
+        <span class="si-priority sip-med">Recommended</span>
+        <div class="si-body">
+          <div class="si-name">Ferritin · Dietary Iron First</div>
+          <div class="si-why">Ferritin at 28 is low-normal for your activity profile. Do not supplement yet — dietary iron increase first. Red meat, legumes, leafy greens with Vitamin C. Retest in 60 days before considering supplementation.</div>
+          <div class="si-source">Source: DiagnosticOS lab interpretation · 28 ng/mL watch signal</div>
+          <div class="si-dose">Food first: red meat 3× week + Vitamin C with meals · Retest before supplementing</div>
+        </div>
+      </div>
+      <div class="supp-item" onclick="openD('Ashwagandha (KSM-66)','Consider · Stress adaptation','Your stress signal is moderate and sustained — consistent with Building season high-output. Ashwagandha (KSM-66 form) is an adaptogen that reduces cortisol, supports sleep quality, and improves stress resilience over 8–12 weeks. This is a long-term intervention, not an acute fix.',['Priority','Consider'],['Evidence','KSM-66 form: well-studied'],['Effect timeline','8–12 weeks'],['Target','Cortisol modulation + stress resilience'],['Note','Not a substitute for recovery behaviors'])">
+        <span class="si-priority sip-low">Consider</span>
+        <div class="si-body">
+          <div class="si-name">Ashwagandha KSM-66</div>
+          <div class="si-why">Moderate sustained stress signal in Building season. Ashwagandha (KSM-66 form) reduces cortisol and improves stress resilience over 8–12 weeks. Long-term intervention — not a substitute for recovery behaviors.</div>
+          <div class="si-source">Source: B3 stress signal + cortisol watch (DiagnosticOS) + Building season duration</div>
+          <div class="si-dose">300–600mg · with dinner · KSM-66 form specifically</div>
+        </div>
+      </div>
+      <div class="supp-note">Align Nutrition supplement recommendations are based on your User Model, B3 state, DiagnosticOS lab signals, and nutrition profile. These are not medical prescriptions. Consult a physician before starting supplementation, especially for iron and any medications you are currently taking. DiagnosticOS lab interpretation supplements but does not replace medical advice.</div>
+    </div>
+  </div>
+
+</div><!-- main -->
+
+<!-- DRAWER -->
+<div class="drawer" id="drawer">
+  <button class="drawer-close" onclick="closeD()">Close ×</button>
+  <div class="drawer-eye">Align Nutrition™ · Detail</div>
+  <div class="drawer-title" id="d-title"></div>
+  <div class="drawer-body" id="d-body"></div>
+  <div class="drawer-grid" id="d-grid"></div>
+</div>
+
+<script>
+// Animate bars on load
+setTimeout(()=>document.querySelectorAll('[data-w]').forEach(el=>el.style.width=el.dataset.w),400);
+
+// Tab/view switching
+function switchView(view, el){
+  // Deactivate all views and tabs
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+
+  document.getElementById('view-'+view).classList.add('active');
+
+  // Activate the right tab button
+  const tabMap={home:'tab-home',today:'tab-today',grocery:'tab-grocery',supps:'tab-supps'};
+  if(tabMap[view]) document.getElementById(tabMap[view]).classList.add('active');
+
+  // Activate nav item if it was clicked (not a tab button)
+  if(el && el.classList.contains('nav-item')) el.classList.add('active');
+  else if(el && el.classList.contains('tab-btn')){
+    // Find the matching nav item
+    document.querySelectorAll('.nav-item').forEach(n=>{
+      if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+view+"'")) n.classList.add('active');
+    });
+  }
+
+  // Update page header
+  const meta = {
+    home:['Align Nutrition™ · Samuel · Building Season · Recovery Focus','Your nutrition, calibrated to who you are.','Not meal plans. Nutrition intelligence that reads from your User Model, your B3 state, your Life Journey season, and your health signals — and tells you exactly what to eat, why, and when it matters most for what you are building.'],
+    today:['Today\'s Guidance · Building Season · Recovery Low · A Day','What to eat today. Why. When.','Every meal is calibrated to your B3 recovery signal, your Building season output demands, and your Nervous System Support gap. Follow the timing — it matters as much as the food.'],
+    grocery:['Grocery Intelligence™ · Samuel\'s Pantry','Meals from what you have. A list for what you\'re missing.','Tell Align Nutrition what\'s in your pantry. It builds three calibrated recipes from your ingredients, identifies what\'s missing for the week, and connects you to delivery if you want it.'],
+    supps:['Supplement Intelligence™ · Samuel\'s Profile','Not "buy supplements." The right ones, for your reasons.','Every recommendation connects to a specific signal from your User Model, B3 state, or DiagnosticOS lab data. Priority is clear. The reason is named. Nothing generic.'],
+  };
+  if(meta[view]){
+    document.getElementById('page-eye').textContent=meta[view][0];
+    document.getElementById('page-title').textContent=meta[view][1];
+    document.getElementById('page-sub').textContent=meta[view][2];
+  }
+}
+
+// Pulse options
+function togglePulse(el){
+  const siblings = el.parentElement.querySelectorAll('.pi-opt');
+  siblings.forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function submitPulse(){
+  const btn = document.querySelector('.pulse-submit');
+  btn.textContent='Guidance updated ✓';
+  btn.style.background='var(--nut)';
+  setTimeout(()=>{btn.textContent='Update my guidance →';btn.style.background='';},2500);
+}
+
+// Pantry chips
+function addChip(){
+  const inp = document.getElementById('pantry-in');
+  const val = inp.value.trim();
+  if(!val) return;
+  const chip = document.createElement('div');
+  chip.className='p-chip';
+  chip.innerHTML=val+' <span class="remove">×</span>';
+  chip.onclick=()=>removeChip(chip);
+  document.getElementById('pantry-chips').appendChild(chip);
+  inp.value='';
+}
+function removeChip(el){ el.remove(); }
+
+// Drawer
+function openD(title,val,body,cells){
+  document.getElementById('d-title').textContent=title+(val?' · '+val:'');
+  document.getElementById('d-body').textContent=body||'';
+  const g=document.getElementById('d-grid');g.innerHTML='';
+  if(cells&&cells.length){
+    const pairs=typeof cells[0]==='string'?
+      cells.reduce((a,v,i)=>{if(i%2===0)a.push([v,cells[i+1]||'']);return a;},[]):cells;
+    pairs.forEach(([l,v])=>{const d=document.createElement('div');d.className='dg-cell';d.innerHTML=`<div class="dgc-lbl">${l}</div><div class="dgc-val">${v}</div>`;g.appendChild(d);});
+  }
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('ov').classList.add('open');
+}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('ov').classList.remove('open')}
+</script>
+</body>
+</html>

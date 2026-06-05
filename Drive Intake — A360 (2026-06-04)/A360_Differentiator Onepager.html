@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Align360 · What Makes This Different</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--cherry:#2A122E;--cherry2:#3D1A42;--cherry3:#521F58;--obsidian:#0D0A14;--stone:#F7F6F5;--white:#fff;--gold:#C9A96E;--gold2:#E8C97E;--muted:#7A6E7E;--border:rgba(42,18,46,.1);--green:#0F6E56;--ent:#185FA5}
+html,body{background:var(--stone);font-family:'DM Sans',sans-serif;color:var(--obsidian)}
+
+/* HERO */
+.hero{background:var(--obsidian);padding:5rem 2rem 6rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(42,18,46,.9),var(--obsidian))}
+.hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:80px;background:linear-gradient(to bottom,transparent,var(--stone))}
+.hero-inner{position:relative;z-index:1}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:2.5rem}
+.logo-text{font-size:11px;font-weight:600;letter-spacing:.3em;color:rgba(255,255,255,.3);text-transform:uppercase}
+.hero-eye{font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(36px,7vw,72px);font-weight:500;color:var(--white);line-height:1;margin-bottom:.75rem}
+.hero-title em{color:var(--gold2);font-style:italic;display:block}
+.hero-sub{font-size:16px;font-weight:300;color:rgba(255,255,255,.45);max-width:560px;margin:0 auto 2.5rem;line-height:1.75}
+.hero-rule{width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.6),transparent);margin:0 auto 2rem}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.htag{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5)}
+
+/* LAYOUT */
+.page{max-width:960px;margin:0 auto;padding:0 1.5rem}
+
+/* SECTION */
+.section{padding:5rem 0;border-bottom:1px solid var(--border)}
+.section:last-child{border:none}
+.sec-eye{font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.sec-title{font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,44px);font-weight:500;color:var(--obsidian);line-height:1.1;margin-bottom:.75rem}
+.sec-sub{font-size:15px;font-weight:300;color:var(--muted);line-height:1.75;max-width:580px;margin-bottom:3rem}
+
+/* MOAT */
+.moat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.moat-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.75rem;position:relative;overflow:hidden}
+.moat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.mc-1::before{background:linear-gradient(90deg,var(--cherry),var(--cherry3))}
+.mc-2::before{background:linear-gradient(90deg,var(--green),#27AE60)}
+.mc-3::before{background:linear-gradient(90deg,var(--ent),#2E86DE)}
+.mc-4::before{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.mc-5::before{background:linear-gradient(90deg,#521F58,#9B59B6)}
+.moat-card.wide{grid-column:1/-1}
+.moat-num{font-family:'Playfair Display',serif;font-size:48px;font-weight:400;color:rgba(42,18,46,.08);position:absolute;top:12px;right:20px;line-height:1}
+.moat-label{font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+.moat-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--obsidian);margin-bottom:.625rem;line-height:1.25}
+.moat-body{font-size:13px;font-weight:300;color:var(--muted);line-height:1.72}
+
+/* PERSONA */
+.persona-section{background:var(--cherry);border-radius:24px;padding:3.5rem;margin:3rem 0;position:relative;overflow:hidden}
+.persona-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 100%,rgba(201,169,110,.1),transparent 70%)}
+.ps-inner{position:relative;z-index:1}
+.ps-eye{font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.ps-title{font-family:'Playfair Display',serif;font-size:clamp(24px,4vw,38px);font-weight:500;color:var(--white);margin-bottom:.75rem;line-height:1.15}
+.ps-sub{font-size:15px;font-weight:300;color:rgba(255,255,255,.5);max-width:560px;margin-bottom:2rem;line-height:1.75}
+.ps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ps-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:1.25rem}
+.psc-label{font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.5rem}
+.psc-title{font-family:'Playfair Display',serif;font-size:17px;color:var(--white);margin-bottom:.5rem}
+.psc-body{font-size:12px;color:rgba(255,255,255,.45);line-height:1.65}
+
+/* DATA ARCHITECTURE */
+.data-section{background:var(--white);border:1px solid var(--border);border-radius:24px;padding:3rem;margin-bottom:3rem}
+.data-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:start;margin-top:2rem}
+.data-side{border-radius:14px;padding:1.5rem}
+.data-personal{background:rgba(42,18,46,.04);border:1px solid rgba(42,18,46,.1)}
+.data-enterprise{background:rgba(24,95,165,.04);border:1px solid rgba(24,95,165,.15)}
+.data-side-label{font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;margin-bottom:1rem}
+.data-personal .data-side-label{color:var(--cherry)}
+.data-enterprise .data-side-label{color:var(--ent)}
+.data-item{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(42,18,46,.06);font-size:13px;color:var(--muted)}
+.data-item:last-child{border:none}
+.data-chip{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px}
+.chip-never{background:rgba(163,45,45,.08);color:#C0392B;border:1px solid rgba(163,45,45,.2)}
+.chip-in{background:rgba(15,110,86,.08);color:var(--green);border:1px solid rgba(15,110,86,.2)}
+.chip-agg{background:rgba(24,95,165,.08);color:var(--ent);border:1px solid rgba(24,95,165,.2)}
+.data-bridge{padding:0 2rem;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem}
+.db-icon{font-size:28px}
+.db-label{font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.db-note{font-size:11px;color:rgba(42,18,46,.3);line-height:1.5}
+
+/* COMPARISON */
+.comp-table{background:var(--white);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.ct-header{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;background:var(--cherry);padding:1rem 1.25rem}
+.ct-h{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.ct-h.highlight{color:var(--gold2);font-weight:600}
+.ct-row{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
+.ct-row:last-child{border:none}
+.ct-row:nth-child(even){background:rgba(42,18,46,.02)}
+.ct-cell{font-size:13px;color:var(--muted)}
+.ct-cell.feature{color:var(--obsidian);font-weight:500}
+.ct-cell.yes{color:var(--green);font-weight:500}
+.ct-cell.no{color:rgba(42,18,46,.3)}
+.ct-cell.partial{color:var(--gold)}
+.ct-cell.align{color:var(--cherry);font-weight:600}
+
+/* FORMULA */
+.formula-section{text-align:center;padding:4rem 0}
+.formula-row{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.5rem;margin:2rem 0}
+.fs{padding:.625rem 1.25rem;border-radius:8px;font-size:13px;font-weight:500;border:1px solid}
+.fs.done{background:rgba(42,18,46,.06);border-color:rgba(42,18,46,.15);color:var(--muted)}
+.fs.active{background:var(--cherry);border-color:var(--cherry);color:var(--white)}
+.fs.next{background:rgba(201,169,110,.1);border-color:rgba(201,169,110,.3);color:var(--gold)}
+.fa{color:var(--muted);font-size:18px}
+.formula-note{font-size:14px;color:var(--muted);max-width:560px;margin:0 auto;line-height:1.75}
+
+/* CTA */
+.cta{background:linear-gradient(135deg,var(--obsidian),var(--cherry2));border-radius:24px;padding:4rem 3rem;text-align:center;margin:4rem 0;position:relative;overflow:hidden}
+.cta::before{content:'';position:absolute;bottom:-20%;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(201,169,110,.08),transparent 70%)}
+.cta-inner{position:relative;z-index:1}
+.cta-eye{font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem}
+.cta-title{font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,48px);font-weight:500;color:var(--white);margin-bottom:.75rem;line-height:1.1}
+.cta-title em{color:var(--gold2);font-style:italic}
+.cta-sub{font-size:15px;color:rgba(255,255,255,.45);max-width:520px;margin:0 auto 2.5rem;line-height:1.75}
+.cta-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.cta-pill{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:8px 18px;border-radius:20px;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5)}
+
+/* FOOTER */
+.footer{text-align:center;padding:3rem 0;font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(42,18,46,.28);border-top:1px solid var(--border)}
+
+@media(max-width:640px){.moat-grid,.ps-grid,.data-grid,.comp-table{grid-template-columns:1fr}.moat-card.wide{grid-column:1}.data-bridge{padding:1rem 0}.ct-header,.ct-row{grid-template-columns:1.5fr 1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="logo-row">
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="10" stroke="white" stroke-width="1.2" stroke-opacity=".6"/><circle cx="20" cy="20" r="3" fill="white" opacity=".85"/><line x1="20" y1="2" x2="20" y2="10" stroke="white" stroke-width="1.2" stroke-opacity=".6"/><line x1="20" y1="30" x2="20" y2="38" stroke="white" stroke-width="1.2" stroke-opacity=".6"/><line x1="2" y1="20" x2="10" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".6"/><line x1="30" y1="20" x2="38" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".6"/></svg>
+      <span class="logo-text">Align360</span>
+    </div>
+    <div class="hero-eye">Why Align360 is different · What makes this a moat</div>
+    <h1 class="hero-title">Not a platform.<em>A digital twin.</em></h1>
+    <div class="hero-sub">Align360 is not selling assessments, courses, or coaching. It is building a continuously improving model of who you are — and routing every product, decision, and recommendation through it.</div>
+    <div class="hero-rule"></div>
+    <div class="hero-tags">
+      <span class="htag">Living User Model</span>
+      <span class="htag">AI Persona · Mr. JC</span>
+      <span class="htag">Semantic Bridge</span>
+      <span class="htag">RhythmOS</span>
+      <span class="htag">Compounding Intelligence</span>
+      <span class="htag">Transparent Pricing</span>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- SECTION 1: MOAT -->
+<div class="section">
+  <div class="sec-eye">The moat · Why this compounds</div>
+  <h2 class="sec-title">Every assessment makes every product smarter.</h2>
+  <p class="sec-sub">Most platforms sell you a course and move on. Align360's architecture means that every input — every assessment, every conversation, every life event — improves the model that powers every product. The moat gets stronger with use.</p>
+
+  <div class="moat-grid">
+    <div class="moat-card mc-1">
+      <div class="moat-num">1</div>
+      <div class="moat-label">Core moat</div>
+      <div class="moat-title">The Living User Model</div>
+      <div class="moat-body">Five assessments create your diagnostic foundation. But unlike competitors whose assessments produce a static PDF, Align360's User Model is alive — it updates through conversations, journal entries, life events, decisions, and B3 daily signals. The longer you use it, the smarter it gets. That is not a feature. It is a compounding structural advantage.</div>
+    </div>
+    <div class="moat-card mc-2">
+      <div class="moat-num">2</div>
+      <div class="moat-label">The compounding loop</div>
+      <div class="moat-title">Assessment → Intelligence → Product → Update</div>
+      <div class="moat-body">Wiring for Impact™ feeds the User Model. The User Model powers DesignSuite™. DesignSuite produces an offer. The offer gets refined. The refinement updates the User Model. That cycle runs across all five products simultaneously. BetterUp, Lattice, and Culture Amp do not have this loop. They have one-directional data collection. Align360 has compounding intelligence.</div>
+    </div>
+    <div class="moat-card mc-3">
+      <div class="moat-num">3</div>
+      <div class="moat-label">Competitive advantage</div>
+      <div class="moat-title">Transparent pricing in an opaque market</div>
+      <div class="moat-body">BetterUp, Lattice, Culture Amp, and 15Five all hide pricing. Align360 publishes it. For enterprise buyers who have been burned by non-transparent SaaS pricing, this is a trust signal that costs nothing to produce and creates a meaningful differentiation before the first demo. The signal communicates confidence in the product's value — which the market reads correctly.</div>
+    </div>
+    <div class="moat-card mc-4">
+      <div class="moat-num">4</div>
+      <div class="moat-label">Identity-first architecture</div>
+      <div class="moat-title">The category no one owns</div>
+      <div class="moat-body">BetterUp is coaching. Lattice is performance management. Culture Amp is engagement surveys. 15Five is check-ins. None of them start with identity. Align360 starts with who you are — wiring, orientation, values, rejection gift, worth, readiness — and builds every product recommendation from that foundation. This is not an incremental improvement on an existing category. It is a new one.</div>
+    </div>
+    <div class="moat-card mc-5 wide">
+      <div class="moat-num">5</div>
+      <div class="moat-label">The real product</div>
+      <div class="moat-title">A continuously improving digital twin of a person's identity, purpose, readiness, value, capacity, and potential</div>
+      <div class="moat-body">DesignSuite, Career Navigator, Integrate360, 627, and LegacyLab are all specialized applications of the same underlying model. The User Model is the product. Everything else is a portal into it. This architecture means that a user who starts with DesignSuite and then activates Career Navigator does not start from scratch — Career Navigator already knows everything the User Model knows. Competitors cannot replicate this without rebuilding their entire data architecture. Most cannot do that in under three years.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: AI PERSONA -->
+<div class="section">
+  <div class="persona-section">
+    <div class="ps-inner">
+      <div class="ps-eye">AI Persona · Mr. JC · Feeling Like Chocolate</div>
+      <h2 class="ps-title">Not a chatbot. Your named companion — powered by your full User Model.</h2>
+      <p class="ps-sub">Most AI in personal development platforms is a search engine with better grammar. Align360's AI persona is different because it reads from everything the User Model knows — not just your last message.</p>
+      <div class="ps-grid">
+        <div class="ps-card">
+          <div class="psc-label">Default persona</div>
+          <div class="psc-title">Mr. JC · Feeling Like Chocolate</div>
+          <div class="psc-body">The brand persona. Warm, principled, direct. Knows your wiring, your season, your rejection gift, your B3 state, and your Life Journey™ context before the conversation begins. Every response is calibrated to who you are — not who the average user is.</div>
+        </div>
+        <div class="ps-card">
+          <div class="psc-label">User-customizable</div>
+          <div class="psc-title">Name your persona. Make it yours.</div>
+          <div class="psc-body">Users can name their AI companion — Samuel calls his Master Chief. The name changes the relationship dynamic. The User Model stays the same. When a user names their persona, Align360 asks one question: "What does that name mean to you?" The answer feeds the User Model and makes every subsequent interaction more calibrated.</div>
+        </div>
+        <div class="ps-card">
+          <div class="psc-label">What makes it different</div>
+          <div class="psc-title">Context-aware, not query-aware</div>
+          <div class="psc-body">Most AI assistants know what you asked. Align360's persona knows who you are, what season you are in, what your B3 state is today, what your Life Journey™ shows about your current lesson, and what your User Model says you are ready for — before you say anything. That is not a feature. It is a different category of AI entirely.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: DATA -->
+<div class="section">
+  <div class="sec-eye">Data architecture · The semantic bridge</div>
+  <h2 class="sec-title">Individual data stays personal. Meaning informs the organization.</h2>
+  <p class="sec-sub">This is the most important architectural decision Align360 has made — and it is the one enterprise buyers will ask about first. The answer is simple and defensible: we do not build a data bridge. We build a semantic bridge.</p>
+
+  <div class="data-section">
+    <div class="moat-label">How it works</div>
+    <div class="moat-title" style="font-family:'Playfair Display',serif;font-size:22px;color:var(--obsidian);margin-top:.5rem;margin-bottom:.75rem">Unidirectional data flow. Two-directional meaning.</div>
+    <div class="moat-body" style="font-size:14px;max-width:620px;line-height:1.75">External sources — APIs, calendar, tools, enterprise signals — flow in to improve the User Model. Nothing flows out. On the enterprise side, individual raw data never crosses to the org layer. Only aggregated, anonymized semantic signals cross — what the pattern means for the organization, never what any individual is experiencing.</div>
+
+    <div class="data-grid">
+      <div class="data-side data-personal">
+        <div class="data-side-label">Personal Layer · Always Private</div>
+        <div class="data-item">Assessment scores <span class="data-chip chip-never">Never shared</span></div>
+        <div class="data-item">B3 daily state <span class="data-chip chip-never">Never shared</span></div>
+        <div class="data-item">AI persona conversations <span class="data-chip chip-never">Never shared</span></div>
+        <div class="data-item">Life Journey™ events <span class="data-chip chip-never">Never shared</span></div>
+        <div class="data-item">Individual season <span class="data-chip chip-never">Never shared</span></div>
+        <div class="data-item">External data (APIs, calendar) <span class="data-chip chip-in">Flows in only</span></div>
+      </div>
+      <div class="data-bridge">
+        <div class="db-icon">⇄</div>
+        <div class="db-label">Semantic Bridge</div>
+        <div class="db-note">Meaning crosses.<br>Data stays.<br>Always anonymized.</div>
+      </div>
+      <div class="data-side data-enterprise">
+        <div class="data-side-label">Enterprise Layer · Receives</div>
+        <div class="data-item">Org alignment signal <span class="data-chip chip-agg">Aggregated</span></div>
+        <div class="data-item">Season distribution <span class="data-chip chip-agg">Anonymized</span></div>
+        <div class="data-item">Readiness patterns <span class="data-chip chip-agg">Anonymized</span></div>
+        <div class="data-item">Network complementarity <span class="data-chip chip-agg">Anonymized</span></div>
+        <div class="data-item">Decision Suite™ context <span class="data-chip chip-in">Flows in only</span></div>
+        <div class="data-item">Individual raw data <span class="data-chip chip-never">Never</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: COMPETITIVE -->
+<div class="section">
+  <div class="sec-eye">Competitive landscape · Where the gap lives</div>
+  <h2 class="sec-title">What the market built. What Align360 built.</h2>
+  <p class="sec-sub">The competitors are real businesses with real revenue. Align360 does not need to replace them — it needs to occupy the category they left unclaimed.</p>
+
+  <div class="comp-table">
+    <div class="ct-header">
+      <div class="ct-h">Capability</div>
+      <div class="ct-h highlight">Align360</div>
+      <div class="ct-h">BetterUp</div>
+      <div class="ct-h">Lattice</div>
+      <div class="ct-h">Culture Amp</div>
+    </div>
+    <div class="ct-row">
+      <div class="ct-cell feature">Identity-first architecture</div>
+      <div class="ct-cell align">✓ Yes</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+    </div>
+    <div class="ct-row">
+      <div class="ct-cell feature">Living User Model</div>
+      <div class="ct-cell align">✓ Yes</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+    </div>
+    <div class="ct-row">
+      <div class="ct-cell feature">Named AI persona</div>
+      <div class="ct-cell align">✓ Yes</div>
+      <div class="ct-cell partial">Partial</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+    </div>
+    <div class="ct-row">
+      <div class="ct-cell feature">Semantic bridge (not data bridge)</div>
+      <div class="ct-cell align">✓ Yes</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+    </div>
+    <div class="ct-row">
+      <div class="ct-cell feature">Transparent pricing</div>
+      <div class="ct-cell align">✓ Yes</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+    </div>
+    <div class="ct-row">
+      <div class="ct-cell feature">RhythmOS / wellness pacing</div>
+      <div class="ct-cell align">✓ Yes</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+    </div>
+    <div class="ct-row">
+      <div class="ct-cell feature">Compounding intelligence loop</div>
+      <div class="ct-cell align">✓ Yes</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+    </div>
+    <div class="ct-row">
+      <div class="ct-cell feature">Life journey narrative layer</div>
+      <div class="ct-cell align">✓ Yes</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+    </div>
+    <div class="ct-row">
+      <div class="ct-cell feature">Enterprise as distribution channel</div>
+      <div class="ct-cell align">✓ Yes</div>
+      <div class="ct-cell partial">Partial</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+    </div>
+    <div class="ct-row">
+      <div class="ct-cell feature">Value Spectrum™ assessment</div>
+      <div class="ct-cell align">✓ Proprietary</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+      <div class="ct-cell no">✗ No</div>
+    </div>
+  </div>
+</div>
+
+<!-- FORMULA -->
+<div class="formula-section">
+  <div class="sec-eye">The master flow</div>
+  <h2 class="sec-title" style="margin-bottom:1rem">How everything connects</h2>
+  <div class="formula-row">
+    <div class="fs done">Assessments</div><div class="fa">→</div>
+    <div class="fs active">User Model</div><div class="fa">→</div>
+    <div class="fs active">AI Layer</div><div class="fa">→</div>
+    <div class="fs active">Recommendations</div><div class="fa">→</div>
+    <div class="fs next">Products</div><div class="fa">→</div>
+    <div class="fs next">Execution</div><div class="fa">→</div>
+    <div class="fs next">Results</div><div class="fa">→</div>
+    <div class="fs active">Model Updates</div>
+  </div>
+  <p class="formula-note">Every loop through this cycle makes the model smarter. Every product that reads from the User Model produces better outputs. Every result that flows back into the model improves every future recommendation. This is not a platform that scales through users. It is a platform that scales through intelligence.</p>
+</div>
+
+<!-- CTA -->
+<div class="cta">
+  <div class="cta-inner">
+    <div class="cta-eye">Align360 · What comes next</div>
+    <h2 class="cta-title">The category is unclaimed.<em>The moat is being built.</em></h2>
+    <p class="cta-sub">DesignSuite, Career Navigator, Integrate360, 627, and LegacyLab are all specialized applications of one underlying model. The model is the product. Everything else is a portal into it.</p>
+    <div class="cta-pills">
+      <span class="cta-pill">Individual · $99 alpha deposit</span>
+      <span class="cta-pill">Enterprise · Wholesale + white-label</span>
+      <span class="cta-pill">Transparent pricing · Always</span>
+      <span class="cta-pill">SOC 2 · In progress</span>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Align360 · Clarity · Alignment · Abundance · © 2026</div>
+</div>
+
+</body>
+</html>
