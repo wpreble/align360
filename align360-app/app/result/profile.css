@@ -331,3 +331,26 @@
    --gold isn't in scope here. */
 .result-toolbar .rt-btn.primary { background:#CDA0C2; color:#1B0A24; border-color:#CDA0C2; font-weight:700; }
 .result-toolbar .rt-btn.primary:hover { background:#DBB6D2; }
+
+/* ════════════════════════════════════════════════════════════════
+   Numbers + controls must POP. The big numerals were hairline-thin
+   (font-weight:200) in a mid accent, so they read the same as the dark
+   backdrop. Heavier weight + the bright (light) accent.
+   ════════════════════════════════════════════════════════════════ */
+.profile-doc .sig-pct,
+.profile-doc .cr-pct { color: var(--gold2); font-weight: 500; }
+.profile-doc .gift-pct { font-weight: 600; }
+.profile-doc .opp-sv { font-weight: 600; }
+.profile-doc .opp-legacy .opp-sv { color:#EBB0B8; }
+.profile-doc .opp-ai .opp-sv { color:#C2B6FF; }
+/* decorative numerals were near-invisible (.14/.25 alpha) */
+.profile-doc .am-num { color: rgba(150,170,255,.55); font-weight: 300; }
+.profile-doc .stack-n { color: rgba(224,196,212,.42); font-weight: 300; }
+
+/* Floating controls — unmistakably buttons, well clear of the backdrop */
+.result-back { background: rgba(60,34,78,.97); color:#F8EFF5; border-color: rgba(224,196,212,.7); }
+.result-back:hover { background: rgba(74,44,94,.98); }
+.result-toolbar { background: rgba(60,34,78,.97); border-color: rgba(224,196,212,.55); }
+.result-toolbar .rt-btn { background: rgba(224,196,212,.16); color:#F8EFF5; border-color: rgba(224,196,212,.65); }
+.result-toolbar .rt-btn:hover { background: rgba(224,196,212,.3); }
+.result-toolbar .rt-btn.primary { background:#DEC0D3; color:#1B0A24; border-color:#DEC0D3; }

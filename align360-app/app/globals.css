@@ -210,6 +210,29 @@ a { color:inherit; text-decoration:none; }
 .lib-modal-note { font-size:14px; color:var(--text-muted); font-style:italic; line-height:1.5; margin-bottom:18px; }
 .lib-modal-close { font-family:var(--font-brand); font-weight:600; font-size:14px; padding:10px 20px; border-radius:var(--radius-md); background:var(--cta); color:var(--cta-text); }
 
+/* ── Frameworks page (per-family accent via --fwa) ── */
+.fwk-page { max-width:920px; margin:0 auto; padding:48px 24px 90px; width:100%; }
+.fwk-intro h1 { font-family:var(--font-display); font-weight:600; font-size:42px; margin-bottom:10px; }
+.fwk-intro p { font-family:var(--font-read); font-size:18px; line-height:1.6; color:var(--text-secondary); max-width:640px; }
+.fwk-family { margin-top:22px; border:1px solid var(--border); border-top:3px solid var(--fwa); border-radius:var(--radius-lg); background:var(--bg-surface); padding:24px 26px; }
+.fwk-family.soon { opacity:.9; }
+.fwk-head { display:flex; align-items:center; gap:12px; margin-bottom:6px; flex-wrap:wrap; }
+.fwk-name { font-family:var(--font-display); font-weight:600; font-size:26px; color:var(--fwa); }
+.fwk-status { font-family:var(--font-brand); font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:3px 10px; border-radius:999px; }
+.fwk-status.live { color:#fff; background:var(--fwa); }
+.fwk-status.soon { color:var(--text-muted); border:1px solid var(--border-strong); }
+.fwk-blurb { font-family:var(--font-read); font-size:15.5px; line-height:1.55; color:var(--text-secondary); margin-bottom:18px; max-width:620px; }
+.fwk-tools { display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:8px; }
+.fwk-tool { display:flex; align-items:center; gap:11px; padding:13px 15px; border-radius:var(--radius-md); border:1px solid var(--border); font-size:15px; color:var(--text-primary); }
+.fwk-tool.live { transition:transform .15s var(--ease-out), border-color .15s, background .15s; cursor:pointer; }
+.fwk-tool.live:hover { border-color:var(--fwa); background:color-mix(in srgb, var(--fwa) 10%, transparent); transform:translateX(2px); }
+.fwk-tool.locked { opacity:.62; }
+.fwk-tool-name { flex:1; min-width:0; }
+.fwk-dot { width:7px; height:7px; border-radius:50%; background:var(--fwa); flex-shrink:0; }
+.fwk-tool.locked .fwk-dot { background:var(--text-muted); }
+.fwk-go { font-family:var(--font-brand); font-size:12.5px; font-weight:600; color:var(--fwa); white-space:nowrap; }
+.fwk-lock { font-size:12px; opacity:.6; }
+
 /* ── Center column ── */
 .center-col { position:relative; min-width:0; overflow-y:auto; display:flex; flex-direction:column; }
 .reopen-tab { position:fixed; top:14px; z-index:40; width:30px; height:34px; display:grid; place-items:center; background:var(--bg-surface); border:1px solid var(--border); color:var(--text-muted); border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.06); }

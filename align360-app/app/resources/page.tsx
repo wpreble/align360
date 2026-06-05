@@ -19,17 +19,6 @@ type Section = { title: string; sub?: string; items: Item[] };
 
 const SECTIONS: Section[] = [
   {
-    title: 'Frameworks',
-    sub: 'Build your profile. Each one is remembered and fed into your AI.',
-    items: [
-      { id: 'wiring', kind: 'assessment', slug: 'wiring', title: 'Wiring for Impact', desc: 'How you naturally create value, under pressure and at your best.', meta: 'Core · 19 questions' },
-      { id: 'orientation', kind: 'assessment', slug: 'orientation', title: 'Orientation for Impact', desc: 'How you read situations and make decisions.', meta: '12 questions' },
-      { id: 'rejection-gift', kind: 'assessment', slug: 'rejection-gift', title: 'Rejection Gift Finder', desc: 'How adversity forged a specific edge that is now yours.', meta: '12 questions' },
-      { id: 'career-align', kind: 'guided', runName: 'Career Alignment', title: 'Career Alignment', desc: 'Talk through where you are and where you want to go.', meta: 'Guided chat' },
-      { id: 'resume', kind: 'guided', runName: 'Resume Analyzer', title: 'Resume Analyzer', desc: 'Sharpen your resume against your real wiring.', meta: 'Guided chat' },
-    ],
-  },
-  {
     title: 'Watch',
     sub: 'Short videos to get the most from Align360.',
     items: [
@@ -109,7 +98,7 @@ export default function ResourcesPage() {
     <div className="lib-page">
       <div className="lib-intro">
         <h1>Resources</h1>
-        <p>Frameworks, videos, and guides to go deeper. Tap any card to begin.</p>
+        <p>Videos and guides to go deeper. Tap any card to begin.</p>
       </div>
 
       {SECTIONS.map((sec) => (
