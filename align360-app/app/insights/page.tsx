@@ -82,6 +82,12 @@ export default function InsightsHub() {
           const isDone = done[a.slug];
           return (
             <div key={a.slug} className={`ins-card${isDone ? ' done' : ''}`}>
+              {/* Whole-card click target (stretched link). */}
+              <Link
+                href={isDone ? '/insights/profile' : `/assessment/${a.slug}`}
+                className="ins-card-cover"
+                aria-label={`${a.name}: ${isDone ? 'view your result' : 'take the assessment'}`}
+              />
               <span className={`ins-dot${isDone ? ' on' : ''}`} />
               <div className="ins-card-body">
                 <div className="ins-card-top">
@@ -93,11 +99,11 @@ export default function InsightsHub() {
               </div>
               {isDone ? (
                 <div className="ins-card-actions">
-                  <Link href="/insights/profile" className="ins-link">View result</Link>
-                  <Link href={`/assessment/${a.slug}`} className="ins-link muted">Retake</Link>
+                  <span className="ins-link go">View result →</span>
+                  <Link href={`/assessment/${a.slug}`} className="ins-link muted ins-retake">Retake</Link>
                 </div>
               ) : (
-                <Link href={`/assessment/${a.slug}`} className="ins-link go">Take it →</Link>
+                <span className="ins-link go">Take it →</span>
               )}
             </div>
           );
