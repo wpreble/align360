@@ -55,7 +55,9 @@ export function parseAssessment(slug: string, md: string): Assessment {
   let promptParts: string[] = [];
 
   const flushPrompt = () => {
-    if (curQ) curQ.prompt = promptParts.join(' ').trim();
+    // Only write when there's collected prompt text — otherwise the repeated
+    // flush on each option line (B–E) would overwrite a captured prompt with "".
+    if (curQ && promptParts.length) curQ.prompt = promptParts.join(' ').trim();
     promptParts = [];
   };
 

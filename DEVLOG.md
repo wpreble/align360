@@ -4,6 +4,34 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Post-deploy polish — onboarding, frameworks, account, contrast, prompts (2026-06-05)
+
+Live and auto-deploying on **https://align360-app.vercel.app** (every push to `main` ships). All of the below is committed + deployed.
+
+**Canonical onboarding (19 questions).** Replaced my placeholder questions with the authoritative spec from `content/Assessments/Onboarding.md` — Sections A–I (why here, wiring, life rhythm, decision/AI-style, what shaped you, connection, faith gate, building toward, + 6 Current-State Calibration Qs incl. distress flag & disruption posture). `lib/onboarding.ts` holds the questions + a per-answer **signal map**; **`buildOnboardingContext` feeds each chosen answer's behavior signal to the AI** (tone, faith level, routing, distress). Synthesis is index-based (can't drift from option text). Options render as a full-width vertical list (sentences). 19 Qs ≈ 5 min — if testers find it long, trim Section I to the 2–3 highest-impact Qs.
+
+**Frameworks page (new nav).** `/frameworks` lists the full system from the Knowledge File (System Prompt §15): DesignSuite + Career Navigator **live**, Integrate360 / 627 Figures / LegacyLab **locked (coming soon)**, each with its own accent (`--fwa`). Click rules: the 3 DesignSuite assessments → runner / Insights (take-or-view); every other live tool → `/chat?run=<name>`; locked families are non-interactive. Nav is now Chat / Insights / **Frameworks** / Resources. **Resources is now a pure content library** (Watch + Guides poster cards; the duplicate Frameworks section was removed).
+
+**Per-framework + per-result color system.** Landing framework cards: DesignSuite = fig-rose, Career Navigator = teal (top bar + tag + bullets). Resources posters re-colored to match (assessment fig / guided teal / video violet / doc sapphire). This complements the per-gift profile tinting.
+
+**Account & Settings panel (`Shell.tsx`).** Footer no longer shows a "Set your name" input — it shows the user's name + avatar as a button that opens an Account & Settings modal: editable display name, Account items (Profile / Plan & billing / Sign in–up — "Soon"), Preferences (Appearance theme toggle, Notifications "Soon"), and **Reset my data** (`resetAll()` wipes all `align360:*` localStorage → fresh start; with a "data is local to this device" note). NOTE: all state is still **localStorage, per-browser** — no DB, nothing shared between testers.
+
+**Report numbers + controls contrast.** The big numerals were hairline (`font-weight:200`) in a mid accent → read like the background. Now weight 500–600 in the bright `--gold2` accent (sig/cr/gift percentages, opp scores); decorative numerals lifted; floating Back/Regenerate/Download controls made solid with bright text (Download uses a concrete fill since the toolbar sits outside `.profile-doc`).
+
+**Whole assessment card clickable.** Insights-hub assessment cards use a stretched cover-link (entire card navigates), with Retake layered above. Hover lift added.
+
+**No em dashes (house style).** All authored copy cleaned; plus a render-time strip — `stripDashes()` in `lib/markdown.ts` (chat) and a deep-strip of the generated profile in `/api/profile/generate` — so even model-written prose has none.
+
+**Samuel founder photo.** `public/brand/samuel.png` in the landing founder section (via `FounderAvatar`, falls back to the mark).
+
+**Assessment question prompts FIXED (this was a real bug).** The runner showed only the question *label* ("Crisis scenario"), not the actual scenario *prompt* ("Your team just discovered a critical error…"). Root cause: `parseAssessment`'s `flushPrompt()` ran on **every** option line and unconditionally set `curQ.prompt = promptParts.join(' ')`; after option A flushed the captured prompt, options B–E re-flushed an empty buffer → overwrote it to `""`. Affected every question in all assessments. Fix: `flushPrompt` now only writes when `promptParts.length`. Verified via `tsx`: all 19 wiring Qs (and orientation/rejection) now carry their prompt; the runner renders the full scenario above the answers. Note the runner shows `q.prompt || q.label` (prompt only); the short label is no longer displayed — add it back as a small kicker if desired.
+
+**Mobile pass.** Walked every route at 375px (landing, onboarding, chat, frameworks, resources, insights hub, the dark report, runner): no horizontal overflow; grids collapse to 1col; report controls fit (mobile top bar hidden on the profile); onboarding ✓ no longer overlaps option text.
+
+**Pending / next:** custom domain `alpha.align360.io`; wire onboarding signals into profile *generation* (currently fed to chat context); real accounts (Supabase) behind the "Soon" items; full assessment banks from Samuel; Next 16 upgrade (npm audit wants it; deferred as a breaking migration).
+
+---
+
 ## Deployed to Vercel (2026-06-04)
 
 Live (public): **https://align360-app.vercel.app**. Verified end-to-end — public landing + live gpt-5.5 profile generation (`generated:true`), which also proves the in-app content (system prompt + assessments) is traced/read correctly on Vercel.
