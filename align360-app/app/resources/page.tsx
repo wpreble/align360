@@ -13,6 +13,7 @@ type Item = {
   meta?: string;          // e.g. "12 questions", "6 min", "PDF"
   slug?: string;          // assessment route
   runName?: string;       // guided chat launch
+  href?: string;          // direct file/doc link (opens in new tab)
   soon?: boolean;         // placeholder content
 };
 type Section = { title: string; sub?: string; items: Item[] };
@@ -32,6 +33,9 @@ const SECTIONS: Section[] = [
     title: 'Guides & Docs',
     sub: 'Read at your own pace.',
     items: [
+      { id: 'g0', kind: 'guide', href: '/resources/align360-quick-orientation.pdf', title: 'Align360 at a Glance', desc: 'What Align360 is, how it works, and what we promise — on one page.', meta: 'PDF · 1 page' },
+      { id: 'g5', kind: 'guide', href: '/resources/align360-designsuite-overview.pdf', title: 'DesignSuite Overview', desc: 'The three core assessments, the nine gifts, and the five orientations.', meta: 'PDF · 1 page' },
+      { id: 'g6', kind: 'guide', href: '/resources/align360-career-navigator-overview.pdf', title: 'Career Navigator Overview', desc: 'Eight tools for aligned work, powered by your wiring.', meta: 'PDF · 1 page' },
       { id: 'g1', kind: 'guide', soon: true, title: 'The Align360 Field Guide', desc: 'Concepts, language, and how the frameworks connect.', meta: 'PDF' },
       { id: 'g2', kind: 'guide', soon: true, title: 'True Riches Currency Map', desc: 'The currencies that compound regardless of market.', meta: 'PDF' },
       { id: 'g3', kind: 'guide', soon: true, title: 'Rejection Gift Workbook', desc: 'Turn a specific setback into a named advantage.', meta: 'Worksheet' },
@@ -116,6 +120,13 @@ export default function ResourcesPage() {
                   <Link key={it.id} href={completed ? '/insights/profile' : `/assessment/${it.slug}`} className="lib-card">
                     {cardInner(it)}
                   </Link>
+                );
+              }
+              if (it.href) {
+                return (
+                  <a key={it.id} href={it.href} target="_blank" rel="noopener noreferrer" className="lib-card">
+                    {cardInner(it)}
+                  </a>
                 );
               }
               if (it.runName) {
