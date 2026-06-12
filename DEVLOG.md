@@ -1,6 +1,46 @@
 # Align360 — DEVLOG
 
-Running log of the Align360 app build. Newest section first. The app lives in `align360-app/` (Next.js 14, App Router, TypeScript). Repo: `github.com/wpreble/align360` (private).
+Running log of the Align360 app build. Newest section first. The app lives in `align360-app/` (Next.js 14, App Router, TypeScript). Repo: `github.com/wpreble/align360` (**public**).
+
+---
+
+## Clarity Layer scored result reports + AI analysis (2026-06-08)
+
+Built the full scored-result pipeline for the two Clarity Layer assessments, mirroring the existing combined-profile architecture (deterministic scores → gpt-5.5 narrative → result page).
+
+- **`lib/clarity-scoring.ts`** (new): deterministic numeric scoring. Option points (0/3/7/10) → sub-scores (0-10) → domain + overall scores (0-100, clamped), five-band level ladders (Impact Readiness: Insecure→Convicted; Value Spectrum: Inferiority Complex→Authentic Rockstar), AI-Era subset (Impact Readiness only), primary gap (lowest sub), strengths (subs at 10). `isClaritySlug()`. Verified: all-A=0/Insecure, all-D=100/Convicted, partial answers score unanswered as 0.
+- **`lib/clarity.ts`** (new): `ClarityNarrative` type, `claritySchema(scores)` (interpolated labels JSON-escaped), `fallbackClarityNarrative()` so the report renders with no API key.
+- **`app/api/clarity/generate/route.ts`** (new): POST {slug,name,answers,demo?} → score, gpt-5.5 (json_object, reasoning_effort low, ~45s), **field-by-field merge** over the fallback (`mergeNarrative`) that rebuilds domains/subs from the authoritative score labels so a partial/label-drifted model response can never blank a section. deepStripDashes, fallback-safe. Added to `next.config.js` outputFileTracingIncludes.
+- **`app/insights/clarity/[slug]/`** (new): result page (cache via `getClarityReport`/`setClarityReport`, else generate) + `ClarityReport` component + `clarity.css` (self-contained palette, adapted from the Drive report). Sections: score hero + progression ladder, domain cards with color-coded sub-bars, granular signals with per-signal AI insight, primary-gap card (with the practice that closes it), strengths, AI-Era card (omitted for Value Spectrum), severity/source/velocity diagnostic, CTA. Headline rendered via `dangerouslySetInnerHTML` is sanitized to allow only `<em>`. Partial-answer banner when answered < total.
+- **Wiring**: `storage.ts` clarity report cache + `clearClarityReport`; `Runner.tsx` routes Clarity finishes to `/insights/clarity/<slug>` and clears that report (leaves the core profile untouched); Insights Clarity cards show "View result →" (+ Retake) when done.
+- **Verified live**: Impact Readiness 50/100 "Discovering" (with AI-Era 88) and Value Spectrum 47/100 "Emerging Worth" (no AI-Era) both render fully with real gpt-5.5 analysis; merge confirmed to produce complete narratives; no console errors; production build passes.
+- **Adversarial review**: ran a multi-agent review workflow over the new code (4 dimensions → verify). Fixed the confirmed real issues: the shallow-merge data-loss bug (the big one), `bandFor` out-of-range mapping to the wrong band, unescaped schema labels, headline XSS surface, AI-Era regex breadth, name length, partial-answer UX. Consciously skipped the non-issues it flagged (prompt-injection via answers — answers are fixed A/B/C/D options mapping to our authored text, not free input; retake race; answer-ID validation — already safe).
+- **NOT done**: these reports are standalone per-assessment; they do not yet feed the combined gift profile or a cross-assessment "integrated" view (the Drive "Integrated User Model" docs). Future work if wanted.
+
+---
+
+## Clarity Layer assessments — Impact Readiness + Value Spectrum (2026-06-08)
+
+Added the **Clarity Layer**: two new takeable assessments in a separate section of the Insights tab, sourced from Drive (canonical docx "ALIGN360 — Assessment Question Bank — Impact Readiness · Value Spectrum", file id `1RA6-MVYMu_P8ObLDe3WO__cZwLuyTBTL`).
+
+- **Question banks** (`content/Assessments/Impact Readiness.md`, `Value Spectrum.md`). Impact Readiness = 20 Qs across 5 domains (Identity, Capability, Rejection, Direction, Belonging); Value Spectrum = 15 Qs across 5 dimensions (Self-Worth Baseline, Boundary Intelligence, Comparison Immunity, Value Expression, Identity Ownership). Each option carries its point value as the tag (`→ 0/3/7/10`, A/B/C/D). Em dashes converted to house style. Transcribed verbatim from the docx; Samuel's highlighted answers ignored (neutral bank).
+- **`lib/assessments.ts`**: added `CLARITY_LAYER` registry + `ALL_ASSESSMENTS` (core + clarity); `slugToFile` now resolves from `ALL_ASSESSMENTS`, so `/assessment/impact-readiness` and `/assessment/value-spectrum` route automatically. Added `listClarityLayer()`.
+- **`lib/storage.ts`**: added `CLARITY_SLUGS` + `getClarityAnswers()` (via shared `readAnswerSet`). Deliberately kept OUT of `getAnswers()`/`hasAnyAnswers()` so Clarity Layer completions do NOT trigger the core combined-profile generation (different scoring model).
+- **`app/insights/page.tsx`**: new "Clarity Layer" section below the core Assessments list, same stretched-link card pattern + completion count. Cards take/retake the runner (`/assessment/<slug>`).
+- **Verified**: both banks parse (20/15 Qs, every Q has prompt + 4 options, scores 0/3/7/10); production build passes; dev server shows both Insights sections and the Impact Readiness runner renders "1 of 20" with the full question above 4 clean options; no console errors.
+- **NOT built yet (follow-up):** the scored results pages. These assessments produce a **Conviction Score** (Impact Readiness) and **Value Score** (Value Spectrum), 0-100 with named bands (Insecure/Uncertain/Discovering/Aligning/Convicted; Inferiority/Comparison Loop/Emerging/Confident/Authentic Rockstar). Drive has elaborate HTML result reports per assessment (`1KJIL4V0…` Impact, `19UL2FVI…` Value) that can become the in-app results view. Right now answers are stored but no score/result page is generated for them.
+
+---
+
+## Repo public + handoff hygiene (2026-06-08)
+
+**Repo is now PUBLIC.** `github.com/wpreble/align360` was switched private → public by Will (verified `visibility: PUBLIC`, anon fetch returns HTTP 200). Pre-flight secret scan of full git history was clean: only `.env.example` templates ever committed, no `sk-` keys anywhere, `.gitignore` correctly excludes `.env`/`.env.*`. The live `OPENAI_API_KEY` lives only in Vercel env, never in git. NOTE: public now exposes `align360-app/content/` (Samuel's assessment banks, gift mappings, AI model/system-prompt files) — that's the product IP; flagged to Will, he proceeded knowingly.
+
+**Assessment question label kicker — decided: NO.** The runner shows `q.prompt || q.label` (full scenario question only). Considered adding the short label ("Crisis scenario") back as a small kicker/eyebrow above the question. Decision: **leave as-is (prompt only)** — the section name already sits above the question (a kicker would be a third stacked line), and Qs 16–19 have no label in the source, so a kicker would render inconsistently across the bank. No code change.
+
+**Internal `.agent/` plan/state convention added (local only).** Created `.agent/` at the repo root (PLAN.md, STATE.json, DECISIONS.md, RESULTS/, agent-onboarding.md) so context survives compaction across sessions. **`.agent/` is git-ignored** (added to `.gitignore`) — it's internal scaffolding and must not land in the now-public repo. Authoritative project history remains this `DEVLOG.md` plus the in-repo `DEV PLAN`/`CODING AGENT BRIEF`; `.agent/` defers to those and is supplemental.
+
+**State at handoff:** prompt-render fix is live and verified (commit `7ba19ff`, deploy `align360-6im87paki` Ready). Working tree clean, local == `origin/main`. No open code tasks. Optional/unstarted: README polish + LICENSE for the public repo (Will did not request; without a LICENSE the code is visible but not reusable).
 
 ---
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { clearProfile } from '@/lib/storage';
+import { clearProfile, clearClarityReport, CLARITY_SLUGS } from '@/lib/storage';
 
 type Option = { letter: string; text: string; giftTag?: string };
 type Q = { id: string; number: number; label: string; prompt: string; options: Option[]; section: string };
@@ -47,7 +47,7 @@ export default function Runner({ title, slug, questions }: { title: string; slug
 
   function finish(finalAnswers: Record<string, string>) {
     // No persistence yet (Supabase pending). Stash locally so the result step
-    // can pick it up, then route to the result placeholder.
+    // can pick it up, then route to the result.
     try {
       localStorage.setItem(
         `align360:answers:${slug}`,
@@ -56,8 +56,16 @@ export default function Runner({ title, slug, questions }: { title: string; slug
     } catch {
       /* ignore */
     }
-    // New answers invalidate any prior profile so Insights regenerates fresh
-    // (and the chat picks up the updated profile).
+    // Clarity Layer assessments have their own scored report and do NOT feed the
+    // combined gift profile. Invalidate this assessment's cached report so it
+    // regenerates from the new answers, then go straight to its result page.
+    if ((CLARITY_SLUGS as readonly string[]).includes(slug)) {
+      clearClarityReport(slug);
+      router.push(`/insights/clarity/${slug}`);
+      return;
+    }
+    // Core assessments: new answers invalidate any prior profile so Insights
+    // regenerates fresh (and the chat picks up the updated profile).
     clearProfile();
     router.push('/insights');
   }

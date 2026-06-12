@@ -7,6 +7,7 @@ const nextConfig = {
     outputFileTracingIncludes: {
       '/api/chat': ['./content/**/*'],
       '/api/profile/generate': ['./content/**/*'],
+      '/api/clarity/generate': ['./content/**/*'],
       '/assessment/[slug]': ['./content/**/*'],
     },
   },

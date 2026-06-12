@@ -7,6 +7,9 @@
 Project Log/
 R&D/
 
+# Internal agent plan/state scaffolding — local only (repo is public)
+.agent/
+
 # Heavy binaries — screen recordings / video (not source)
 *.MOV
 *.mov

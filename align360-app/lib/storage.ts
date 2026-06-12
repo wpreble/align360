@@ -9,9 +9,11 @@ export const CHATS_KEY = 'align360:chats';
 export const ANSWER_PREFIX = 'align360:answers:';
 export const NAME_KEY = 'align360:name';
 export const ONBOARDING_KEY = 'align360:onboarding';
+export const CLARITY_REPORT_PREFIX = 'align360:clarity:';
 export const STORE_EVENT = 'align360:store-changed';
 
 export const ASSESSMENT_SLUGS = ['wiring', 'orientation', 'rejection-gift'] as const;
+export const CLARITY_SLUGS = ['impact-readiness', 'value-spectrum'] as const;
 
 export type StoredProfile = { profile: any; scores: any; generatedAt: string };
 export type ChatImage = string;
@@ -87,16 +89,36 @@ export function isOnboarded(): boolean {
 }
 
 /* ── Answers ── */
-export function getAnswers(): Record<string, Record<string, string>> {
+function readAnswerSet(slugs: readonly string[]): Record<string, Record<string, string>> {
   const out: Record<string, Record<string, string>> = {};
-  for (const slug of ASSESSMENT_SLUGS) {
+  for (const slug of slugs) {
     const r = read<{ answers?: Record<string, string> } | null>(ANSWER_PREFIX + slug, null);
     if (r?.answers && Object.keys(r.answers).length) out[slug] = r.answers;
   }
   return out;
 }
+/** Core gift/wiring assessments only (these feed the combined profile). */
+export function getAnswers(): Record<string, Record<string, string>> {
+  return readAnswerSet(ASSESSMENT_SLUGS);
+}
+/** Clarity Layer assessments (Impact Readiness, Value Spectrum) — kept separate. */
+export function getClarityAnswers(): Record<string, Record<string, string>> {
+  return readAnswerSet(CLARITY_SLUGS);
+}
 export function hasAnyAnswers(): boolean {
   return Object.keys(getAnswers()).length > 0;
+}
+
+/* ── Clarity Layer reports (one cached report per slug) ── */
+export function getClarityReport(slug: string): any | null {
+  return read<any | null>(CLARITY_REPORT_PREFIX + slug, null);
+}
+export function setClarityReport(slug: string, report: unknown) {
+  write(CLARITY_REPORT_PREFIX + slug, report);
+}
+export function clearClarityReport(slug: string) {
+  if (typeof window === 'undefined') return;
+  try { localStorage.removeItem(CLARITY_REPORT_PREFIX + slug); window.dispatchEvent(new Event(STORE_EVENT)); } catch {}
 }
 
 /* ── Chat sessions ── */

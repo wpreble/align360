@@ -34,8 +34,28 @@ export const ALPHA_ASSESSMENTS: { slug: string; file: string; blurb: string }[] 
   },
 ];
 
+/**
+ * Clarity Layer assessments — the behavioral readiness layer (scored 0-100),
+ * distinct from the gift/wiring profile. Their own section in the Insights hub.
+ */
+export const CLARITY_LAYER: { slug: string; file: string; blurb: string }[] = [
+  {
+    slug: 'impact-readiness',
+    file: 'Impact Readiness.md',
+    blurb: 'Your Conviction Score across five domains: identity, capability, rejection, direction, and belonging. How ready you are to create impact right now.',
+  },
+  {
+    slug: 'value-spectrum',
+    file: 'Value Spectrum.md',
+    blurb: 'How you perceive and protect your own worth, independent of external validation, across five dimensions.',
+  },
+];
+
+/** Every assessment the app can render (core gift assessments + Clarity Layer). */
+export const ALL_ASSESSMENTS = [...ALPHA_ASSESSMENTS, ...CLARITY_LAYER];
+
 function slugToFile(slug: string): string | null {
-  return ALPHA_ASSESSMENTS.find((a) => a.slug === slug)?.file ?? null;
+  return ALL_ASSESSMENTS.find((a) => a.slug === slug)?.file ?? null;
 }
 
 /**
@@ -142,6 +162,13 @@ export function getAssessment(slug: string): Assessment | null {
 
 export function listAssessments(): (Assessment & { blurb: string })[] {
   return ALPHA_ASSESSMENTS.map((a) => {
+    const parsed = getAssessment(a.slug);
+    return parsed ? { ...parsed, blurb: a.blurb } : null;
+  }).filter(Boolean) as (Assessment & { blurb: string })[];
+}
+
+export function listClarityLayer(): (Assessment & { blurb: string })[] {
+  return CLARITY_LAYER.map((a) => {
     const parsed = getAssessment(a.slug);
     return parsed ? { ...parsed, blurb: a.blurb } : null;
   }).filter(Boolean) as (Assessment & { blurb: string })[];
