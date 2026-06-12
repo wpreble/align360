@@ -297,3 +297,59 @@
 @media (max-width: 600px) {
   .clr-dom-grid { grid-template-columns: 1fr; }
 }
+
+/* ── Clarity Layer summary, appended to the (dark) combined profile ──
+   Matches the Black Cherry Fig palette of .profile-doc so it blends in. */
+.clr-sum {
+  --void: #110319;
+  --obsidian: #1b0a24;
+  --gold: #b98fa8;
+  --gold2: #d9bbcb;
+  --goldd: #6e3f5f;
+  --ivory: #f7f2f5;
+  --ivoryd: #ece2ea;
+  --silverd: #b7a6b2;
+  --edge: rgba(185, 143, 168, 0.16);
+  --green: #5fae8e;
+  --blue: #6e7fcc;
+  --amber: #c99a6e;
+  --crimson: #b5566a;
+  background: var(--void);
+  color: var(--ivoryd);
+  padding: 1px 0 0;
+}
+.clr-sum-inner { max-width: 960px; margin: 0 auto; padding: 4rem 2rem 5rem; }
+.clr-sum-eyebrow {
+  font-family: 'Cinzel', 'Cormorant Garamond', serif;
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--goldd);
+  margin-bottom: 1.25rem;
+}
+.clr-sum-title { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(28px, 5vw, 44px); color: var(--ivory); line-height: 1; margin-bottom: 0.75rem; }
+.clr-sum-sub { font-size: 15px; font-weight: 300; color: var(--silverd); line-height: 1.7; max-width: 560px; margin-bottom: 2rem; }
+.clr-sum-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.clr-sum-card {
+  display: block;
+  background: var(--obsidian);
+  border: 1px solid var(--edge);
+  border-radius: 14px;
+  padding: 1.75rem;
+  text-decoration: none;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+.clr-sum-card:hover { transform: translateY(-3px); border-color: var(--gold); }
+.clr-sum-name { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+.clr-sum-score { font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 300; line-height: 0.9; }
+.clr-sum-score span { font-size: 0.4em; color: var(--silverd); opacity: 0.6; }
+.clr-sum-level { font-size: 12px; color: var(--gold2); margin: 0.35rem 0 1.1rem; }
+.clr-sum-minis { display: flex; flex-wrap: wrap; gap: 0.9rem; padding-top: 1rem; border-top: 1px solid var(--edge); margin-bottom: 1.1rem; }
+.clr-sum-mini { text-align: center; }
+.clr-sum-mini-v { display: block; font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--ivory); }
+.clr-sum-mini-l { display: block; font-size: 8px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--silverd); margin-top: 2px; }
+.clr-sum-pending { font-size: 13px; color: var(--silverd); margin: 0.5rem 0 1.1rem; }
+.clr-sum-link { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+@media (max-width: 600px) {
+  .clr-sum-grid { grid-template-columns: 1fr; }
+}

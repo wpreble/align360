@@ -1,10 +1,12 @@
 'use client';
 
 import '../../result/profile.css';
+import '../clarity/clarity.css';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import CombinedProfile from '../../result/_components/CombinedProfile';
+import ClarityLayerSummary from '../_components/ClarityLayerSummary';
 import type { Profile } from '@/lib/profile';
 import type { Scores } from '@/lib/scoring';
 import { getAnswers, getProfile, setProfile } from '@/lib/storage';
@@ -85,6 +87,7 @@ function ProfileInner() {
         <button className="rt-btn primary" onClick={() => window.print()}>↓ Download PDF</button>
       </div>
       <CombinedProfile profile={state.profile} scores={state.scores} />
+      <ClarityLayerSummary />
     </>
   );
 }

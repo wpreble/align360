@@ -4,6 +4,14 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Clarity Layer appended to the combined profile (2026-06-08)
+
+Integrated the Clarity Layer results into the full identity report. A new `ClarityLayerSummary` is appended below `CombinedProfile` on `/insights/profile`: for each Clarity assessment the user has **completed**, a card shows its score (Conviction/Value Score, color-coded by band), level, and domain mini-scores, linking to the full report. Assessments that are not done simply do not appear, so completed ones "pop in" as they are finished. Styled in `clarity.css` with the profile's Black Cherry Fig palette so it blends with the dark document. Reads `getClarityAnswers`/`getClarityReport` from storage (client-only, no scoring on the client), refreshes on `STORE_EVENT`. Verified: combined profile + appended Impact Readiness card (86 Convicted) render together, no console errors, build passes.
+
+Possible follow-up: also feed completed Clarity scores into the chat context (`buildProfileContext`) so the AI knows them, not just the report.
+
+---
+
 ## Clarity Layer scored result reports + AI analysis (2026-06-08)
 
 Built the full scored-result pipeline for the two Clarity Layer assessments, mirroring the existing combined-profile architecture (deterministic scores → gpt-5.5 narrative → result page).
