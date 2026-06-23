@@ -9,6 +9,7 @@ const nextConfig = {
       '/api/profile/generate': ['./content/**/*'],
       '/api/clarity/generate': ['./content/**/*'],
       '/assessment/[slug]': ['./content/**/*'],
+      '/discover/[slug]': ['./content/landing/**/*'],
     },
   },
 };

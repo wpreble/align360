@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Align · Workforce Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cherry:#2A122E;--cherry2:#4E0230;--obsidian:#0D0A14;--white:#FFFFFF;--gold:#C9A96E;--gold2:#E8C97E;--green:#27AE60;--muted:rgba(255,255,255,.45);--mono:'IBM Plex Mono',monospace;--display:'Playfair Display',serif;--sans:'DM Sans',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--obsidian);color:rgba(255,255,255,.82);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 65% 55% at 50% -10%,rgba(78,2,48,.7),transparent 60%);pointer-events:none;z-index:0}
+.wrap{max-width:680px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,10,20,.9);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.05);height:52px;display:flex;align-items:center;justify-content:center}
+.nav-logo{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--white);display:flex;align-items:center;gap:8px}
+/* nav-dot replaced by SVG logo */
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 0 60px}
+.hero-eye{font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:.24em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:14px}
+.hero-eye::before,.hero-eye::after{content:'';width:24px;height:1px;background:rgba(201,169,110,.35)}
+.hero-h1{font-family:'Playfair Display',serif;font-size:clamp(32px,6vw,54px);font-weight:800;color:var(--white);line-height:1.05;letter-spacing:-.02em;margin-bottom:18px}
+.hero-h1 em{color:var(--gold2);font-style:italic}
+.hero-sub{font-size:15px;font-weight:300;color:var(--muted);line-height:1.8;max-width:500px;margin:0 auto 40px}
+
+/* RECOGNITION */
+.recog-section{padding:48px 0;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:48px}
+.recog-label{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.2em;text-transform:uppercase;text-align:center;margin-bottom:24px}
+.recog-grid{display:flex;flex-direction:column;gap:8px}
+.recog-item{display:flex;gap:12px;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);align-items:flex-start;text-align:left}
+.recog-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:5px}
+.recog-text{font-size:13px;color:rgba(255,255,255,.65);line-height:1.6}
+
+/* PARTIAL RESULT */
+.partial-section{margin-bottom:48px;text-align:center}
+.partial-label{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px}
+.partial-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);padding:20px;text-align:left;position:relative;overflow:hidden}
+.partial-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+
+/* CAPTURE */
+.capture-section{text-align:center;padding:40px 0;border-top:1px solid rgba(255,255,255,.05)}
+.capture-h{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:8px}
+.capture-sub{font-size:12px;color:var(--muted);margin-bottom:20px}
+.form-row{display:flex;max-width:400px;margin:0 auto 12px}
+.form-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-right:none;padding:13px 16px;color:var(--white);font-family:var(--sans);font-size:13px;outline:none}
+.form-input::placeholder{color:rgba(255,255,255,.22)}
+.form-btn{background:var(--cherry2);border:1px solid var(--cherry2);color:var(--white);font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;padding:13px 20px;cursor:pointer;white-space:nowrap}
+.form-note{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.2);letter-spacing:.08em;text-align:center}
+
+/* BLUR */
+.blurred{filter:blur(5px);user-select:none;color:rgba(255,255,255,.3)}
+.blurred-bar{height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:4px 0}
+.blurred-text{background:rgba(255,255,255,.08);height:12px;border-radius:2px;margin:4px 0}
+
+/* WIRING CARDS */
+.wiring-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.wc{padding:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}
+.wc-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--white);margin-bottom:3px}
+.wc-gift{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;line-height:1.45}
+.wc-gap{font-size:10px;color:rgba(201,122,26,.7);font-style:italic}
+
+footer{padding:32px 0;text-align:center;border-top:1px solid rgba(255,255,255,.04)}
+.footer-logo{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px}
+.footer-note{font-size:10px;color:rgba(255,255,255,.15)}
+.partial-card::before{background:linear-gradient(90deg,#0F2744,#2E6AC8)}</style>
+</head>
+<body>
+<nav><div class="nav-logo" style="display:flex;align-items:center;gap:10px">
+  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+  <circle cx="20" cy="20" r="10" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <circle cx="20" cy="20" r="3" fill="white" opacity=".85"/>
+  <line x1="20" y1="2" x2="20" y2="10" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <line x1="20" y1="30" x2="20" y2="38" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <line x1="2" y1="20" x2="10" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <line x1="30" y1="20" x2="38" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <path d="M13 20 Q20 10 27 20" stroke="white" stroke-width="1" fill="none" stroke-opacity=".4"/>
+  <path d="M13 20 Q20 30 27 20" stroke="white" stroke-width="1" fill="none" stroke-opacity=".4"/>
+</svg>
+  <span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;letter-spacing:.12em;color:white">ALIGN</span>
+</div></nav>
+
+<div class="wrap">
+<div class="hero">
+  <div class="hero-eye">StrategyOS · Enterprise</div>
+  <h1 class="hero-h1">Every organization knows their numbers.<br><em>Almost none know why.</em></h1>
+  <p class="hero-sub">Turnover, burnout, underperformance, misaligned strategy — these are not motivation problems. They are identity problems. Align360 is the first platform that tells you what your people are actually built for, and what happens when the work asks them to be something else.</p>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:8px">
+    <a class="form-btn-hero" href="/signup" style="font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--white);background:var(--cherry2);border:none;padding:14px 28px;cursor:pointer">See the enterprise dashboard →</a>
+    <a class="form-btn-hero" href="/signup" style="font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.14);background:transparent;padding:14px 28px;cursor:pointer">Take the assessment yourself first</a>
+  </div>
+  <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.2);letter-spacing:.1em">No pitch deck · No sales call to see pricing · Transparent from day one</div>
+</div>
+
+<div class="recog-section">
+  <div class="recog-label">The questions your current tools cannot answer</div>
+  <div class="recog-grid">
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">Why does your top producer consistently undermine team decisions without realizing it? (Wiring answer: Doer-wiring in a consensus culture creates structural friction before a single word is spoken.)</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">Why is your Q3 sprint underperforming when the team seems motivated? (Season answer: 38% of your team is in Healing season. You are asking a recovery-mode team to execute at expansion speed.)</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">Why does your new team lead — your best individual contributor — keep creating problems they did not create before the promotion? (Wiring answer: Doer wiring leads through action, not development. The role changed. The wiring did not.)</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">Why are your engagement survey scores going up while attrition also goes up? (Semantic bridge answer: survey scores measure sentiment. Wiring signals measure capacity. They are different things.)</div></div>
+  </div>
+</div>
+
+<div class="partial-section">
+  <div class="partial-label">What Align360 surfaces for enterprise leadership</div>
+  <div class="partial-card">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)">
+        <div style="font-size:11px;color:rgba(255,255,255,.6)">Strategic Alignment Score</div>
+        <div style="font-family:var(--mono);font-size:14px;color:var(--gold2)">74 / 100</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(163,45,45,.07);border:1px solid rgba(163,45,45,.15)">
+        <div style="font-size:11px;color:rgba(255,255,255,.6)">Season-Strategy Mismatch</div>
+        <div style="font-family:var(--mono);font-size:11px;color:#E24B4A">38% team in Healing · Expansion strategy</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(46,106,200,.07);border:1px solid rgba(46,106,200,.15)">
+        <div style="font-size:11px;color:rgba(255,255,255,.6)">Wiring Coverage Gap</div>
+        <div style="font-family:var(--mono);font-size:11px;color:#5B9FE8">Creator 5% · Visionary 3% · Risk</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(163,45,45,.07);border:1px solid rgba(163,45,45,.15)">
+        <div style="font-size:11px;color:rgba(255,255,255,.6)">Retention Risk Flagged</div>
+        <div style="font-family:var(--mono);font-size:11px;color:#E24B4A">11 employees · Burnout signals</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(39,174,96,.06);border:1px solid rgba(39,174,96,.15)">
+        <div style="font-size:11px;color:rgba(255,255,255,.6)">Leadership Pipeline Ready</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--green)">6 employees · CS 78+ · Layer 2 done</div>
+      </div>
+      <div style="margin-top:8px;padding:10px 12px;background:rgba(255,255,255,.02);font-size:10px;color:rgba(255,255,255,.3);font-style:italic">Individual scores, sub-scores, AI conversations, and Life Journey entries are never visible to leadership. Hardcoded. Employees control their own data.</div>
+    </div>
+  </div>
+</div>
+
+<div style="padding:28px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);margin-bottom:36px" id="demo-form">
+  <div style="font-family:var(--mono);font-size:8px;color:var(--gold);letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px">See it for your organization</div>
+  <div style="font-size:15px;font-weight:500;color:var(--white);margin-bottom:6px">Book a dashboard walkthrough</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:16px">30 minutes · We show you your industry demo · No pitch · Transparent pricing</div>
+  <div class="form-row">
+    <input class="form-input" type="email" placeholder="Your work email">
+    <a class="form-btn" href="/signup">Book →</a>
+  </div>
+  <div class="form-note">Enterprise pricing: $5,000–$10,000/mo based on org size · White-label available · No hidden fees</div>
+</div>
+
+<div style="text-align:center;padding:24px 0;border-top:1px solid rgba(255,255,255,.05)" id="try-form">
+  <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px">Or — take the assessment yourself first</div>
+  <div style="font-size:13px;color:rgba(255,255,255,.55);margin-bottom:16px;line-height:1.6">The best enterprise buyers start by taking the assessment. They see the precision of their own result and immediately understand what it would look like across a team of 50 or 500.</div>
+  <div class="form-row" style="max-width:340px">
+    <input class="form-input" type="email" placeholder="Your email">
+    <a class="form-btn" href="/signup">Start →</a>
+  </div>
+  <div class="form-note">Free · 12 minutes · Your Conviction Score · No card needed</div>
+</div>
+</div>
+<footer>
+<div class="footer-logo">ALIGN · align360.io</div>
+<div class="footer-note">Free to start · No card required · Your results are yours</div>
+</footer>
+</body>
+</html>
