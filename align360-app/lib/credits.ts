@@ -13,12 +13,18 @@ export const USD_PER_CREDIT = 0.01;
 export const AI_BUDGET_SHARE = 0.15; // 15%
 
 /**
- * Provider rates, USD per 1,000,000 tokens. PLACEHOLDER values — confirm against
- * the live model price sheet before launch.
+ * Provider rates, USD per 1,000,000 tokens. Source: OpenAI developer-docs pricing,
+ * accessed 2026-06-23. Reasoning tokens bill as OUTPUT tokens (counted below).
+ * `cachedInput` is the discounted rate for cache-hit input tokens (not yet applied).
  */
-export const MODEL_RATES: Record<string, { input: number; output: number }> = {
-  'gpt-5.5': { input: 1.25, output: 10 },
-  default: { input: 1.25, output: 10 },
+export const MODEL_RATES: Record<string, { input: number; output: number; cachedInput?: number }> = {
+  'gpt-5.5': { input: 5.0, output: 30.0, cachedInput: 0.5 },
+  'gpt-5.5-pro': { input: 30.0, output: 180.0 },
+  'gpt-5.4': { input: 2.5, output: 15.0, cachedInput: 0.25 },
+  'gpt-5': { input: 1.25, output: 10.0, cachedInput: 0.125 },
+  'gpt-5-mini': { input: 0.25, output: 2.0, cachedInput: 0.025 },
+  'gpt-5-nano': { input: 0.05, output: 0.4, cachedInput: 0.005 },
+  default: { input: 5.0, output: 30.0 }, // app default OPENAI_MODEL is gpt-5.5
 };
 
 export function costUsd(model: string, inputTokens: number, outputTokens: number): number {
