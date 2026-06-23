@@ -25,11 +25,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Signature verification failed' }, { status: 400 });
   }
 
-  // Idempotency: process each event id at most once.
+  // Idempotency: claim the event id atomically (INSERT ... ON CONFLICT DO NOTHING).
+  // A plain SELECT-then-INSERT races two concurrent deliveries of the same event;
+  // the upsert is one statement, so only the first caller gets a row back.
   const db = createServiceClient();
-  const { data: seen } = await db.from('stripe_events').select('id').eq('id', event.id).maybeSingle();
-  if (seen) return NextResponse.json({ received: true, duplicate: true });
-  await db.from('stripe_events').insert({ id: event.id, type: event.type });
+  const { data: claimed } = await db
+    .from('stripe_events')
+    .upsert({ id: event.id, type: event.type }, { onConflict: 'id', ignoreDuplicates: true })
+    .select('id');
+  if (!claimed || claimed.length === 0) return NextResponse.json({ received: true, duplicate: true });
 
   switch (event.type) {
     case 'checkout.session.completed':

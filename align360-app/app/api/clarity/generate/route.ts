@@ -119,7 +119,9 @@ export async function POST(req: NextRequest) {
   }
 
   const answers = body.demo ? demoAnswers(slug) : body.answers || {};
-  const name = (body.name || (body.demo ? 'Sample' : 'Friend')).trim().slice(0, 60);
+  // Strip control chars/newlines so the name can't smuggle prompt instructions
+  // into the system prompt where it's interpolated.
+  const name = (body.name || (body.demo ? 'Sample' : 'Friend')).replace(/[\u0000-\u001f]+/g, ' ').trim().slice(0, 60);
   const scores = computeClarityScores(slug, answers);
 
   if (!scores) {

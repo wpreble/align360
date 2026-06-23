@@ -70,7 +70,8 @@ export async function POST(req: NextRequest) {
   }
 
   const answers = body.demo ? demoAnswers() : body.answers || {};
-  const name = (body.name || (body.demo ? 'Sample' : 'Friend')).trim();
+  // Strip control chars/newlines so the name can't smuggle prompt instructions.
+  const name = (body.name || (body.demo ? 'Sample' : 'Friend')).replace(/[\u0000-\u001f]+/g, ' ').trim().slice(0, 60);
   const scores = computeScores(answers);
 
   if (!scores.completed.wiring && !scores.completed.orientation && !scores.completed.rejectionGift) {

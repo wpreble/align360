@@ -8,7 +8,10 @@ import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 export default function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   const router = useRouter();
   const sp = useSearchParams();
-  const next = sp.get('next') || '/insights';
+  // Only allow same-origin relative paths — blocks open-redirect via ?next=//evil.com
+  // or ?next=https://evil.com (router.push to an absolute URL would navigate away).
+  const rawNext = sp.get('next') || '/insights';
+  const next = /^\/(?!\/)/.test(rawNext) ? rawNext : '/insights';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

@@ -29,7 +29,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'messages array is required.' }, { status: 400 });
   }
 
-  const model = process.env.OPENAI_MODEL || 'gpt-5.5';
+  // Chat runs on a cheaper model than the headline reports (profile/clarity stay on
+  // OPENAI_MODEL=gpt-5.5). gpt-5-mini is ~20x cheaper on output, which is the main
+  // lever keeping AI spend within the credit budget. Override via CHAT_MODEL (e.g.
+  // an OpenRouter GLM id once those keys are wired).
+  const model = process.env.CHAT_MODEL || 'gpt-5-mini';
   let systemPrompt = buildSystemPrompt();
 
   // Make the user's assessment results instantly referenceable by the AI.

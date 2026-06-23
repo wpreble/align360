@@ -6,12 +6,14 @@ import { createClient } from '@/lib/supabase/server';
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') || '/insights';
+  // Same-origin relative paths only — blocks open-redirect via ?next=//evil.com or an absolute URL.
+  const rawNext = searchParams.get('next') || '/insights';
+  const next = /^\/(?!\/)/.test(rawNext) ? rawNext : '/insights';
 
   if (code) {
     const supabase = createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(`${origin}${next.startsWith('/') ? next : '/' + next}`);
+    if (!error) return NextResponse.redirect(`${origin}${next}`);
   }
   return NextResponse.redirect(`${origin}/login?error=auth`);
 }
