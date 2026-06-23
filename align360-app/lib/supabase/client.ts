@@ -1,0 +1,15 @@
+'use client';
+
+import { createBrowserClient } from '@supabase/ssr';
+
+/** Browser-side Supabase client (anon key, RLS-enforced). */
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  );
+}
+
+/** True once the Supabase env is configured (lets the app run pre-provisioning). */
+export const supabaseConfigured =
+  !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
