@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 // Routes reachable without a session. Everything else requires login.
-const PUBLIC_PREFIXES = ['/login', '/signup', '/auth', '/api/stripe/webhook'];
+const PUBLIC_PREFIXES = ['/login', '/signup', '/auth', '/api/stripe/webhook', '/discover'];
 const PUBLIC_EXACT = ['/']; // the marketing landing page
 
 function isPublic(path: string): boolean {

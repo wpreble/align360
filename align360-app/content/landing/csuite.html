@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Align · Executive Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+:root{--cherry:#2A122E;--cherry2:#4E0230;--obsidian:#0D0A14;--white:#FFFFFF;--gold:#C9A96E;--gold2:#E8C97E;--green:#27AE60;--teal:#0D6B6B;--amber:#C97A1A;--muted:rgba(255,255,255,.45);--mono:'IBM Plex Mono',monospace;--display:'Playfair Display',serif;--sans:'DM Sans',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--obsidian);color:rgba(255,255,255,.82);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 50% at 50% -5%,rgba(13,107,107,.55),transparent 60%);pointer-events:none;z-index:0}
+.wrap{max-width:660px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,10,20,.9);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.05);height:52px;display:flex;align-items:center;justify-content:center}
+.nav-logo{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--white);display:flex;align-items:center;gap:8px}
+/* nav-dot replaced by SVG logo */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 0 60px}
+.hero-eye{font-family:var(--mono);font-size:9px;color:rgba(13,200,180,.7);letter-spacing:.24em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:14px}
+.hero-eye::before,.hero-eye::after{content:'';width:24px;height:1px;background:rgba(13,200,180,.25)}
+.hero-h1{font-family:'Playfair Display',serif;font-size:clamp(30px,5.5vw,50px);font-weight:800;color:var(--white);line-height:1.08;letter-spacing:-.02em;margin-bottom:18px}
+.hero-h1 em{color:rgba(13,200,180,.85);font-style:italic}
+.hero-sub{font-size:15px;font-weight:300;color:var(--muted);line-height:1.8;max-width:480px;margin:0 auto 40px}
+.recog-section{padding:44px 0;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:44px}
+.recog-label{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.2em;text-transform:uppercase;text-align:center;margin-bottom:22px}
+.recog-grid{display:flex;flex-direction:column;gap:8px}
+.recog-item{display:flex;gap:12px;padding:13px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);align-items:flex-start;text-align:left}
+.recog-dot{width:6px;height:6px;border-radius:50%;background:rgba(13,200,180,.6);flex-shrink:0;margin-top:5px}
+.recog-text{font-size:13px;color:rgba(255,255,255,.65);line-height:1.6}
+.partial-section{margin-bottom:44px;text-align:center}
+.partial-label{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px}
+.partial-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);padding:20px;text-align:left;position:relative;overflow:hidden}
+.partial-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--teal),rgba(13,200,180,.3))}
+.capture-section{text-align:center;padding:40px 0;border-top:1px solid rgba(255,255,255,.05)}
+.capture-h{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:8px}
+.capture-sub{font-size:12px;color:var(--muted);margin-bottom:20px}
+.form-row{display:flex;max-width:400px;margin:0 auto 12px}
+.form-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-right:none;padding:13px 16px;color:var(--white);font-family:var(--sans);font-size:13px;outline:none}
+.form-input::placeholder{color:rgba(255,255,255,.22)}
+.form-btn{background:var(--teal);border:1px solid var(--teal);color:var(--white);font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;padding:13px 18px;cursor:pointer;white-space:nowrap}
+.form-note{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.2);letter-spacing:.08em;text-align:center}
+.b3-card{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.b3-domain{padding:14px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.025)}
+.b3-domain-name{font-family:var(--mono);font-size:8px;color:rgba(13,200,180,.6);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
+.b3-domain-desc{font-size:11px;color:rgba(255,255,255,.5);line-height:1.55}
+.day-cards{display:flex;gap:8px;margin-bottom:14px}
+.day-card{flex:1;padding:12px 14px;border:1px solid}
+.day-a{background:rgba(39,174,96,.07);border-color:rgba(39,174,96,.2)}
+.day-b{background:rgba(201,169,110,.07);border-color:rgba(201,169,110,.2)}
+.day-c{background:rgba(163,45,45,.07);border-color:rgba(163,45,45,.2)}
+.day-label{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;margin-bottom:3px}
+.day-desc{font-size:10px;color:rgba(255,255,255,.45);line-height:1.5}
+footer{padding:28px 0;text-align:center;border-top:1px solid rgba(255,255,255,.04)}
+.footer-logo{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.18em;text-transform:uppercase;margin-bottom:5px}
+.footer-note{font-size:10px;color:rgba(255,255,255,.15)}
+.danielle-note{margin-bottom:32px;padding:14px 16px;background:rgba(13,107,107,.1);border:1px solid rgba(13,107,107,.25);text-align:left}
+.dn-label{font-family:var(--mono);font-size:7px;color:rgba(13,200,180,.5);letter-spacing:.16em;text-transform:uppercase;margin-bottom:6px}
+.dn-text{font-size:12px;color:rgba(255,255,255,.5);line-height:1.65}
+
+body::before{background:radial-gradient(ellipse 60% 50% at 50% -5%,rgba(42,18,46,.75),transparent 60%)}
+.nav-dot{background:var(--gold)}
+.hero-eye{color:rgba(201,169,110,.7)}
+.hero-eye::before,.hero-eye::after{background:rgba(201,169,110,.25)}
+.hero-h1 em{color:var(--gold2)}
+.recog-dot{background:rgba(201,169,110,.6)}
+.partial-card::before{background:linear-gradient(90deg,var(--cherry2),var(--gold))}
+.form-btn{background:var(--cherry2);border-color:var(--cherry2)}
+.danielle-note{background:rgba(42,18,46,.3);border-color:rgba(201,169,110,.2)}
+.dn-label{color:rgba(201,169,110,.5)}
+</style>
+</head>
+<body>
+<nav><div class="nav-logo" style="display:flex;align-items:center;gap:10px">
+  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+  <circle cx="20" cy="20" r="10" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <circle cx="20" cy="20" r="3" fill="white" opacity=".85"/>
+  <line x1="20" y1="2" x2="20" y2="10" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <line x1="20" y1="30" x2="20" y2="38" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <line x1="2" y1="20" x2="10" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <line x1="30" y1="20" x2="38" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <path d="M13 20 Q20 10 27 20" stroke="white" stroke-width="1" fill="none" stroke-opacity=".4"/>
+  <path d="M13 20 Q20 30 27 20" stroke="white" stroke-width="1" fill="none" stroke-opacity=".4"/>
+</svg>
+  <span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;letter-spacing:.12em;color:white">ALIGN</span>
+</div></nav>
+<div class="wrap">
+
+<div class="hero">
+  <div class="hero-eye">Executive Intelligence · C-Suite · Senior Leadership</div>
+  <h1 class="hero-h1">Your strategy is sound.<br>Your execution keeps<br><em>breaking in the same place.</em></h1>
+  <p class="hero-sub">Every senior leader has a specific pattern that limits their highest-leverage impact. It is not a skill gap. It is a wiring gap. And it runs one beat past the point where it should stop. Align names it precisely — and gives you one practice that moves it.</p>
+  <div class="form-row">
+    <input class="form-input" type="email" placeholder="Your email">
+    <a class="form-btn" href="/signup">Find your pattern →</a>
+  </div>
+  <div class="form-note">12 minutes · No card needed · No generic leadership type</div>
+</div>
+
+<div class="recog-section">
+  <div class="recog-label">Patterns senior leaders recognize in themselves</div>
+  <div class="recog-grid">
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">Your diagnostic precision is the reason you are in the room. It is also why every recommendation you make comes with three qualifications before anyone has a chance to push back.</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">You can see the direction clearly. What you cannot always do is hold the course when a more compelling direction appears six weeks in.</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">The people who need you most are the hardest to develop. Not because you do not want to — because your wiring builds success through individual output, and watching someone else do it slower than you would is genuinely painful.</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">Your execution is exceptional when you are in the right season. In the wrong season, you work twice as hard for half the result and cannot explain why to anyone including yourself.</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">The high-stakes decisions — the ones that actually matter — get made the same way every time. Sometimes that pattern serves you. Sometimes it costs you. You have never had a name for it.</div></div>
+  </div>
+</div>
+
+<div class="partial-section">
+  <div class="partial-label">What Align produces for senior leaders</div>
+  <div class="partial-card">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="padding:12px 14px;background:rgba(42,18,46,.3);border-left:2px solid rgba(201,169,110,.3)">
+        <div style="font-size:11px;font-weight:500;color:var(--gold2);margin-bottom:3px">Conviction Score · Your impact ceiling named precisely</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">Not a leadership style. Not a DISC type. The specific sub-score that is limiting your highest-leverage output right now, named in mechanism terms, with one practice that moves it. Sample: “Release Threshold 3/10. You build what is right. The last step is releasing it without the apology. State it. Then stop.”</div>
+      </div>
+      <div style="padding:12px 14px;background:rgba(255,255,255,.03);border-left:2px solid rgba(255,255,255,.1)">
+        <div style="font-size:11px;font-weight:500;color:rgba(255,255,255,.75);margin-bottom:3px">Decision Pattern Profile · How you make decisions under pressure</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">Wiring-based decision intelligence. How you decide, what causes deviation from your stated values under pressure, where the risk is in your specific decision pattern, and what to do before the next high-stakes decision.</div>
+      </div>
+      <div style="padding:12px 14px;background:rgba(255,255,255,.03);border-left:2px solid rgba(255,255,255,.1)">
+        <div style="font-size:11px;font-weight:500;color:rgba(255,255,255,.75);margin-bottom:3px">Season Intelligence · why this quarter feels different</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">Senior leaders operate in seasons. Building, Expansion, Healing, Discovery. Each season has a specific relationship with strategy, energy, and the type of decisions you should be making. When your personal season conflicts with what the org is asking of you, it creates a structural friction no amount of will resolves. Align names the conflict and tells you what to do about it.</div>
+      </div>
+      <div style="padding:12px 14px;background:rgba(255,255,255,.03);border-left:2px solid rgba(255,255,255,.1)">
+        <div style="font-size:11px;font-weight:500;color:rgba(255,255,255,.75);margin-bottom:3px">Master Chief · The advisor who knows your wiring</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">An AI companion that pre-loads your full identity profile, your current season, your primary gap, and your B3 state before every session. It does not give you generic leadership advice. It gives you the specific next move for your specific mechanism in your current context.</div>
+      </div>
+      <div style="padding:12px 14px;background:rgba(42,18,46,.25);border-left:2px solid rgba(201,169,110,.2)">
+        <div style="font-size:11px;font-weight:500;color:var(--gold2);margin-bottom:3px">For CEOs and Founders · The org cross-reference</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">The most powerful thing Align does for a principal: cross-reference your personal season against your org’s collective season and name the gap. When you are in Healing season and your org is executing an Expansion strategy, that is not a motivation problem. It is a structural misalignment that no executive coaching program has ever named this precisely.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="padding:20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);margin-bottom:36px;text-align:center">
+  <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.28);letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px">What senior leaders say after their first result</div>
+  <div style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.7;max-width:520px;margin:0 auto;font-style:italic">"I have done StrengthsFinder, DISC, Kolbe, and three different 360s. None of them told me what this told me in twelve minutes. The gap it named — I have been working around it for eleven years. I did not know I was working around it."</div>
+</div>
+
+<div class="capture-section">
+  <div class="capture-h">Find your pattern. 12 minutes.</div>
+  <div class="capture-sub">Conviction Score · Wiring Profile · Season · Decision Intelligence</div>
+  <div class="form-row">
+    <input class="form-input" type="email" placeholder="Your email">
+    <a class="form-btn" href="/signup">Begin →</a>
+  </div>
+  <div class="form-note">No card needed · Results in 12 minutes · No generic leadership type</div>
+</div>
+
+</div>
+<footer>
+<div class="footer-logo">ALIGN · align360.io</div>
+<div class="footer-note">Executive Intelligence · Identity-first · Precision over personality type</div>
+</footer>
+</body>
+</html>

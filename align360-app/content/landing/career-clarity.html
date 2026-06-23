@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Align · Career Clarity</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cherry:#2A122E;--cherry2:#4E0230;--obsidian:#0D0A14;--white:#FFFFFF;--gold:#C9A96E;--gold2:#E8C97E;--green:#27AE60;--muted:rgba(255,255,255,.45);--mono:'IBM Plex Mono',monospace;--display:'Playfair Display',serif;--sans:'DM Sans',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--obsidian);color:rgba(255,255,255,.82);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 65% 55% at 50% -10%,rgba(78,2,48,.7),transparent 60%);pointer-events:none;z-index:0}
+.wrap{max-width:680px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,10,20,.9);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.05);height:52px;display:flex;align-items:center;justify-content:center}
+.nav-logo{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--white);display:flex;align-items:center;gap:8px}
+/* nav-dot replaced by SVG logo */
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 0 60px}
+.hero-eye{font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:.24em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:14px}
+.hero-eye::before,.hero-eye::after{content:'';width:24px;height:1px;background:rgba(201,169,110,.35)}
+.hero-h1{font-family:'Playfair Display',serif;font-size:clamp(32px,6vw,54px);font-weight:800;color:var(--white);line-height:1.05;letter-spacing:-.02em;margin-bottom:18px}
+.hero-h1 em{color:var(--gold2);font-style:italic}
+.hero-sub{font-size:15px;font-weight:300;color:var(--muted);line-height:1.8;max-width:500px;margin:0 auto 40px}
+
+/* RECOGNITION */
+.recog-section{padding:48px 0;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:48px}
+.recog-label{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.2em;text-transform:uppercase;text-align:center;margin-bottom:24px}
+.recog-grid{display:flex;flex-direction:column;gap:8px}
+.recog-item{display:flex;gap:12px;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);align-items:flex-start;text-align:left}
+.recog-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:5px}
+.recog-text{font-size:13px;color:rgba(255,255,255,.65);line-height:1.6}
+
+/* PARTIAL RESULT */
+.partial-section{margin-bottom:48px;text-align:center}
+.partial-label{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px}
+.partial-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);padding:20px;text-align:left;position:relative;overflow:hidden}
+.partial-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+
+/* CAPTURE */
+.capture-section{text-align:center;padding:40px 0;border-top:1px solid rgba(255,255,255,.05)}
+.capture-h{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:8px}
+.capture-sub{font-size:12px;color:var(--muted);margin-bottom:20px}
+.form-row{display:flex;max-width:400px;margin:0 auto 12px}
+.form-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-right:none;padding:13px 16px;color:var(--white);font-family:var(--sans);font-size:13px;outline:none}
+.form-input::placeholder{color:rgba(255,255,255,.22)}
+.form-btn{background:var(--cherry2);border:1px solid var(--cherry2);color:var(--white);font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;padding:13px 20px;cursor:pointer;white-space:nowrap}
+.form-note{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.2);letter-spacing:.08em;text-align:center}
+
+/* BLUR */
+.blurred{filter:blur(5px);user-select:none;color:rgba(255,255,255,.3)}
+.blurred-bar{height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:4px 0}
+.blurred-text{background:rgba(255,255,255,.08);height:12px;border-radius:2px;margin:4px 0}
+
+/* WIRING CARDS */
+.wiring-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.wc{padding:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}
+.wc-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--white);margin-bottom:3px}
+.wc-gift{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;line-height:1.45}
+.wc-gap{font-size:10px;color:rgba(201,122,26,.7);font-style:italic}
+
+footer{padding:32px 0;text-align:center;border-top:1px solid rgba(255,255,255,.04)}
+.footer-logo{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px}
+.footer-note{font-size:10px;color:rgba(255,255,255,.15)}
+.partial-card::before{background:linear-gradient(90deg,#521F58,#9B59B6)}</style>
+</head>
+<body>
+<nav><div class="nav-logo" style="display:flex;align-items:center;gap:10px">
+  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+  <circle cx="20" cy="20" r="10" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <circle cx="20" cy="20" r="3" fill="white" opacity=".85"/>
+  <line x1="20" y1="2" x2="20" y2="10" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <line x1="20" y1="30" x2="20" y2="38" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <line x1="2" y1="20" x2="10" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <line x1="30" y1="20" x2="38" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <path d="M13 20 Q20 10 27 20" stroke="white" stroke-width="1" fill="none" stroke-opacity=".4"/>
+  <path d="M13 20 Q20 30 27 20" stroke="white" stroke-width="1" fill="none" stroke-opacity=".4"/>
+</svg>
+  <span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;letter-spacing:.12em;color:white">ALIGN</span>
+</div></nav>
+
+<div class="wrap">
+<div class="hero">
+  <div class="hero-eye">Wiring for Impact · Career Navigator</div>
+  <h1 class="hero-h1">You are not confused about your future.<br><em>You are confused about how you are built.</em></h1>
+  <p class="hero-sub">DISC gave you a letter. StrengthsFinder gave you five words. Neither told you what you are actually wired to do — and why certain paths drain you before they even start.</p>
+  <div class="capture-section">
+<div class="capture-h">Find what you're built for. Free.</div>
+<div class="capture-sub">Wiring assessment · 5 minutes · No card needed</div>
+<div class="form-row">
+<input class="form-input" type="email" placeholder="Enter your email to begin">
+<a class="form-btn" href="/signup">Begin →</a>
+</div>
+<div class="form-note">Free &nbsp;·&nbsp; No card needed &nbsp;·&nbsp; Your results are yours</div>
+</div>
+</div>
+
+<div class="recog-section">
+  <div class="recog-label">Do any of these sound familiar?</div>
+  <div class="recog-grid">
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">You chose your major because it made sense — not because it felt right. It still does not feel right.</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">You are good at your classes or your job but drained by Thursday every week. Nobody tells you that is information.</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">You have taken personality tests before. You got a type. You forgot it within six months because it did not change anything.</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">People ask what you want to do with your life and you freeze — not because you are lost, but because none of the available answers feel true.</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">You can describe what you are good at. You cannot describe why certain things energize you and others cost you twice what they cost everyone else.</div></div>
+  </div>
+</div>
+
+<div class="partial-section">
+  <div class="partial-label">Six wiring profiles · One is yours · The assessment finds it</div>
+  <div class="partial-card">
+    <div class="wiring-cards">
+      <div class="wc">
+        <div class="wc-name">The Organizer</div>
+        <div class="wc-gift">Builds complete systems before anyone asks for them. Thrives when structure creates momentum.</div>
+        <div class="wc-gap">Gap: Commits to the plan before committing to the outcome.</div>
+      </div>
+      <div class="wc">
+        <div class="wc-name">The Realist</div>
+        <div class="wc-gift">Sees what is actually true before anyone else. Diagnostic precision is the gift.</div>
+        <div class="wc-gap">Gap: Names every risk including ones that have not arrived yet.</div>
+      </div>
+      <div class="wc">
+        <div class="wc-name">The Creator</div>
+        <div class="wc-gift">Generates ideas and energy that others build with. Thrives at the beginning of things.</div>
+        <div class="wc-gap">Gap: Moves to the next new thing before the current one is complete.</div>
+      </div>
+      <div class="wc">
+        <div class="wc-name">The Visionary</div>
+        <div class="wc-gift">Sees what could be with uncommon clarity. Direction is the gift.</div>
+        <div class="wc-gap">Gap: Makes commitments from vision that execution cannot always support.</div>
+      </div>
+      <div class="wc">
+        <div class="wc-name">The Supporter</div>
+        <div class="wc-gift">Creates belonging that makes everything else possible. People stay because of them.</div>
+        <div class="wc-gap">Gap: Gives the relationship what it needs before asking for what they need.</div>
+      </div>
+      <div class="wc">
+        <div class="wc-name">The Doer</div>
+        <div class="wc-gift">Converts intention into movement faster than anyone. Momentum is the gift.</div>
+        <div class="wc-gap">Gap: Moves before the direction is fully clear.</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:10px 12px;background:rgba(201,169,110,.07);border-left:2px solid rgba(201,169,110,.3);font-size:12px;color:rgba(255,255,255,.55);line-height:1.6">The assessment finds which one you are — and more importantly, tells you why your wiring produces the specific drain pattern you keep experiencing. That is the part the other tests skip.</div>
+  </div>
+</div>
+
+<div class="capture-section">
+<div class="capture-h">Find your wiring profile. Free.</div>
+<div class="capture-sub">5 minutes · No card needed · Your profile is yours permanently</div>
+<div class="form-row">
+<input class="form-input" type="email" placeholder="Enter your email to begin">
+<a class="form-btn" href="/signup">Begin →</a>
+</div>
+<div class="form-note">Free &nbsp;·&nbsp; No card needed &nbsp;·&nbsp; Your results are yours</div>
+</div>
+</div>
+<footer>
+<div class="footer-logo">ALIGN · align360.io</div>
+<div class="footer-note">Free to start · No card required · Your results are yours</div>
+</footer>
+</body>
+</html>
