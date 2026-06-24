@@ -1,0 +1,64 @@
+/**
+ * Idempotent Stripe product/price setup for Align360 (Direct Charges + Connect).
+ *
+ * Creates each TIER as a Product + recurring Price on Samuel's CONNECTED account
+ * (Direct Charges => objects live on the connected account), keyed by lookup_key
+ * so re-runs never duplicate. Ascendance keeps APPLICATION_FEE_PERCENT per sub
+ * (set on the subscription at checkout, not here).
+ *
+ * Dry run (default — lists what it would do):
+ *   STRIPE_SECRET_KEY=sk_test_... STRIPE_CONNECTED_ACCOUNT_ID=acct_... \
+ *     npx tsx scripts/stripe-setup-products.ts
+ *
+ * Apply:
+ *   STRIPE_SECRET_KEY=sk_test_... STRIPE_CONNECTED_ACCOUNT_ID=acct_... \
+ *     npx tsx scripts/stripe-setup-products.ts --confirm
+ *
+ * Refuses to run against a live (sk_live_) key.
+ */
+import Stripe from 'stripe';
+import { TIERS } from '../lib/billing/tiers';
+
+async function main() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  const acct = process.env.STRIPE_CONNECTED_ACCOUNT_ID;
+  if (!key) throw new Error('STRIPE_SECRET_KEY is required (use a sk_test_ key).');
+  if (key.startsWith('sk_live_')) throw new Error('Refusing to run against a LIVE key. Use sk_test_.');
+  if (!acct) throw new Error("STRIPE_CONNECTED_ACCOUNT_ID is required (Samuel's connected acct_…).");
+  const confirm = process.argv.includes('--confirm');
+
+  const stripe = new Stripe(key);
+  const opts: Stripe.RequestOptions = { stripeAccount: acct }; // Direct Charges → connected account
+
+  console.log(`${confirm ? 'APPLYING' : 'DRY RUN'} on connected account ${acct}\n`);
+  for (const t of TIERS) {
+    const found = await stripe.prices.list({ lookup_keys: [t.lookupKey], active: true, limit: 1 }, opts);
+    if (found.data.length) {
+      const p = found.data[0];
+      console.log(`✓ exists  ${t.lookupKey} → ${p.id}  ($${(p.unit_amount ?? 0) / 100}/${t.interval}${t.perSeat ? '/seat' : ''})`);
+      continue;
+    }
+    if (!confirm) {
+      console.log(`+ would create  ${t.lookupKey}  ($${t.amountCents / 100}/${t.interval}${t.perSeat ? '/seat' : ''})`);
+      continue;
+    }
+    const product = await stripe.products.create({ name: t.productName, description: t.description }, opts);
+    const price = await stripe.prices.create(
+      {
+        product: product.id,
+        unit_amount: t.amountCents,
+        currency: 'usd',
+        recurring: { interval: t.interval, usage_type: 'licensed' },
+        lookup_key: t.lookupKey,
+      },
+      opts,
+    );
+    console.log(`+ created  ${t.lookupKey} → ${price.id}  (product ${product.id})`);
+  }
+  console.log(`\n${confirm ? 'Done.' : 'Dry run only — re-run with --confirm to create.'}`);
+}
+
+main().catch((e) => {
+  console.error('FAILED:', e instanceof Error ? e.message : e);
+  process.exit(1);
+});
