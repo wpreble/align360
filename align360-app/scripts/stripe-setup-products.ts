@@ -24,13 +24,14 @@ async function main() {
   const acct = process.env.STRIPE_CONNECTED_ACCOUNT_ID;
   if (!key) throw new Error('STRIPE_SECRET_KEY is required (use a sk_test_ key).');
   if (key.startsWith('sk_live_')) throw new Error('Refusing to run against a LIVE key. Use sk_test_.');
-  if (!acct) throw new Error("STRIPE_CONNECTED_ACCOUNT_ID is required (Samuel's connected acct_…).");
   const confirm = process.argv.includes('--confirm');
 
   const stripe = new Stripe(key);
-  const opts: Stripe.RequestOptions = { stripeAccount: acct }; // Direct Charges → connected account
+  // Direct Charges → create on the connected account when set; otherwise create on
+  // the platform account (test/dev before Samuel has connected). Idempotent per account.
+  const opts: Stripe.RequestOptions = acct ? { stripeAccount: acct } : {};
 
-  console.log(`${confirm ? 'APPLYING' : 'DRY RUN'} on connected account ${acct}\n`);
+  console.log(`${confirm ? 'APPLYING' : 'DRY RUN'} on ${acct ? `connected account ${acct}` : 'the PLATFORM account (no STRIPE_CONNECTED_ACCOUNT_ID set)'}\n`);
   for (const t of TIERS) {
     const found = await stripe.prices.list({ lookup_keys: [t.lookupKey], active: true, limit: 1 }, opts);
     if (found.data.length) {

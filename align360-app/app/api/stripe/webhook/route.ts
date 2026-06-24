@@ -35,16 +35,44 @@ export async function POST(req: Request) {
     .select('id');
   if (!claimed || claimed.length === 0) return NextResponse.json({ received: true, duplicate: true });
 
+  // Upsert our subscriptions row from a Stripe subscription object. owner_type/
+  // owner_id come from the subscription metadata set at checkout.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const upsertSub = async (sub: any) => {
+    const item = sub.items?.data?.[0];
+    const ownerId = sub.metadata?.owner_id;
+    if (!ownerId) return; // unattributable without metadata
+    await db.from('subscriptions').upsert(
+      {
+        id: sub.id,
+        stripe_customer_id: typeof sub.customer === 'string' ? sub.customer : sub.customer?.id,
+        owner_type: sub.metadata?.owner_type || 'user',
+        owner_id: ownerId,
+        status: sub.status,
+        price_id: item?.price?.id ?? null,
+        quantity: item?.quantity ?? 1,
+        current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
+        cancel_at_period_end: !!sub.cancel_at_period_end,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'id' },
+    );
+  };
+
+  // Connect events arrive on the platform endpoint with event.account = connected acct.
+  const acctOpts = event.account ? { stripeAccount: event.account } : {};
   switch (event.type) {
-    case 'checkout.session.completed':
     case 'customer.subscription.created':
     case 'customer.subscription.updated':
     case 'customer.subscription.deleted':
-    case 'invoice.paid':
-    case 'invoice.payment_failed':
-      // TODO (Phase 3): upsert `subscriptions` (status, quantity, period) from the
-      // event payload; reset the credit allowance on each new billing period.
+      await upsertSub(event.data.object);
       break;
+    case 'checkout.session.completed': {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const s = event.data.object as any;
+      if (s.subscription) await upsertSub(await stripe.subscriptions.retrieve(s.subscription, undefined, acctOpts));
+      break;
+    }
     default:
       break;
   }
