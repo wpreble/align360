@@ -8,14 +8,24 @@ export const runtime = 'nodejs';
 type ChatMessage = { role: 'user' | 'assistant'; content: unknown };
 
 export async function POST(req: NextRequest) {
-  if (!process.env.OPENAI_API_KEY) {
+  // Chat runs on a cheaper model than the headline reports (profile/clarity stay on
+  // OPENAI_MODEL=gpt-5.5). Default gpt-5-mini; set CHAT_MODEL to an OpenRouter id
+  // (e.g. z-ai/glm-5.2) to route chat through OpenRouter instead.
+  const model = process.env.CHAT_MODEL || 'gpt-5-mini';
+  const useOpenRouter = model.includes('/') && !!process.env.OPENROUTER_API_KEY;
+  const apiKey = useOpenRouter ? process.env.OPENROUTER_API_KEY : process.env.OPENAI_API_KEY;
+  if (!apiKey) {
     return NextResponse.json(
-      { error: 'OPENAI_API_KEY is not set on the server.' },
+      { error: `${useOpenRouter ? 'OPENROUTER_API_KEY' : 'OPENAI_API_KEY'} is not set on the server.` },
       { status: 500 },
     );
   }
   // Instantiate lazily (not at module scope) so the build doesn't require a key.
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const client = new OpenAI(
+    useOpenRouter
+      ? { apiKey, baseURL: 'https://openrouter.ai/api/v1', defaultHeaders: { 'HTTP-Referer': 'https://align360-app.vercel.app', 'X-Title': 'Align360' } }
+      : { apiKey },
+  );
 
   let body: { messages?: ChatMessage[]; profileContext?: string };
   try {
@@ -29,11 +39,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'messages array is required.' }, { status: 400 });
   }
 
-  // Chat runs on a cheaper model than the headline reports (profile/clarity stay on
-  // OPENAI_MODEL=gpt-5.5). gpt-5-mini is ~20x cheaper on output, which is the main
-  // lever keeping AI spend within the credit budget. Override via CHAT_MODEL (e.g.
-  // an OpenRouter GLM id once those keys are wired).
-  const model = process.env.CHAT_MODEL || 'gpt-5-mini';
   let systemPrompt = buildSystemPrompt();
 
   // Make the user's assessment results instantly referenceable by the AI.
@@ -43,9 +48,14 @@ export async function POST(req: NextRequest) {
   }
 
   const full = [{ role: 'system', content: systemPrompt }, ...messages];
+  // OpenRouter models use max_tokens + the unified `reasoning` flag (disabled here
+  // for cheap/fast chat); OpenAI models use max_completion_tokens + reasoning_effort.
+  const baseParams = useOpenRouter
+    ? { model, max_tokens: 3000, reasoning: { enabled: false } }
+    : { model, max_completion_tokens: 3000, reasoning_effort: 'low' };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const run = (msgs: any) =>
-    client.chat.completions.create({ model, messages: msgs, max_completion_tokens: 3000, reasoning_effort: 'low' } as any);
+    client.chat.completions.create({ ...baseParams, messages: msgs } as any);
 
   // Drop {type:'file'} parts when a referenced file is gone (expired/deleted),
   // so an old session with a stale file_id stays usable instead of 400ing forever.
