@@ -59,14 +59,24 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  // Gate: first-time users go through onboarding before reaching the app.
-  // The landing page ('/') and onboarding are public + full-bleed.
-  useEffect(() => {
-    if (pathname !== '/onboarding' && pathname !== '/' && !isOnboarded()) router.replace('/onboarding');
-  }, [pathname, router]);
+  // Routes that render bare (no app chrome) AND skip the onboarding gate:
+  // the landing page, onboarding itself, and every auth/public page. Without
+  // this, an un-onboarded visitor on /login or /signup gets bounced to
+  // /onboarding → middleware sends them back to /login → infinite loop, and the
+  // auth pages wrongly render the full app sidebar.
+  const BARE_PREFIXES = ['/login', '/signup', '/auth', '/invite'];
+  const isBare =
+    pathname === '/' ||
+    pathname === '/onboarding' ||
+    BARE_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'));
 
-  // Landing + onboarding render full-bleed — no sidebar/chrome.
-  if (pathname === '/onboarding' || pathname === '/') return <>{children}</>;
+  // Gate: first-time users go through onboarding before reaching the app.
+  useEffect(() => {
+    if (!isBare && !isOnboarded()) router.replace('/onboarding');
+  }, [isBare, router]);
+
+  // Landing, onboarding, and auth pages render full-bleed — no sidebar/chrome.
+  if (isBare) return <>{children}</>;
 
   const toggleLeft = () => setLeftCollapsed((v) => { const n = !v; try { localStorage.setItem('align360:leftCollapsed', n ? '1' : '0'); } catch {} return n; });
   const toggleTheme = () => {
