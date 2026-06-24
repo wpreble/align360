@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import { buildSystemPrompt } from '@/lib/system-prompt';
+import { resolveModel, makeClient, genParams } from '@/lib/ai';
 import { getAssessment } from '@/lib/assessments';
 import { computeScores, type AnswerSet } from '@/lib/scoring';
 import { PROFILE_SCHEMA_A, PROFILE_SCHEMA_B, fallbackProfile, type Profile } from '@/lib/profile';
@@ -78,8 +78,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No assessment answers provided.' }, { status: 400 });
   }
 
-  // No key → return the deterministic fallback so the page still renders.
-  if (!process.env.OPENAI_API_KEY) {
+  // Report model: set REPORT_MODEL=z-ai/glm-5.2 to route through OpenRouter; default
+  // OPENAI_MODEL/gpt-5.5 on OpenAI. No key → deterministic fallback so the page renders.
+  const { model, useOpenRouter, apiKey } = resolveModel('REPORT_MODEL', process.env.OPENAI_MODEL || 'gpt-5.5');
+  if (!apiKey) {
     return NextResponse.json({ scores, profile: fallbackProfile(scores, name), generated: false });
   }
 
@@ -95,8 +97,7 @@ export async function POST(req: NextRequest) {
     .filter(Boolean)
     .join('\n\n');
 
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const model = process.env.OPENAI_MODEL || 'gpt-5.5';
+  const client = makeClient(useOpenRouter, apiKey);
   const sys = buildSystemPrompt();
 
   // Generate the profile as two PARALLEL halves (identity + market/AI-era) so
@@ -105,9 +106,7 @@ export async function POST(req: NextRequest) {
   const gen = async (schema: string) => {
     const c = await client.chat.completions.create({
       model,
-      response_format: { type: 'json_object' },
-      max_completion_tokens: 9000,
-      reasoning_effort: 'low',
+      ...genParams(useOpenRouter, { maxTokens: 9000, json: true, reasoning: 'low' }),
       messages: [
         { role: 'system', content: sys },
         { role: 'user', content: `You are generating part of a combined Align360 identity profile ("Combined in an AI-Era" format). Participant assessment data:\n\n${summary}\n\n${schema}` },

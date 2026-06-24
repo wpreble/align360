@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import { buildSystemPrompt } from '@/lib/system-prompt';
+import { resolveModel, makeClient, genParams } from '@/lib/ai';
 
 export const runtime = 'nodejs';
 
@@ -8,24 +8,16 @@ export const runtime = 'nodejs';
 type ChatMessage = { role: 'user' | 'assistant'; content: unknown };
 
 export async function POST(req: NextRequest) {
-  // Chat runs on a cheaper model than the headline reports (profile/clarity stay on
-  // OPENAI_MODEL=gpt-5.5). Default gpt-5-mini; set CHAT_MODEL to an OpenRouter id
-  // (e.g. z-ai/glm-5.2) to route chat through OpenRouter instead.
-  const model = process.env.CHAT_MODEL || 'gpt-5-mini';
-  const useOpenRouter = model.includes('/') && !!process.env.OPENROUTER_API_KEY;
-  const apiKey = useOpenRouter ? process.env.OPENROUTER_API_KEY : process.env.OPENAI_API_KEY;
+  // Chat model (set CHAT_MODEL=z-ai/glm-5.2 to route through OpenRouter; default
+  // gpt-5-mini on OpenAI). Headline reports use REPORT_MODEL, see those routes.
+  const { model, useOpenRouter, apiKey } = resolveModel('CHAT_MODEL', 'gpt-5-mini');
   if (!apiKey) {
     return NextResponse.json(
       { error: `${useOpenRouter ? 'OPENROUTER_API_KEY' : 'OPENAI_API_KEY'} is not set on the server.` },
       { status: 500 },
     );
   }
-  // Instantiate lazily (not at module scope) so the build doesn't require a key.
-  const client = new OpenAI(
-    useOpenRouter
-      ? { apiKey, baseURL: 'https://openrouter.ai/api/v1', defaultHeaders: { 'HTTP-Referer': 'https://align360-app.vercel.app', 'X-Title': 'Align360' } }
-      : { apiKey },
-  );
+  const client = makeClient(useOpenRouter, apiKey);
 
   let body: { messages?: ChatMessage[]; profileContext?: string };
   try {
@@ -48,11 +40,8 @@ export async function POST(req: NextRequest) {
   }
 
   const full = [{ role: 'system', content: systemPrompt }, ...messages];
-  // OpenRouter models use max_tokens + the unified `reasoning` flag (disabled here
-  // for cheap/fast chat); OpenAI models use max_completion_tokens + reasoning_effort.
-  const baseParams = useOpenRouter
-    ? { model, max_tokens: 3000, reasoning: { enabled: false } }
-    : { model, max_completion_tokens: 3000, reasoning_effort: 'low' };
+  // Chat: no reasoning tokens (cheap/fast). Reports use reasoning:'low'.
+  const baseParams = { model, ...genParams(useOpenRouter, { maxTokens: 3000, reasoning: 'off' }) };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const run = (msgs: any) =>
     client.chat.completions.create({ ...baseParams, messages: msgs } as any);
