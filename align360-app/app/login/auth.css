@@ -1,0 +1,85 @@
+/* Auth pages (login / signup). Centered card on the app's fig/cherry palette. */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  background: var(--stone, #f7f6f5);
+}
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  border: 1px solid rgba(42, 18, 46, 0.1);
+  border-radius: 16px;
+  padding: 2.25rem 2rem;
+  box-shadow: 0 10px 40px rgba(42, 18, 46, 0.06);
+}
+.auth-title {
+  font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  font-size: 28px;
+  font-weight: 500;
+  color: #0d0a14;
+  margin: 0 0 0.35rem;
+}
+.auth-sub { font-size: 14px; font-weight: 300; color: #7a6e7e; line-height: 1.6; margin: 0 0 1.5rem; }
+.auth-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  background: #fff;
+  border: 1px solid rgba(42, 18, 46, 0.18);
+  border-radius: 9px;
+  padding: 0.75rem 1rem;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0d0a14;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.auth-google:hover { background: #faf9f8; border-color: rgba(42, 18, 46, 0.3); }
+.auth-or { display: flex; align-items: center; gap: 0.75rem; margin: 1.25rem 0; color: #a89ea8; font-size: 12px; }
+.auth-or::before, .auth-or::after { content: ''; flex: 1; height: 1px; background: rgba(42, 18, 46, 0.1); }
+.auth-label { display: block; font-size: 12px; font-weight: 500; color: #5a4f5e; margin-bottom: 0.875rem; }
+.auth-input {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.7rem 0.85rem;
+  font-size: 14px;
+  border: 1px solid rgba(42, 18, 46, 0.18);
+  border-radius: 9px;
+  background: #fff;
+  color: #0d0a14;
+  font-family: inherit;
+}
+.auth-input:focus { outline: none; border-color: #a03a6e; box-shadow: 0 0 0 3px rgba(160, 58, 110, 0.12); }
+.auth-err {
+  font-size: 13px;
+  color: #a32d2d;
+  background: rgba(163, 45, 45, 0.06);
+  border: 1px solid rgba(163, 45, 45, 0.18);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.875rem;
+}
+.auth-submit {
+  width: 100%;
+  background: #2a122e;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: 0.8rem 1rem;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.auth-submit:hover:not(:disabled) { background: #3d1a42; }
+.auth-submit:disabled { opacity: 0.6; cursor: default; }
+.auth-switch { text-align: center; font-size: 13px; color: #7a6e7e; margin: 1.25rem 0 0; }
+.auth-link { color: #a03a6e; font-weight: 500; text-decoration: none; }
+.auth-link:hover { text-decoration: underline; }

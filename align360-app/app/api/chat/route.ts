@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import { buildSystemPrompt } from '@/lib/system-prompt';
+import { resolveModel, makeClient, genParams } from '@/lib/ai';
 
 export const runtime = 'nodejs';
 
@@ -8,14 +8,16 @@ export const runtime = 'nodejs';
 type ChatMessage = { role: 'user' | 'assistant'; content: unknown };
 
 export async function POST(req: NextRequest) {
-  if (!process.env.OPENAI_API_KEY) {
+  // Chat model (set CHAT_MODEL=z-ai/glm-5.2 to route through OpenRouter; default
+  // gpt-5-mini on OpenAI). Headline reports use REPORT_MODEL, see those routes.
+  const { model, useOpenRouter, apiKey } = resolveModel('CHAT_MODEL', 'gpt-5-mini');
+  if (!apiKey) {
     return NextResponse.json(
-      { error: 'OPENAI_API_KEY is not set on the server.' },
+      { error: `${useOpenRouter ? 'OPENROUTER_API_KEY' : 'OPENAI_API_KEY'} is not set on the server.` },
       { status: 500 },
     );
   }
-  // Instantiate lazily (not at module scope) so the build doesn't require a key.
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const client = makeClient(useOpenRouter, apiKey);
 
   let body: { messages?: ChatMessage[]; profileContext?: string };
   try {
@@ -29,7 +31,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'messages array is required.' }, { status: 400 });
   }
 
-  const model = process.env.OPENAI_MODEL || 'gpt-5.5';
   let systemPrompt = buildSystemPrompt();
 
   // Make the user's assessment results instantly referenceable by the AI.
@@ -39,9 +40,11 @@ export async function POST(req: NextRequest) {
   }
 
   const full = [{ role: 'system', content: systemPrompt }, ...messages];
+  // Chat: no reasoning tokens (cheap/fast). Reports use reasoning:'low'.
+  const baseParams = { model, ...genParams(useOpenRouter, { maxTokens: 3000, reasoning: 'off' }) };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const run = (msgs: any) =>
-    client.chat.completions.create({ model, messages: msgs, max_completion_tokens: 3000, reasoning_effort: 'low' } as any);
+    client.chat.completions.create({ ...baseParams, messages: msgs } as any);
 
   // Drop {type:'file'} parts when a referenced file is gone (expired/deleted),
   // so an old session with a stale file_id stays usable instead of 400ing forever.

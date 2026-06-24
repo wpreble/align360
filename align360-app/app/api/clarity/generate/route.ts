@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import { buildSystemPrompt } from '@/lib/system-prompt';
+import { resolveModel, makeClient, genParams } from '@/lib/ai';
 import { getAssessment } from '@/lib/assessments';
 import { computeClarityScores, isClaritySlug, type ClarityScores } from '@/lib/clarity-scoring';
 import { claritySchema, fallbackClarityNarrative, type ClarityNarrative, type ClarityNote } from '@/lib/clarity';
@@ -119,7 +119,9 @@ export async function POST(req: NextRequest) {
   }
 
   const answers = body.demo ? demoAnswers(slug) : body.answers || {};
-  const name = (body.name || (body.demo ? 'Sample' : 'Friend')).trim().slice(0, 60);
+  // Strip control chars/newlines so the name can't smuggle prompt instructions
+  // into the system prompt where it's interpolated.
+  const name = (body.name || (body.demo ? 'Sample' : 'Friend')).replace(/[\u0000-\u001f]+/g, ' ').trim().slice(0, 60);
   const scores = computeClarityScores(slug, answers);
 
   if (!scores) {
@@ -129,8 +131,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No answers provided for this assessment.' }, { status: 400 });
   }
 
+  // Report model: REPORT_MODEL=z-ai/glm-5.2 → OpenRouter; default OPENAI_MODEL/gpt-5.5.
   // No key → deterministic fallback so the report still renders.
-  if (!process.env.OPENAI_API_KEY) {
+  const { model, useOpenRouter, apiKey } = resolveModel('REPORT_MODEL', process.env.OPENAI_MODEL || 'gpt-5.5');
+  if (!apiKey) {
     return NextResponse.json({ scores, narrative: fallbackClarityNarrative(scores, name), generated: false });
   }
 
@@ -146,16 +150,13 @@ export async function POST(req: NextRequest) {
     .filter(Boolean)
     .join('\n');
 
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const model = process.env.OPENAI_MODEL || 'gpt-5.5';
+  const client = makeClient(useOpenRouter, apiKey);
   const sys = buildSystemPrompt();
 
   try {
     const c = await client.chat.completions.create({
       model,
-      response_format: { type: 'json_object' },
-      max_completion_tokens: 9000,
-      reasoning_effort: 'low',
+      ...genParams(useOpenRouter, { maxTokens: 9000, json: true, reasoning: 'low' }),
       messages: [
         { role: 'system', content: sys },
         {
