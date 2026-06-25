@@ -2,10 +2,11 @@
 
 import '../../result/profile.css';
 import '../clarity/clarity.css';
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import CombinedProfile from '../../result/_components/CombinedProfile';
+import GenLoader from '@/app/_components/GenLoader';
 import ClarityLayerSummary from '../_components/ClarityLayerSummary';
 import type { Profile } from '@/lib/profile';
 import type { Scores } from '@/lib/scoring';
@@ -23,6 +24,8 @@ function ProfileInner() {
   const router = useRouter();
   const demo = sp.get('demo') === '1';
   const [state, setState] = useState<State>({ phase: 'loading' });
+  const aliveRef = useRef(true);
+  const inFlightRef = useRef(false);
 
   const generate = useCallback(async (opts: { demo?: boolean; force?: boolean }) => {
     if (!opts.demo && !opts.force) {
@@ -31,6 +34,8 @@ function ProfileInner() {
     }
     const answers = getAnswers();
     if (!opts.demo && Object.keys(answers).length === 0) { setState({ phase: 'empty' }); return; }
+    if (inFlightRef.current) return; // dedupe concurrent runs (no double credit charge / race)
+    inFlightRef.current = true;
 
     setState({ phase: 'generating' });
     let name = 'Friend';
@@ -42,15 +47,22 @@ function ProfileInner() {
         body: JSON.stringify(opts.demo ? { demo: true } : { name, answers }),
       });
       const data = await res.json();
+      if (!aliveRef.current) return; // user navigated away mid-generation
       if (!res.ok) throw new Error(data.error || 'Generation failed');
       if (!opts.demo) setProfile({ profile: data.profile, scores: data.scores, generatedAt: new Date().toISOString() });
       setState({ phase: 'ready', profile: data.profile, scores: data.scores, generated: data.generated });
     } catch (err) {
-      setState({ phase: 'error', message: err instanceof Error ? err.message : 'Unknown error' });
+      if (aliveRef.current) setState({ phase: 'error', message: err instanceof Error ? err.message : 'Unknown error' });
+    } finally {
+      inFlightRef.current = false;
     }
   }, []);
 
-  useEffect(() => { generate({ demo }); }, [generate, demo]);
+  useEffect(() => {
+    aliveRef.current = true;
+    generate({ demo });
+    return () => { aliveRef.current = false; };
+  }, [generate, demo]);
 
   if (state.phase === 'empty') {
     return (
@@ -73,7 +85,9 @@ function ProfileInner() {
   if (state.phase === 'loading' || state.phase === 'generating') {
     return (
       <div className="result-gen">
-        <div><div className="gen-pulse" /><p>{state.phase === 'generating' ? 'Reading your signals and composing your profile…' : 'Loading…'}</p></div>
+        {state.phase === 'generating'
+          ? <GenLoader messages={['Reading your signals', 'Mapping how you are wired', 'Finding the convergence', 'Composing your profile', 'Polishing the language']} />
+          : <div><div className="gen-pulse" /><p>Loading&hellip;</p></div>}
       </div>
     );
   }

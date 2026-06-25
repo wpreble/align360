@@ -385,3 +385,28 @@
   .profile-doc .gifts { padding:1.5rem 1.1rem; }
   .profile-doc .gift-name { min-width:96px; font-size:13px; }
 }
+
+/* ═══ Report generation loader (orbiting + cycling status lines) ═══ */
+.genx { display:flex; flex-direction:column; align-items:center; gap:1.7rem; }
+.genx-orbit { position:relative; width:120px; height:120px; }
+.genx-core { position:absolute; top:50%; left:50%; width:18px; height:18px; margin:-9px; border-radius:50%;
+  background:radial-gradient(circle at 38% 34%, #F0DCE8, #C58FB0 52%, #7E1A4C); box-shadow:0 0 26px 7px rgba(197,143,176,.5);
+  animation:genxpulse 2.2s ease-in-out infinite; }
+.genx-ring { position:absolute; top:50%; left:50%; width:34px; height:34px; margin:-17px; border-radius:50%;
+  border:1px solid rgba(197,143,176,.32); animation:genxexpand 2.8s ease-out infinite; }
+.genx-ring.r2 { animation-delay:1.4s; }
+.genx-dot { position:absolute; top:50%; left:50%; width:7px; height:7px; margin:-3.5px; border-radius:50%;
+  background:#C58FB0; box-shadow:0 0 10px rgba(197,143,176,.85); }
+.genx-dot.d1 { animation:genxorbit 3.4s linear infinite; }
+.genx-dot.d2 { background:#D9BBCB; animation:genxorbit 5s linear infinite reverse; }
+.genx-dot.d3 { background:#7E3A66; animation:genxorbit 6.6s linear infinite; }
+.genx-msg { font-family:'Crimson Pro',Georgia,serif; font-size:16.5px; color:#CFC6CC; letter-spacing:.01em; animation:genxfade .55s ease; }
+@keyframes genxorbit { from { transform:rotate(0) translateX(50px) rotate(0); } to { transform:rotate(360deg) translateX(50px) rotate(-360deg); } }
+@keyframes genxpulse { 0%,100% { transform:scale(.82); opacity:.85; } 50% { transform:scale(1.18); opacity:1; } }
+@keyframes genxexpand { 0% { transform:scale(.5); opacity:.75; } 100% { transform:scale(2.6); opacity:0; } }
+@keyframes genxfade { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) {
+  .genx-core, .genx-ring, .genx-dot, .genx-msg { animation:none; }
+  .genx-ring.r1 { opacity:.35; transform:scale(1.8); }
+  .genx-ring.r2 { display:none; }
+}

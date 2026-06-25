@@ -2,10 +2,11 @@
 
 import '../../../result/profile.css'; // shared result chrome: toolbar, back button, placeholder, gen pulse
 import '../clarity.css';
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import ClarityReport from './_components/ClarityReport';
+import GenLoader from '@/app/_components/GenLoader';
 import type { ClarityScores } from '@/lib/clarity-scoring';
 import type { ClarityNarrative } from '@/lib/clarity';
 import { getClarityAnswers, getClarityReport, setClarityReport, CLARITY_SLUGS } from '@/lib/storage';
@@ -25,6 +26,8 @@ function ClarityInner() {
   const slug = String(params.slug || '');
   const demo = sp.get('demo') === '1';
   const [state, setState] = useState<State>({ phase: 'loading' });
+  const aliveRef = useRef(true);
+  const inFlightRef = useRef(false);
 
   const generate = useCallback(
     async (opts: { demo?: boolean; force?: boolean }) => {
@@ -44,6 +47,8 @@ function ClarityInner() {
         setState({ phase: 'empty' });
         return;
       }
+      if (inFlightRef.current) return; // dedupe concurrent runs (no double credit charge / race)
+      inFlightRef.current = true;
 
       setState({ phase: 'generating' });
       let name = 'Friend';
@@ -55,17 +60,24 @@ function ClarityInner() {
           body: JSON.stringify(opts.demo ? { slug, demo: true } : { slug, name, answers }),
         });
         const data = await res.json();
+        if (!aliveRef.current) return; // user navigated away mid-generation
         if (!res.ok) throw new Error(data.error || 'Generation failed');
         if (!opts.demo) setClarityReport(slug, { scores: data.scores, narrative: data.narrative, name, generatedAt: new Date().toISOString() });
         setState({ phase: 'ready', scores: data.scores, narrative: data.narrative, generated: data.generated });
       } catch (err) {
-        setState({ phase: 'error', message: err instanceof Error ? err.message : 'Unknown error' });
+        if (aliveRef.current) setState({ phase: 'error', message: err instanceof Error ? err.message : 'Unknown error' });
+      } finally {
+        inFlightRef.current = false;
       }
     },
     [slug],
   );
 
-  useEffect(() => { generate({ demo }); }, [generate, demo]);
+  useEffect(() => {
+    aliveRef.current = true;
+    generate({ demo });
+    return () => { aliveRef.current = false; };
+  }, [generate, demo]);
 
   if (state.phase === 'unknown') {
     return (
@@ -97,7 +109,9 @@ function ClarityInner() {
   if (state.phase === 'loading' || state.phase === 'generating') {
     return (
       <div className="result-gen">
-        <div><div className="gen-pulse" /><p>{state.phase === 'generating' ? 'Scoring your answers and composing your analysis…' : 'Loading…'}</p></div>
+        {state.phase === 'generating'
+          ? <GenLoader messages={['Scoring your answers', 'Reading the patterns', 'Locating your primary gap', 'Composing your analysis']} />
+          : <div><div className="gen-pulse" /><p>Loading&hellip;</p></div>}
       </div>
     );
   }
