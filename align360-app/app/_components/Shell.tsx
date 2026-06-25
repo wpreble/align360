@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
-import { getChats, deleteChat, getName, setName, isOnboarded, resetAll, STORE_EVENT, type ChatSession } from '@/lib/storage';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { getChats, deleteChat, renameChat, getName, setName, isOnboarded, resetAll, STORE_EVENT, type ChatSession } from '@/lib/storage';
 import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import { wipeCloud } from '@/lib/sync';
 import AlignMark from './AlignMark';
@@ -31,6 +31,9 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(true);
   const [chats, setChats] = useState<ChatSession[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const renameCancelled = useRef(false);
   const [name, setNameState] = useState('');
   const [accountOpen, setAccountOpen] = useState(false);
   const [theme, setTheme] = useState('light');
@@ -104,6 +107,15 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     window.location.href = '/login';
   };
 
+  // Inline rename of a chat-history item.
+  const startRename = (c: ChatSession) => { renameCancelled.current = false; setEditTitle(c.title || ''); setEditingId(c.id); };
+  const commitRename = () => {
+    if (!renameCancelled.current && editingId && editTitle.trim()) { renameChat(editingId, editTitle); refreshChats(); }
+    setEditingId(null);
+    renameCancelled.current = false;
+  };
+  const cancelRename = () => { renameCancelled.current = true; setEditingId(null); };
+
   // Landing, onboarding, and auth pages render full-bleed — no sidebar/chrome.
   if (isBare) return <>{children}</>;
 
@@ -158,8 +170,24 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               ) : (
                 chats.map((c) => (
                   <div key={c.id} className="ch-item">
-                    <Link href={`/chat?chat=${c.id}`} className="ch-item-link" title={c.title}>{c.title || 'Untitled'}</Link>
-                    <button className="ch-del" onClick={() => deleteChat(c.id)} aria-label="Delete chat">✕</button>
+                    {editingId === c.id ? (
+                      <input
+                        className="ch-edit"
+                        value={editTitle}
+                        autoFocus
+                        maxLength={80}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); commitRename(); } else if (e.key === 'Escape') { e.preventDefault(); cancelRename(); } }}
+                        onBlur={commitRename}
+                        aria-label="Chat name"
+                      />
+                    ) : (
+                      <>
+                        <Link href={`/chat?chat=${c.id}`} className="ch-item-link" title={c.title}>{c.title || 'Untitled'}</Link>
+                        <button className="ch-rename" onClick={() => startRename(c)} aria-label="Rename chat" title="Rename"><Icon d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" /></button>
+                        <button className="ch-del" onClick={() => deleteChat(c.id)} aria-label="Delete chat" title="Delete">✕</button>
+                      </>
+                    )}
                   </div>
                 ))
               )}

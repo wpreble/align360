@@ -132,8 +132,14 @@ a { color:inherit; text-decoration:none; }
 .ch-item:hover { background:var(--fig-wash); }
 [data-theme='dark'] .ch-item:hover { background:rgba(185,143,168,.1); }
 .ch-item-link { flex:1; padding:7px 11px; font-size:13px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.ch-del { opacity:0; padding:0 8px; font-size:11px; color:var(--text-muted); transition:opacity .15s; }
+.ch-del { opacity:0; padding:0 8px; font-size:11px; color:var(--text-muted); transition:opacity .15s,color .15s; }
 .ch-item:hover .ch-del { opacity:1; }
+.ch-del:hover { color:var(--accent); }
+.ch-rename { opacity:0; padding:0 3px; color:var(--text-muted); display:grid; place-items:center; flex:none; transition:opacity .15s,color .15s; }
+.ch-rename svg { width:13px; height:13px; }
+.ch-item:hover .ch-rename { opacity:1; }
+.ch-rename:hover { color:var(--accent); }
+.ch-edit { flex:1; min-width:0; margin:2px 6px; padding:5px 8px; font-size:13px; font-family:inherit; color:var(--text-primary); background:var(--bg-surface); border:1px solid var(--accent); border-radius:6px; outline:none; }
 
 /* ── Resources (frameworks accordion) ── */
 .resources-page { max-width:860px; margin:0 auto; padding:48px 24px 80px; width:100%; }
@@ -586,6 +592,7 @@ a { color:inherit; text-decoration:none; }
   .collapse-left { display:none; }
   .sidebar { width:min(280px, 86vw); }
   .ch-del { opacity:1; padding:8px 12px; }
+  .ch-rename { opacity:1; padding:8px 8px; }
   .ch-new { width:40px; height:40px; font-size:20px; }
   .ch-toggle-btn { padding:10px 0; }
   .ch-item-link { padding:11px 12px; font-size:14px; }

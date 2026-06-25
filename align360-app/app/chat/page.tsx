@@ -203,10 +203,14 @@ function ChatInner() {
 
   function persist(msgs: ChatMsg[], id: string) {
     const firstUser = msgs.find((m) => m.role === 'user');
-    const title = (firstUser?.text || 'New chat').replace(/\n[\s\S]*/, '').slice(0, 42) || 'New chat';
+    // A user-renamed title is sticky; otherwise auto-derive from the first message.
+    const existing = getChat(id);
+    const title = existing?.titleCustom
+      ? existing.title
+      : ((firstUser?.text || 'New chat').replace(/\n[\s\S]*/, '').slice(0, 42) || 'New chat');
     // Keep file refs (small) but drop image data URLs (too large for localStorage).
     const slim = msgs.map((m) => ({ role: m.role, text: m.text, files: m.files }));
-    saveChat({ id, title, messages: slim, updatedAt: Date.now() });
+    saveChat({ id, title, titleCustom: existing?.titleCustom, messages: slim, updatedAt: Date.now() });
   }
 
   function onKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {

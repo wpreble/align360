@@ -19,7 +19,7 @@ export type StoredProfile = { profile: any; scores: any; generatedAt: string };
 export type ChatImage = string;
 export type ChatFileRef = { fileId: string; name: string };
 export type ChatMsg = { role: 'user' | 'assistant'; text: string; images?: ChatImage[]; files?: ChatFileRef[] };
-export type ChatSession = { id: string; title: string; messages: ChatMsg[]; updatedAt: number };
+export type ChatSession = { id: string; title: string; messages: ChatMsg[]; updatedAt: number; titleCustom?: boolean };
 
 function read<T>(key: string, fallback: T): T {
   if (typeof window === 'undefined') return fallback;
@@ -137,6 +137,16 @@ export function saveChat(session: ChatSession) {
 }
 export function deleteChat(id: string) {
   write(CHATS_KEY, read<ChatSession[]>(CHATS_KEY, []).filter((c) => c.id !== id));
+}
+/** Rename a chat. Marks the title as custom so auto-titling never overwrites it. */
+export function renameChat(id: string, title: string) {
+  const all = read<ChatSession[]>(CHATS_KEY, []);
+  const i = all.findIndex((c) => c.id === id);
+  if (i < 0) return;
+  const t = title.trim().slice(0, 80);
+  if (!t) return;
+  all[i] = { ...all[i], title: t, titleCustom: true };
+  write(CHATS_KEY, all);
 }
 export function newChatId(): string {
   return 'c_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
