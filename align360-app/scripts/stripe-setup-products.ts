@@ -19,6 +19,11 @@
 import Stripe from 'stripe';
 import { TIERS } from '../lib/billing/tiers';
 
+// ALIGN brand image shown on the Stripe product / Checkout line item. The
+// account-level Checkout logo + brand color are set in the Stripe Dashboard
+// (Settings -> Branding); they can't be set via the API.
+const BRAND_IMAGE = 'https://align360-app.vercel.app/brand/align-mark-fig.png';
+
 async function main() {
   const key = process.env.STRIPE_SECRET_KEY;
   const acct = process.env.STRIPE_CONNECTED_ACCOUNT_ID;
@@ -43,7 +48,10 @@ async function main() {
       console.log(`+ would create  ${t.lookupKey}  ($${t.amountCents / 100}/${t.interval}${t.perSeat ? '/seat' : ''})`);
       continue;
     }
-    const product = await stripe.products.create({ name: t.productName, description: t.description }, opts);
+    const product = await stripe.products.create(
+      { name: t.productName, description: t.description, images: [BRAND_IMAGE], statement_descriptor: 'ALIGN360', metadata: { brand: 'Align360', tier: t.key } },
+      opts,
+    );
     const price = await stripe.prices.create(
       {
         product: product.id,
