@@ -64,10 +64,11 @@ export default function Runner({ title, slug, questions }: { title: string; slug
       router.push(`/insights/clarity/${slug}`);
       return;
     }
-    // Core assessments: new answers invalidate any prior profile so Insights
-    // regenerates fresh (and the chat picks up the updated profile).
+    // Core assessments: new answers invalidate the prior combined profile, then
+    // go straight to the profile page so it shows the generation loader and
+    // builds the fresh (dynamic) result, instead of bouncing to the hub.
     clearProfile();
-    router.push('/insights');
+    router.push('/insights/profile');
   }
 
   if (done) return null;
