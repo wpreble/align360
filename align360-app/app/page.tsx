@@ -2,6 +2,7 @@ import './landing.css';
 import Link from 'next/link';
 import AlignMark from '@/app/_components/AlignMark';
 import FounderAvatar from '@/app/_components/FounderAvatar';
+import LandingMotion from '@/app/_components/LandingMotion';
 
 export const metadata = {
   title: 'Align360 · Put out the fires. Then become one.',
@@ -16,6 +17,7 @@ const ENTER = '/chat';
 export default function Landing() {
   return (
     <div className="lp">
+      <LandingMotion />
       {/* NAV */}
       <header className="lp-nav">
         <div className="wrap">
@@ -30,12 +32,14 @@ export default function Landing() {
       {/* HERO */}
       <section className="lp-hero">
         <div className="lp-hero-bg" />
+        <div className="lp-hero-grain" aria-hidden="true" />
         <div className="wrap">
           <div className="lp-hero-mark"><AlignMark /></div>
-          <h1 className="lp-h1">Put out the fires.<br /><em>Then become one.</em></h1>
+          <div className="lp-index" aria-hidden="true"><span className="lp-idot" />01 · ignition</div>
+          <h1 className="lp-h1"><span className="lp-l1">Put out the fires.</span><br /><em className="lp-l2">Then become one.<span className="lp-ember" aria-hidden="true" /></em></h1>
           <p className="lp-sub">Align360 solves what&apos;s urgent, then builds the clarity to ignite everything else. One system that actually knows how you&apos;re wired.</p>
           <div className="lp-hero-cta">
-            <Link href={ENTER} className="lp-btn primary">Discover Your Wiring →</Link>
+            <Link href={ENTER} className="lp-btn primary lp-magnetic">Discover Your Wiring <span className="lp-arrow" aria-hidden="true">→</span><span className="lp-spk s1" aria-hidden="true" /><span className="lp-spk s2" aria-hidden="true" /></Link>
             <Link href={ENTER} className="lp-btn ghost">Log In</Link>
           </div>
         </div>
@@ -44,12 +48,12 @@ export default function Landing() {
       {/* PROBLEM */}
       <section className="lp-section dark">
         <div className="wrap">
-          <div className="lp-sec-head">
+          <div className="lp-sec-head lp-reveal">
             <div className="lp-rule" />
             <h2 className="lp-h2">You&apos;re navigating life without a system that <em>knows you</em>.</h2>
             <p className="lp-lead">Education, career, money, relationships, and an AI shift rewriting all of it, while the only tools you have are generic. So you guess. Compare. Chase things that don&apos;t fit.</p>
           </div>
-          <div className="lp-domains">
+          <div className="lp-domains lp-reveal">
             <span className="lp-domain">Education</span>
             <span className="lp-domain">Career</span>
             <span className="lp-domain">AI Disruption</span>
@@ -62,11 +66,11 @@ export default function Landing() {
       {/* TWO PILLARS */}
       <section className="lp-section">
         <div className="wrap">
-          <div className="lp-sec-head">
+          <div className="lp-sec-head lp-reveal">
             <h2 className="lp-h2">Two questions everything else is built on</h2>
             <p className="lp-lead">Optimize these first. Then your finances, relationships, health, and legacy have something true to organize around.</p>
           </div>
-          <div className="lp-pillars">
+          <div className="lp-pillars lp-reveal">
             <div className="lp-pillar">
               <div className="lp-pillar-n">01</div>
               <h3>Who you are</h3>
@@ -84,10 +88,10 @@ export default function Landing() {
       {/* HOW IT WORKS */}
       <section id="how" className="lp-section dark">
         <div className="wrap">
-          <div className="lp-sec-head">
+          <div className="lp-sec-head lp-reveal">
             <h2 className="lp-h2">Urgent first. Then aligned for what&apos;s next.</h2>
           </div>
-          <div className="lp-steps">
+          <div className="lp-steps lp-reveal">
             <div className="lp-step">
               <div className="lp-step-time">Minutes</div>
               <div className="lp-step-n">I</div>
@@ -113,11 +117,11 @@ export default function Landing() {
       {/* WHAT'S INCLUDED */}
       <section id="included" className="lp-section">
         <div className="wrap">
-          <div className="lp-sec-head">
+          <div className="lp-sec-head lp-reveal">
             <h2 className="lp-h2">Frameworks that compound</h2>
             <p className="lp-lead">Every assessment you complete is remembered and fed into your AI, so the more you do, the sharper it gets.</p>
           </div>
-          <div className="lp-frames">
+          <div className="lp-frames lp-reveal">
             <div className="lp-frame fw-design">
               <span className="lp-frame-tag">DesignSuite · Live</span>
               <h3>Understand how you&apos;re wired</h3>
@@ -149,10 +153,10 @@ export default function Landing() {
       {/* OUTCOMES */}
       <section className="lp-section dark">
         <div className="wrap">
-          <div className="lp-sec-head">
+          <div className="lp-sec-head lp-reveal">
             <h2 className="lp-h2">Clarity you can feel, on a real timeline</h2>
           </div>
-          <div className="lp-outcomes">
+          <div className="lp-outcomes lp-reveal">
             <div className="lp-outcome">
               <div className="lp-outcome-lbl">In 45 Minutes</div>
               <div className="lp-outcome-big">1</div>
@@ -175,10 +179,10 @@ export default function Landing() {
       {/* DIFFERENTIATION */}
       <section className="lp-section">
         <div className="wrap">
-          <div className="lp-sec-head">
+          <div className="lp-sec-head lp-reveal">
             <h2 className="lp-h2">Not another personality test</h2>
           </div>
-          <div className="lp-compare">
+          <div className="lp-compare lp-reveal">
             <div className="lp-compare-row">
               <div className="lp-compare-cell them lp-compare-head them">Generic tests</div>
               <div className="lp-compare-cell us lp-compare-head us">Align360</div>
@@ -202,7 +206,7 @@ export default function Landing() {
       {/* FOUNDER */}
       <section id="founder" className="lp-section dark">
         <div className="wrap">
-          <div className="lp-founder">
+          <div className="lp-founder lp-reveal">
             <div className="lp-founder-badge"><FounderAvatar /></div>
             <div>
               <div className="lp-founder-name">Samuel Ngu</div>
