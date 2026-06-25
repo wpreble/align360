@@ -24,7 +24,7 @@ export type Tier = {
 export const TIERS: Tier[] = [
   {
     key: 'individual_monthly',
-    productName: 'Align360 — Individual',
+    productName: 'Align360 · Individual',
     description: 'Individual plan, billed monthly. Alpha $49 (public release $99; alpha users grandfathered at $49 through first renewal).',
     amountCents: 4900,
     interval: 'month',
@@ -33,7 +33,7 @@ export const TIERS: Tier[] = [
   },
   {
     key: 'org_pilot_seat_monthly',
-    productName: 'Align360 — Team (Alpha Pilot)',
+    productName: 'Align360 · Team (Alpha Pilot)',
     description: 'Team plan, per seat, billed monthly. Minimum 5 seats (enforced at checkout).',
     amountCents: 1900,
     interval: 'month',

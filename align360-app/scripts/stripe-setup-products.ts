@@ -41,7 +41,19 @@ async function main() {
     const found = await stripe.prices.list({ lookup_keys: [t.lookupKey], active: true, limit: 1 }, opts);
     if (found.data.length) {
       const p = found.data[0];
-      console.log(`✓ exists  ${t.lookupKey} → ${p.id}  ($${(p.unit_amount ?? 0) / 100}/${t.interval}${t.perSeat ? '/seat' : ''})`);
+      const productId = typeof p.product === 'string' ? p.product : p.product.id;
+      const price = `$${(p.unit_amount ?? 0) / 100}/${t.interval}${t.perSeat ? '/seat' : ''}`;
+      if (confirm) {
+        // Idempotently (re)apply ALIGN branding to the existing product.
+        await stripe.products.update(
+          productId,
+          { name: t.productName, description: t.description, images: [BRAND_IMAGE], statement_descriptor: 'ALIGN360', metadata: { brand: 'Align360', tier: t.key } },
+          opts,
+        );
+        console.log(`✓ exists  ${t.lookupKey} → ${p.id}  (${price}, ALIGN branding applied)`);
+      } else {
+        console.log(`✓ exists  ${t.lookupKey} → ${p.id}  (${price}, would apply ALIGN branding)`);
+      }
       continue;
     }
     if (!confirm) {
