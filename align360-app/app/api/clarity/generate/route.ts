@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildSystemPrompt } from '@/lib/system-prompt';
-import { resolveModel, makeClient, genParams } from '@/lib/ai';
+import { resolveModel, makeClient, genParams, parseJsonLoose } from '@/lib/ai';
 import { getAssessment } from '@/lib/assessments';
 import { computeClarityScores, isClaritySlug, type ClarityScores } from '@/lib/clarity-scoring';
 import { claritySchema, fallbackClarityNarrative, type ClarityNarrative, type ClarityNote } from '@/lib/clarity';
@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
   const client = makeClient(useOpenRouter, apiKey);
   const sys = buildSystemPrompt();
 
-  try {
+  const genOnce = async () => {
     const c = await client.chat.completions.create({
       model,
       ...genParams(useOpenRouter, { maxTokens: 9000, json: true, reasoning: 'low' }),
@@ -161,22 +161,27 @@ export async function POST(req: NextRequest) {
         { role: 'system', content: sys },
         {
           role: 'user',
-          content: `You are writing the analysis for an Align360 Clarity Layer result (${scores.title}). The scores are already computed; write ONLY the interpretive narrative.\n\n${summary}\n\n${claritySchema(scores)}`,
+          content: `You are writing the analysis for an Align360 Clarity Layer result (${scores.title}). The scores are already computed; write ONLY the interpretive narrative as a single valid JSON object, no markdown fences or prose.\n\n${summary}\n\n${claritySchema(scores)}`,
         },
       ],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
-    const text = c.choices[0]?.message?.content || '{}';
-    let parsed: Partial<ClarityNarrative> = {};
-    try {
-      parsed = JSON.parse(text);
-    } catch {
-      /* fall through to fallback merge */
+    const text = c.choices[0]?.message?.content || '';
+    return { parsed: parseJsonLoose<Partial<ClarityNarrative>>(text), finish: c.choices[0]?.finish_reason, len: text.length };
+  };
+
+  try {
+    // One retry when the model returns unparseable/empty/thin JSON (intermittent on GLM).
+    let r = await genOnce();
+    if (!r.parsed || Object.keys(r.parsed).length < 2) {
+      const retry = await genOnce();
+      if (retry.parsed && Object.keys(retry.parsed).length >= Object.keys(r.parsed || {}).length) r = retry;
     }
+    const parsed = r.parsed || {};
     const narrative = deepStripDashes(mergeNarrative(fallbackClarityNarrative(scores, name), parsed, scores));
     const ok = Object.keys(parsed).length > 0;
     const debug = req.nextUrl.searchParams.has('debug')
-      ? { finish: c.choices[0]?.finish_reason, len: text.length, keys: Object.keys(parsed) }
+      ? { finish: r.finish, len: r.len, keys: Object.keys(parsed) }
       : undefined;
     return NextResponse.json({ scores, narrative, generated: ok, debug });
   } catch (err) {

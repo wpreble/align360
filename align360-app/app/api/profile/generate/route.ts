@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildSystemPrompt } from '@/lib/system-prompt';
-import { resolveModel, makeClient, genParams } from '@/lib/ai';
+import { resolveModel, makeClient, genParams, parseJsonLoose } from '@/lib/ai';
 import { getAssessment } from '@/lib/assessments';
 import { computeScores, type AnswerSet } from '@/lib/scoring';
 import { PROFILE_SCHEMA_A, PROFILE_SCHEMA_B, fallbackProfile, type Profile } from '@/lib/profile';
@@ -103,20 +103,30 @@ export async function POST(req: NextRequest) {
   // Generate the profile as two PARALLEL halves (identity + market/AI-era) so
   // wall-clock is the slower half, not the sum. Each half parses defensively,
   // so one malformed half still leaves the rest (over the deterministic fallback).
-  const gen = async (schema: string) => {
+  const genOnce = async (schema: string) => {
     const c = await client.chat.completions.create({
       model,
       ...genParams(useOpenRouter, { maxTokens: 9000, json: true, reasoning: 'low' }),
       messages: [
         { role: 'system', content: sys },
-        { role: 'user', content: `You are generating part of a combined Align360 identity profile ("Combined in an AI-Era" format). Participant assessment data:\n\n${summary}\n\n${schema}` },
+        { role: 'user', content: `You are generating part of a combined Align360 identity profile ("Combined in an AI-Era" format). Return ONLY a single valid JSON object, no markdown fences or prose. Participant assessment data:\n\n${summary}\n\n${schema}` },
       ],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
-    const text = c.choices[0]?.message?.content || '{}';
-    let parsed: Partial<Profile> = {};
-    try { parsed = JSON.parse(text); } catch {}
-    return { parsed, finish: c.choices[0]?.finish_reason, len: text.length };
+    const text = c.choices[0]?.message?.content || '';
+    return { parsed: parseJsonLoose<Partial<Profile>>(text), finish: c.choices[0]?.finish_reason, len: text.length };
+  };
+  // One retry when the model returns unparseable/empty JSON (GLM does this
+  // intermittently); a malformed half otherwise silently drops to fallback.
+  const gen = async (schema: string) => {
+    let r = await genOnce(schema);
+    // Retry on empty/unparseable OR a suspiciously thin half (GLM sometimes
+    // returns just one key); a thin half otherwise leaves sections on fallback.
+    if (!r.parsed || Object.keys(r.parsed).length < 2) {
+      const retry = await genOnce(schema);
+      if (retry.parsed && Object.keys(retry.parsed).length >= Object.keys(r.parsed || {}).length) r = retry;
+    }
+    return { parsed: r.parsed || {}, finish: r.finish, len: r.len };
   };
 
   try {

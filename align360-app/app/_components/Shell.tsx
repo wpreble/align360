@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { getChats, deleteChat, getName, setName, isOnboarded, resetAll, STORE_EVENT, type ChatSession } from '@/lib/storage';
+import { createClient, supabaseConfigured } from '@/lib/supabase/client';
+import { wipeCloud } from '@/lib/sync';
 import AlignMark from './AlignMark';
+import AccountSync from './AccountSync';
 
 const NAV = [
   { key: 'chat', label: 'Chat', href: '/chat', icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
@@ -31,6 +34,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const [name, setNameState] = useState('');
   const [accountOpen, setAccountOpen] = useState(false);
   const [theme, setTheme] = useState('light');
+  const [email, setEmail] = useState<string | null>(null);
   const year = new Date().getFullYear();
 
   const refreshChats = useCallback(() => setChats(getChats()), []);
@@ -75,6 +79,18 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     if (!isBare && !isOnboarded()) router.replace('/onboarding');
   }, [isBare, router]);
 
+  // Who's signed in (for the account panel + sign out).
+  useEffect(() => {
+    if (!supabaseConfigured) return;
+    createClient().auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null)).catch(() => {});
+  }, []);
+
+  const signOut = async () => {
+    try { if (supabaseConfigured) await createClient().auth.signOut(); } catch {}
+    try { Object.keys(localStorage).filter((k) => k.startsWith('align360:')).forEach((k) => localStorage.removeItem(k)); } catch {}
+    window.location.href = '/login';
+  };
+
   // Landing, onboarding, and auth pages render full-bleed — no sidebar/chrome.
   if (isBare) return <>{children}</>;
 
@@ -89,6 +105,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={`app-layout${leftCollapsed ? ' left-collapsed' : ''}${drawerOpen ? ' drawer-open' : ''}`}>
+      <AccountSync />
       <div className="drawer-scrim" onClick={() => setDrawerOpen(false)} />
 
       <aside className="sidebar">
@@ -174,27 +191,39 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             </label>
 
             <div className="acct-section-label">Account</div>
-            <button className="acct-item" disabled><span>Profile</span><span className="acct-soon">Soon</span></button>
+            {email ? (
+              <div className="acct-item" style={{ cursor: 'default' }}><span>Signed in as</span><span className="acct-val">{email}</span></div>
+            ) : null}
             <button className="acct-item" disabled><span>Plan &amp; billing</span><span className="acct-soon">Soon</span></button>
-            <button className="acct-item" disabled><span>Sign in / Sign up</span><span className="acct-soon">Soon</span></button>
+            {email ? (
+              <button className="acct-item" onClick={signOut}><span>Sign out</span><span className="acct-val">&rarr;</span></button>
+            ) : (
+              <a className="acct-item" href="/login" style={{ textDecoration: 'none' }}><span>Sign in</span><span className="acct-val">&rarr;</span></a>
+            )}
 
             <div className="acct-section-label">Preferences</div>
             <button className="acct-item" onClick={toggleTheme}><span>Appearance</span><span className="acct-val">{theme === 'dark' ? 'Dark' : 'Light'}</span></button>
             <button className="acct-item" disabled><span>Notifications</span><span className="acct-soon">Soon</span></button>
 
-            <div className="acct-section-label">This device</div>
+            <div className="acct-section-label">Data</div>
             <button
               className="acct-item danger"
-              onClick={() => {
-                if (window.confirm('Reset all your Align360 data on this device? Your onboarding, assessments, profile, and chats will be cleared.')) {
-                  resetAll();
-                  window.location.href = '/onboarding';
-                }
+              onClick={async () => {
+                if (!window.confirm('Reset all your Align360 data? Your onboarding, assessments, profile, and chats will be cleared on every device.')) return;
+                try {
+                  if (supabaseConfigured) {
+                    const sb = createClient();
+                    const { data } = await sb.auth.getUser();
+                    if (data.user?.id) await wipeCloud(sb, data.user.id);
+                  }
+                } catch {}
+                resetAll();
+                window.location.href = '/onboarding';
               }}
             >
               <span>Reset my data</span><span className="acct-val danger">Clear</span>
             </button>
-            <div className="acct-note">Your data is saved only on this device. Nothing is shared with other testers.</div>
+            <div className="acct-note">Your data is saved to your account and syncs across your devices.</div>
 
             <button className="acct-done" onClick={() => setAccountOpen(false)}>Done</button>
           </div>
