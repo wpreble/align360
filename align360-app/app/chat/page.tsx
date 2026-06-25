@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { renderMarkdown } from '@/lib/markdown';
-import { buildProfileContext, getProfile, getChat, getName, getOnboarding, saveChat, newChatId, type ChatMsg } from '@/lib/storage';
+import { buildProfileContext, buildClarityContext, getProfile, getChat, getName, getOnboarding, saveChat, newChatId, type ChatMsg } from '@/lib/storage';
 import { buildOnboardingContext, synthesize } from '@/lib/onboarding';
 import AlignMark from '@/app/_components/AlignMark';
 
@@ -178,6 +178,7 @@ function ChatInner() {
       nm ? `The user's preferred name is ${nm}.` : '',
       buildOnboardingContext(getOnboarding() || {}),
       buildProfileContext(getProfile()),
+      buildClarityContext(),
     ].filter(Boolean).join('\n\n');
 
     try {

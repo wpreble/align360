@@ -160,3 +160,24 @@ export function buildProfileContext(stored: StoredProfile | null): string {
   ].filter(Boolean);
   return lines.join('\n');
 }
+
+/** Clarity Layer results (Impact Readiness, Value Spectrum) as chat context, so
+ *  the AI knows the user's scored clarity profile in addition to the combined one.
+ *  Reads whatever is cached now, so it reflects the latest the moment a report
+ *  is (re)generated. */
+export function buildClarityContext(): string {
+  const blocks: string[] = [];
+  for (const slug of CLARITY_SLUGS) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const r: any = getClarityReport(slug);
+    const s = r?.scores;
+    if (!s) continue;
+    const doms = Array.isArray(s.domains) ? s.domains.map((d: any) => `${d.name} ${d.score}`).join(', ') : '';
+    const ai = s.aiEra ? `, AI-Era ${s.aiEra.score}` : '';
+    const gap = s.primaryGap ? ` Primary gap: ${s.primaryGap.label} (${s.primaryGap.points}/10).` : '';
+    const strengths = Array.isArray(s.strengths) && s.strengths.length ? ` Strengths: ${s.strengths.map((x: any) => x.label).join(', ')}.` : '';
+    const head = r?.narrative?.headline ? ` ${stripHtml(r.narrative.headline)}` : '';
+    blocks.push(`${s.title}: ${s.scoreName} ${s.overall}/100 (${s.level?.label || ''}). Domains: ${doms}${ai}.${gap}${strengths}${head}`.replace(/\s+/g, ' ').trim());
+  }
+  return blocks.length ? `Clarity Layer results:\n${blocks.join('\n')}` : '';
+}
