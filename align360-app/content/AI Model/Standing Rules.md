@@ -12,7 +12,9 @@ Every output the platform generates, and every surface where Align360 assessment
 
 > © [Year] Align360. All rights reserved. Reproduction or use of these assessments without written permission is prohibited.
 
-**Where it must appear:**
+**The conversational AI must NEVER print this notice in a chat reply** (not at the top, not at the bottom, not anywhere). The platform already renders it persistently in the UI footer, and standalone deliverables carry it themselves. Reproducing it inside a normal chat message is incorrect and intrusive. It is handled entirely by the platform and document templates, never by the chat assistant.
+
+**Where it must appear (rendered by the platform / document templates, NOT typed by the chat AI):**
 
 - The platform UI itself (web app, demo, partner embeds) — persistent footer or unobtrusive fixed banner.
 - Any document the AI generates and the user receives (assessment results, profile reports, summaries, exports). Place at the foot of the document or in a standard footer block.
