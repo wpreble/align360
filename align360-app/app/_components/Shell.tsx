@@ -69,7 +69,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   // this, an un-onboarded visitor on /login or /signup gets bounced to
   // /onboarding → middleware sends them back to /login → infinite loop, and the
   // auth pages wrongly render the full app sidebar.
-  const BARE_PREFIXES = ['/login', '/signup', '/auth', '/invite'];
+  const BARE_PREFIXES = ['/login', '/signup', '/auth', '/invite', '/subscribe'];
   const isBare =
     pathname === '/' ||
     pathname === '/onboarding' ||
@@ -79,6 +79,17 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isBare && !isOnboarded()) router.replace('/onboarding');
   }, [isBare, router]);
+
+  // Billing gate: when enforcement is on (BILLING_ENABLED), users without access
+  // (not an internal admin, no active subscription) are sent to /subscribe. Off
+  // by default, so this is a no-op until billing is switched on.
+  useEffect(() => {
+    if (isBare || !supabaseConfigured) return;
+    fetch('/api/access/status')
+      .then((r) => r.json())
+      .then((d) => { if (d?.enforce && !d.access) router.replace('/subscribe'); })
+      .catch(() => {});
+  }, [isBare, pathname, router]);
 
   // Who's signed in (for the account panel + sign out).
   useEffect(() => {
