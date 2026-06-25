@@ -35,6 +35,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const [accountOpen, setAccountOpen] = useState(false);
   const [theme, setTheme] = useState('light');
   const [email, setEmail] = useState<string | null>(null);
+  const [credits, setCredits] = useState<{ remaining: number; granted: number } | null>(null);
   const year = new Date().getFullYear();
 
   const refreshChats = useCallback(() => setChats(getChats()), []);
@@ -83,6 +84,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!supabaseConfigured) return;
     createClient().auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null)).catch(() => {});
+    fetch('/api/credits/status').then((r) => r.json()).then((d) => { if (d?.available) setCredits({ remaining: d.remaining, granted: d.granted }); }).catch(() => {});
   }, []);
 
   const signOut = async () => {
@@ -193,6 +195,9 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             <div className="acct-section-label">Account</div>
             {email ? (
               <div className="acct-item" style={{ cursor: 'default' }}><span>Signed in as</span><span className="acct-val">{email}</span></div>
+            ) : null}
+            {credits ? (
+              <div className="acct-item" style={{ cursor: 'default' }}><span>Credits this month</span><span className="acct-val">{credits.remaining} / {credits.granted}</span></div>
             ) : null}
             <button className="acct-item" disabled><span>Plan &amp; billing</span><span className="acct-soon">Soon</span></button>
             {email ? (

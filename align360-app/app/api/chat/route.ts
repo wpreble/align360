@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildSystemPrompt } from '@/lib/system-prompt';
 import { resolveModel, makeClient, genParams } from '@/lib/ai';
+import { creditPrecheck, meterUsage } from '@/lib/credit-metering';
 
 export const runtime = 'nodejs';
 
@@ -29,6 +30,11 @@ export async function POST(req: NextRequest) {
   const messages = Array.isArray(body.messages) ? body.messages : [];
   if (messages.length === 0) {
     return NextResponse.json({ error: 'messages array is required.' }, { status: 400 });
+  }
+
+  const pre = await creditPrecheck();
+  if (!pre.ok) {
+    return NextResponse.json({ error: 'out_of_credits', message: 'You are out of credits this month. Top up to keep chatting.' }, { status: 402 });
   }
 
   let systemPrompt = buildSystemPrompt();
@@ -71,6 +77,9 @@ export async function POST(req: NextRequest) {
       }
     }
     const text = completion.choices[0]?.message?.content ?? '';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const u = (completion as any).usage;
+    await meterUsage('chat', model, u?.prompt_tokens ?? 0, u?.completion_tokens ?? 0);
     return NextResponse.json({ text });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';

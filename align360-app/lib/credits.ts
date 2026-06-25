@@ -10,7 +10,11 @@
 export const USD_PER_CREDIT = 0.01;
 
 /** Target ceiling for AI spend as a share of plan revenue (guardrail). */
-export const AI_BUDGET_SHARE = 0.15; // 15%
+export const AI_BUDGET_SHARE = 0.12; // 12% (Will, 2026-06-25)
+
+/** Top-up / add-on credits are sold at a markup over their true cost. */
+export const CREDIT_MARKUP = 3; // 3x cost → ~$0.03 per credit
+export const USD_PER_CREDIT_SELL = 0.01 * CREDIT_MARKUP;
 
 /**
  * Provider rates, USD per 1,000,000 tokens. Source: OpenAI developer-docs pricing,
@@ -24,11 +28,23 @@ export const MODEL_RATES: Record<string, { input: number; output: number; cached
   'gpt-5': { input: 1.25, output: 10.0, cachedInput: 0.125 },
   'gpt-5-mini': { input: 0.25, output: 2.0, cachedInput: 0.025 },
   'gpt-5-nano': { input: 0.05, output: 0.4, cachedInput: 0.005 },
+  // GLM 5.2 via OpenRouter (measured 2026-06-24): ~$1.40/M in, ~$4.40/M out.
+  'z-ai/glm-5.2': { input: 1.4, output: 4.4 },
   default: { input: 5.0, output: 30.0 }, // app default OPENAI_MODEL is gpt-5.5
 };
 
+/** Look up a rate by exact id, then by vendor/model prefix (handles versioned
+ *  ids like "z-ai/glm-5.2-20260616"), falling back to the conservative default. */
+export function rateFor(model: string): { input: number; output: number; cachedInput?: number } {
+  if (MODEL_RATES[model]) return MODEL_RATES[model];
+  for (const key of Object.keys(MODEL_RATES)) {
+    if (key !== 'default' && model.startsWith(key)) return MODEL_RATES[key];
+  }
+  return MODEL_RATES.default;
+}
+
 export function costUsd(model: string, inputTokens: number, outputTokens: number): number {
-  const r = MODEL_RATES[model] ?? MODEL_RATES.default;
+  const r = rateFor(model);
   return (inputTokens / 1e6) * r.input + (outputTokens / 1e6) * r.output;
 }
 
@@ -44,4 +60,24 @@ export function creditsFor(model: string, inputTokens: number, outputTokens: num
 export function monthlyCreditsForPlan(priceCents: number, share = AI_BUDGET_SHARE): number {
   const aiBudgetUsd = (priceCents / 100) * share;
   return Math.round(usdToCredits(aiBudgetUsd));
+}
+
+/** Per-plan monthly allowance (credits). Individual $49, org seat $19, at 12%. */
+export const PLAN_ALLOWANCE = {
+  individual: monthlyCreditsForPlan(4900), // 588
+  org_seat: monthlyCreditsForPlan(1900),   // 228
+} as const;
+
+/** Alpha: signups are free but still metered. Everyone gets the individual
+ *  allowance so usage data is real and the hard-stop can be exercised. */
+export const ALPHA_FREE_ALLOWANCE = PLAN_ALLOWANCE.individual;
+
+/** Price (in cents) to sell `credits` as a top-up / add-on pack (markup applied). */
+export function topupPriceCents(credits: number): number {
+  return Math.round(credits * USD_PER_CREDIT_SELL * 100);
+}
+
+/** Credits granted for a top-up of `priceCents` (inverse of topupPriceCents). */
+export function creditsForTopup(priceCents: number): number {
+  return Math.round((priceCents / 100) / USD_PER_CREDIT_SELL);
 }

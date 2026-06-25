@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildSystemPrompt } from '@/lib/system-prompt';
 import { resolveModel, makeClient, genParams, parseJsonLoose } from '@/lib/ai';
+import { creditPrecheck, meterUsage } from '@/lib/credit-metering';
 import { getAssessment } from '@/lib/assessments';
 import { computeScores, type AnswerSet } from '@/lib/scoring';
 import { PROFILE_SCHEMA_A, PROFILE_SCHEMA_B, fallbackProfile, type Profile } from '@/lib/profile';
@@ -85,6 +86,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ scores, profile: fallbackProfile(scores, name), generated: false });
   }
 
+  const pre = await creditPrecheck();
+  if (!pre.ok) return NextResponse.json({ error: 'out_of_credits', message: 'You are out of credits this month. Top up to generate more reports.' }, { status: 402 });
+  let mInTok = 0, mOutTok = 0;
+
   const summary = [
     `Participant first name: ${name}`,
     `WIRING — primary ${scores.wiring.primary}, secondary ${scores.wiring.secondary}. Ranked: ${scores.wiring.ranked.map((t) => `${t.tag} ${t.pct}%`).join(', ')}.`,
@@ -114,6 +119,8 @@ export async function POST(req: NextRequest) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
     const text = c.choices[0]?.message?.content || '';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cu = (c as any).usage; mInTok += cu?.prompt_tokens ?? 0; mOutTok += cu?.completion_tokens ?? 0;
     return { parsed: parseJsonLoose<Partial<Profile>>(text), finish: c.choices[0]?.finish_reason, len: text.length };
   };
   // One retry when the model returns unparseable/empty JSON (GLM does this
@@ -136,6 +143,7 @@ export async function POST(req: NextRequest) {
     const debug = req.nextUrl.searchParams.has('debug')
       ? { finishA: a.finish, finishB: b.finish, lenA: a.len, lenB: b.len, keysA: Object.keys(a.parsed), keysB: Object.keys(b.parsed) }
       : undefined;
+    await meterUsage('profile', model, mInTok, mOutTok);
     return NextResponse.json({ scores, profile, generated: ok, debug });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'generation failed';

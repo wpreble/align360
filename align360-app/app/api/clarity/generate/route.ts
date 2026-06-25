@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildSystemPrompt } from '@/lib/system-prompt';
 import { resolveModel, makeClient, genParams, parseJsonLoose } from '@/lib/ai';
+import { creditPrecheck, meterUsage } from '@/lib/credit-metering';
 import { getAssessment } from '@/lib/assessments';
 import { computeClarityScores, isClaritySlug, type ClarityScores } from '@/lib/clarity-scoring';
 import { claritySchema, fallbackClarityNarrative, type ClarityNarrative, type ClarityNote } from '@/lib/clarity';
@@ -138,6 +139,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ scores, narrative: fallbackClarityNarrative(scores, name), generated: false });
   }
 
+  const pre = await creditPrecheck();
+  if (!pre.ok) return NextResponse.json({ error: 'out_of_credits', message: 'You are out of credits this month. Top up to generate more reports.' }, { status: 402 });
+  let mInTok = 0, mOutTok = 0;
+
   const summary = [
     `Participant first name: ${name}`,
     `Assessment: ${scores.title}. ${scores.scoreName}: ${scores.overall}/100 (level: ${scores.level.label}).`,
@@ -167,6 +172,8 @@ export async function POST(req: NextRequest) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
     const text = c.choices[0]?.message?.content || '';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cu = (c as any).usage; mInTok += cu?.prompt_tokens ?? 0; mOutTok += cu?.completion_tokens ?? 0;
     return { parsed: parseJsonLoose<Partial<ClarityNarrative>>(text), finish: c.choices[0]?.finish_reason, len: text.length };
   };
 
@@ -183,6 +190,7 @@ export async function POST(req: NextRequest) {
     const debug = req.nextUrl.searchParams.has('debug')
       ? { finish: r.finish, len: r.len, keys: Object.keys(parsed) }
       : undefined;
+    await meterUsage('clarity', model, mInTok, mOutTok);
     return NextResponse.json({ scores, narrative, generated: ok, debug });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'generation failed';
