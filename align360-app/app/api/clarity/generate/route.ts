@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
   const genOnce = async () => {
     const c = await client.chat.completions.create({
       model,
-      ...genParams(useOpenRouter, { maxTokens: 9000, json: true, reasoning: 'low' }),
+      ...genParams(useOpenRouter, { maxTokens: 9000, json: true, reasoning: 'off' }),
       messages: [
         { role: 'system', content: sys },
         {
@@ -180,9 +180,9 @@ export async function POST(req: NextRequest) {
   try {
     // One retry when the model returns unparseable/empty/thin JSON (intermittent on GLM).
     let r = await genOnce();
-    if (!r.parsed || Object.keys(r.parsed).length < 2) {
+    if (!r.parsed || Object.keys(r.parsed).length === 0) {
       const retry = await genOnce();
-      if (retry.parsed && Object.keys(retry.parsed).length >= Object.keys(r.parsed || {}).length) r = retry;
+      if (retry.parsed && Object.keys(retry.parsed).length > 0) r = retry;
     }
     const parsed = r.parsed || {};
     const narrative = deepStripDashes(mergeNarrative(fallbackClarityNarrative(scores, name), parsed, scores));

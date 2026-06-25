@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
   const genOnce = async (schema: string) => {
     const c = await client.chat.completions.create({
       model,
-      ...genParams(useOpenRouter, { maxTokens: 9000, json: true, reasoning: 'low' }),
+      ...genParams(useOpenRouter, { maxTokens: 9000, json: true, reasoning: 'off' }),
       messages: [
         { role: 'system', content: sys },
         { role: 'user', content: `You are generating part of a combined Align360 identity profile ("Combined in an AI-Era" format). Return ONLY a single valid JSON object, no markdown fences or prose. Participant assessment data:\n\n${summary}\n\n${schema}` },
@@ -127,11 +127,12 @@ export async function POST(req: NextRequest) {
   // intermittently); a malformed half otherwise silently drops to fallback.
   const gen = async (schema: string) => {
     let r = await genOnce(schema);
-    // Retry on empty/unparseable OR a suspiciously thin half (GLM sometimes
-    // returns just one key); a thin half otherwise leaves sections on fallback.
-    if (!r.parsed || Object.keys(r.parsed).length < 2) {
+    // Retry only on empty/unparseable JSON (the real failure mode). A thin-but-
+    // valid half degrades to the deterministic fallback rather than paying for a
+    // second 40-70s GLM call, keeping generation fast.
+    if (!r.parsed || Object.keys(r.parsed).length === 0) {
       const retry = await genOnce(schema);
-      if (retry.parsed && Object.keys(retry.parsed).length >= Object.keys(r.parsed || {}).length) r = retry;
+      if (retry.parsed && Object.keys(retry.parsed).length > 0) r = retry;
     }
     return { parsed: r.parsed || {}, finish: r.finish, len: r.len };
   };

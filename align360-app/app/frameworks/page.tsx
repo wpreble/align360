@@ -94,37 +94,32 @@ export default function FrameworksPage() {
             <span className="fwk-name">{f.name}</span>
             <span className={`fwk-status ${f.status}`}>{f.status === 'live' ? 'Live' : 'Coming soon'}</span>
           </div>
-          <p className="fwk-blurb">{f.blurb}</p>
-          <div className="fwk-tools">
-            {f.tools.map((t) => {
-              if (f.status === 'soon') {
-                return (
-                  <span className="fwk-tool locked" key={t.name}>
-                    <span className="fwk-dot" />
-                    <span className="fwk-tool-name">{t.name}</span>
-                    <span className="fwk-lock" aria-hidden>🔒</span>
-                  </span>
-                );
-              }
-              if (t.slug) {
-                const completed = done[t.slug];
-                return (
-                  <Link key={t.name} href={completed ? '/insights/profile' : `/assessment/${t.slug}`} className="fwk-tool live">
-                    <span className="fwk-dot" />
-                    <span className="fwk-tool-name">{t.name}</span>
-                    <span className="fwk-go">{completed ? 'View result →' : 'Start →'}</span>
-                  </Link>
-                );
-              }
-              return (
-                <Link key={t.name} href={`/chat?run=${encodeURIComponent(t.name)}`} className="fwk-tool live">
-                  <span className="fwk-dot" />
-                  <span className="fwk-tool-name">{t.name}</span>
-                  <span className="fwk-go">Run →</span>
-                </Link>
-              );
-            })}
-          </div>
+          {f.status === 'live' && (
+            <>
+              <p className="fwk-blurb">{f.blurb}</p>
+              <div className="fwk-tools">
+                {f.tools.map((t) => {
+                  if (t.slug) {
+                    const completed = done[t.slug];
+                    return (
+                      <Link key={t.name} href={completed ? '/insights/profile' : `/assessment/${t.slug}`} className="fwk-tool live">
+                        <span className="fwk-dot" />
+                        <span className="fwk-tool-name">{t.name}</span>
+                        <span className="fwk-go">{completed ? 'View result →' : 'Start →'}</span>
+                      </Link>
+                    );
+                  }
+                  return (
+                    <Link key={t.name} href={`/chat?run=${encodeURIComponent(t.name)}`} className="fwk-tool live">
+                      <span className="fwk-dot" />
+                      <span className="fwk-tool-name">{t.name}</span>
+                      <span className="fwk-go">Run →</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </section>
       ))}
     </div>

@@ -35,7 +35,7 @@ export default function Landing() {
         <div className="lp-hero-grain" aria-hidden="true" />
         <div className="wrap">
           <div className="lp-hero-mark"><AlignMark /></div>
-          <div className="lp-index" aria-hidden="true"><span className="lp-idot" />01 · ignition</div>
+          <div className="lp-index" aria-hidden="true"><span className="lp-idot" />ignition</div>
           <h1 className="lp-h1"><span className="lp-l1">Put out the fires.</span><br /><em className="lp-l2">Then become one.<span className="lp-ember" aria-hidden="true" /></em></h1>
           <p className="lp-sub">Align360 solves what&apos;s urgent, then builds the clarity to ignite everything else. One system that actually knows how you&apos;re wired.</p>
           <div className="lp-hero-cta">
