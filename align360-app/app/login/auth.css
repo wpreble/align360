@@ -190,4 +190,9 @@
   .auth-brand-mobile { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 1.75rem; }
   .auth-brand-mobile .align-mark { height: 28px; }
   .auth-wordmark.dark { color: var(--text-primary); }
+  /* Dynamic viewport so the submit button + switch link clear mobile chrome;
+     the column grows and .auth-main scrolls instead of clipping. */
+  .auth-page { height: auto; min-height: 100vh; min-height: 100dvh; }
+  .auth-card { padding: 1.75rem 1.35rem; border-radius: 14px; }
+  .auth-title { font-size: clamp(24px, 6.5vw, 30px); }
 }

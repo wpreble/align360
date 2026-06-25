@@ -475,10 +475,11 @@ a { color:inherit; text-decoration:none; }
 .synth-lead { font-family:var(--font-read); font-size:19px; color:var(--text-primary); line-height:1.6; margin-bottom:14px; }
 .synth-body { font-family:var(--font-read); font-size:15.5px; color:var(--text-secondary); line-height:1.7; }
 .synth-lead strong, .synth-body strong { color:var(--accent); font-weight:600; }
-.pg-card { background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px 24px; margin-bottom:26px; }
-.pg-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); margin-bottom:6px; }
-.pg-name { font-family:var(--font-display); font-size:28px; font-weight:600; color:var(--accent); margin-bottom:10px; }
-.pg-note { font-family:var(--font-read); font-size:14px; color:var(--text-secondary); line-height:1.6; }
+.pg-card { text-align:center; background:linear-gradient(160deg,var(--fig-wash),var(--bg-surface)); border:1.5px solid var(--fig-soft); border-radius:var(--radius-lg); padding:40px 34px; margin:10px auto 30px; max-width:580px; box-shadow:0 26px 64px -36px rgba(78,2,48,.55); }
+[data-theme='dark'] .pg-card { background:linear-gradient(160deg,rgba(185,143,168,.14),var(--bg-surface)); border-color:rgba(185,143,168,.34); box-shadow:0 26px 64px -36px rgba(0,0,0,.6); }
+.pg-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.16em; color:var(--accent); margin-bottom:10px; }
+.pg-name { font-family:var(--font-display); font-size:46px; font-weight:600; color:var(--accent); line-height:1.05; margin-bottom:14px; }
+.pg-note { font-family:var(--font-read); font-size:14.5px; color:var(--text-secondary); line-height:1.6; max-width:420px; margin:0 auto; }
 .pg-note strong { color:var(--text-primary); font-weight:600; }
 @media (max-width:640px) {
   .ob-header { padding:18px 18px 0; }
@@ -487,6 +488,9 @@ a { color:inherit; text-decoration:none; }
   .ob-options, .ob-options.compact { grid-template-columns:repeat(2,1fr); gap:10px; }
   .ob-btn { flex:1; justify-content:center; }
   .ob-actions { width:100%; }
+  .synth-lead { font-size:17px; }
+  .pg-card { padding:30px 22px; }
+  .pg-name { font-size:34px; }
 }
 
 /* ═══════════════════════════════════════════════
@@ -530,3 +534,74 @@ a { color:inherit; text-decoration:none; }
 .sidebar-nav-item, .tool-item, .nav-tab { border-radius:var(--radius-md); }
 .input-inner { border-radius:14px; }
 .chip { border-radius:var(--radius-md); }
+
+/* ═══ Mobile polish pass (audited 2026-06-25). Additive overrides; later in the
+   file so they win at equal specificity. Targets phones <=414px. ═══ */
+
+/* Dynamic viewport so the bottom-anchored chat composer is not hidden behind
+   mobile browser chrome / the on-screen keyboard (100vh stays as fallback). */
+.app-layout { height:100dvh; }
+
+/* AI markdown tables + long tokens must not force horizontal page scroll. */
+.bubble { overflow-wrap:anywhere; }
+.bubble.ai.md code { overflow-wrap:anywhere; word-break:break-word; }
+.bubble.ai.md table { display:block; width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.bubble.ai.md th, .bubble.ai.md td { white-space:nowrap; }
+
+/* Insights hub — had no phone breakpoint. */
+@media (max-width:520px) {
+  .ins-page { padding:28px 16px 64px; }
+  .ins-intro h1 { font-size:30px; }
+  .ins-intro p { font-size:15px; }
+  .ins-hero { flex-direction:column; align-items:flex-start; gap:18px; padding:22px 18px; }
+  .ins-hero-main { min-width:0; }
+  .ins-hero-name { font-size:24px; }
+  .ins-btn.primary { width:100%; justify-content:center; }
+  .ins-card-actions { gap:8px; }
+  .ins-link.go, .ins-retake { display:inline-flex; align-items:center; min-height:40px; padding:0 6px; }
+}
+
+/* Frameworks + Resources — had no phone breakpoint. */
+@media (max-width:560px) {
+  .fwk-page { padding:32px 16px 72px; }
+  .fwk-intro h1 { font-size:32px; }
+  .fwk-intro p { font-size:16px; }
+  .fwk-family { padding:20px 18px; }
+  .fwk-name { font-size:22px; }
+  .fwk-tools { grid-template-columns:1fr; }
+  .fwk-tool { flex-wrap:wrap; }
+  .fwk-tool-name { flex:1 1 100%; }
+  .lib-page { padding:32px 16px 72px; }
+  .lib-intro h1 { font-size:32px; }
+  .lib-intro p { font-size:16px; }
+  .lib-section-head h2 { font-size:22px; }
+  .lib-grid { grid-template-columns:1fr; gap:14px; }
+}
+
+/* Drawer + account modal + composer: real tap targets, scrollable modal,
+   touch-visible delete, no dead collapse control. */
+@media (max-width:900px) {
+  .app-layout { height:100dvh; }
+  .mobile-bar .icon-btn { width:44px; height:44px; }
+  .collapse-left { display:none; }
+  .sidebar { width:min(280px, 86vw); }
+  .ch-del { opacity:1; padding:8px 12px; }
+  .ch-new { width:40px; height:40px; font-size:20px; }
+  .ch-toggle-btn { padding:10px 0; }
+  .ch-item-link { padding:11px 12px; font-size:14px; }
+  .foot-controls .icon-btn { width:40px; height:40px; }
+  .acct-modal { max-height:calc(100dvh - 28px); overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .acct-scrim { padding:14px; align-items:flex-start; }
+  .acct-x { width:40px; height:40px; }
+  .acct-field input { font-size:16px; }
+  .composer-btn, .send-btn { width:40px; height:40px; }
+  .composer-btn svg { width:21px; height:21px; }
+  .char-count { display:none; }
+}
+
+/* Onboarding: comfier option + Back/Skip tap targets (the option list is
+   already 1-per-row on mobile; the grid rule only affects compact chips). */
+@media (max-width:640px) {
+  .ob-option { padding:15px 38px 15px 15px; min-height:58px; font-size:15px; }
+  .ob-btn-ghost { padding:13px 20px; min-height:44px; font-size:14px; }
+}

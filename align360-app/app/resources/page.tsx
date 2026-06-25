@@ -20,26 +20,12 @@ type Section = { title: string; sub?: string; items: Item[] };
 
 const SECTIONS: Section[] = [
   {
-    title: 'Watch',
-    sub: 'Short videos to get the most from Align360.',
+    title: 'Guides',
+    sub: 'Short overviews of how Align360 works. Tap a card to open the PDF.',
     items: [
-      { id: 'v1', kind: 'video', soon: true, title: 'Welcome to Align360', desc: 'A 3-minute orientation to how the system works.', meta: '3 min' },
-      { id: 'v2', kind: 'video', soon: true, title: 'Reading Your Profile', desc: 'Make sense of your combined identity document.', meta: '5 min' },
-      { id: 'v3', kind: 'video', soon: true, title: 'The Nine Gifts', desc: 'A tour of the wiring gifts and what they mean.', meta: '8 min' },
-      { id: 'v4', kind: 'video', soon: true, title: 'Aligning for the AI Era', desc: 'Positioning your edge as the market shifts.', meta: '6 min' },
-    ],
-  },
-  {
-    title: 'Guides & Docs',
-    sub: 'Read at your own pace.',
-    items: [
-      { id: 'g0', kind: 'guide', href: '/resources/align360-quick-orientation.pdf', title: 'Align360 at a Glance', desc: 'What Align360 is, how it works, and what we promise — on one page.', meta: 'PDF · 1 page' },
-      { id: 'g5', kind: 'guide', href: '/resources/align360-designsuite-overview.pdf', title: 'DesignSuite Overview', desc: 'The three core assessments, the nine gifts, and the five orientations.', meta: 'PDF · 1 page' },
-      { id: 'g6', kind: 'guide', href: '/resources/align360-career-navigator-overview.pdf', title: 'Career Navigator Overview', desc: 'Eight tools for aligned work, powered by your wiring.', meta: 'PDF · 1 page' },
-      { id: 'g1', kind: 'guide', soon: true, title: 'The Align360 Field Guide', desc: 'Concepts, language, and how the frameworks connect.', meta: 'PDF' },
-      { id: 'g2', kind: 'guide', soon: true, title: 'True Riches Currency Map', desc: 'The currencies that compound regardless of market.', meta: 'PDF' },
-      { id: 'g3', kind: 'guide', soon: true, title: 'Rejection Gift Workbook', desc: 'Turn a specific setback into a named advantage.', meta: 'Worksheet' },
-      { id: 'g4', kind: 'guide', soon: true, title: 'Career Navigator Playbook', desc: 'A step-by-step for your next move.', meta: 'PDF' },
+      { id: 'g0', kind: 'guide', href: '/resources/align360-quick-orientation.pdf', title: 'Align360 at a Glance', desc: 'What Align360 is, how it works, and what it promises, in a quick orientation.', meta: 'PDF' },
+      { id: 'g5', kind: 'guide', href: '/resources/align360-designsuite-overview.pdf', title: 'DesignSuite Overview', desc: 'The three core assessments, the nine wiring gifts, and the five orientations.', meta: 'PDF' },
+      { id: 'g6', kind: 'guide', href: '/resources/align360-career-navigator-overview.pdf', title: 'Career Navigator Overview', desc: 'The tools for aligned work, powered by how you are wired.', meta: 'PDF' },
     ],
   },
 ];
@@ -102,7 +88,7 @@ export default function ResourcesPage() {
     <div className="lib-page">
       <div className="lib-intro">
         <h1>Resources</h1>
-        <p>Videos and guides to go deeper. Tap any card to begin.</p>
+        <p>Guides to go deeper. Tap any card to open it.</p>
       </div>
 
       {SECTIONS.map((sec) => (

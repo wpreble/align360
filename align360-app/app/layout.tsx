@@ -1,10 +1,19 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Shell from './_components/Shell';
 
 export const metadata: Metadata = {
   title: 'Align360',
   description: 'Discover how you are wired, navigate your path, and grow with clarity. Powered by Align360.',
+};
+
+// interactiveWidget:'resizes-content' makes the layout shrink above the mobile
+// keyboard so the chat composer / form buttons stay visible (pairs with 100dvh).
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  interactiveWidget: 'resizes-content',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

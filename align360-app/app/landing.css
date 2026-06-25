@@ -215,3 +215,24 @@
 @keyframes lpDot{0%,100%{opacity:.4;transform:scale(.82)}50%{opacity:1;transform:scale(1.15)}}
 @keyframes lpSparkL{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(-9px,-22px) scale(.3)}}
 @keyframes lpSparkR{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(11px,-22px) scale(.3)}}
+
+/* ═══ Mobile polish (audited 2026-06-25). Phones <=560px. ═══ */
+@media (max-width:560px){
+  .lp .wrap{padding:0 18px}
+  .lp-section{padding:4rem 0}
+  .lp-hero{padding:4.5rem 0 3.5rem}
+  .lp-final{padding:4.5rem 0 5rem}
+  .lp-compare-row{grid-template-columns:1fr}
+  .lp-compare-cell.them{border-right:none;border-bottom:1px solid var(--sec-border)}
+  .lp-compare-cell{padding:.9rem 1.1rem;font-size:14.5px}
+  .lp-step{padding:1.75rem 1.5rem}
+  .lp-pillar{padding:1.75rem 1.5rem}
+  .lp-frame{padding:1.75rem 1.5rem}
+  .lp-founder{padding:1.75rem 1.25rem}
+  .lp-stats{gap:1.1rem}
+  .lp-founder-badge{width:92px;height:92px}
+  .lp-founder-badge .align-mark-img{height:42px}
+  .lp-foot{padding:1.75rem 0}
+  .lp-foot .wrap{gap:10px}
+  .lp-foot-copy{margin-left:0;flex-basis:100%}
+}
