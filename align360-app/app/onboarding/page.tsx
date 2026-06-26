@@ -119,7 +119,7 @@ function Summary({ answers, onEnter, onBack }: { answers: Answers; onEnter: () =
   return (
     <>
       <div className="ob-eyebrow">Your first read</div>
-      <h1 className="ob-question">Here&apos;s what I&apos;m sensing, {synth.name}.</h1>
+      <h1 className="ob-question">Here&apos;s what I&apos;m sensing, {synth.name ? synth.name.charAt(0).toUpperCase() + synth.name.slice(1) : 'friend'}.</h1>
 
       <div className="synth-block">
         <p className="synth-lead">
