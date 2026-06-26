@@ -20,12 +20,13 @@ export async function GET() {
 
     if (isAdminEmail(user.email)) return NextResponse.json({ enforce, access: true, admin: true, plan: 'admin' });
 
-    const { data: sub } = await supabase
+    // Array (not maybeSingle): a user can have more than one subscription row
+    // (e.g. re-subscribe after cancel), and maybeSingle throws on >1 row.
+    const { data: subs } = await supabase
       .from('subscriptions')
       .select('status')
-      .eq('owner_type', 'user').eq('owner_id', user.id)
-      .maybeSingle();
-    let access = !!sub && ACTIVE.includes(sub.status);
+      .eq('owner_type', 'user').eq('owner_id', user.id);
+    let access = (subs || []).some((s) => ACTIVE.includes(s.status));
     let plan = access ? 'individual' : 'none';
 
     if (!access) {

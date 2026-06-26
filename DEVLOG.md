@@ -4,6 +4,18 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Fix subscribe loop (subscribed → bounced back to /subscribe) + sign-out redesign (2026-06-25)
+
+- **Subscribe loop**: access was gated on a local `subscriptions` row that only the Stripe webhook writes, so a completed checkout whose webhook had not landed (or was unconfigured) left the user bounced back to `/subscribe`. Made activation authoritative:
+  - **`app/api/stripe/sync/route.ts`** (new): for the signed-in user, looks up their Stripe customer (written synchronously at checkout) and pulls live subscriptions directly from Stripe, upserting them into `subscriptions`. Returns the resulting access. No webhook dependency.
+  - **Subscribe page**: on load, calls `/api/stripe/sync` first (then `/api/access/status`); redirects into the app if access is granted, with a brief "Checking your account" state so subscribers never see the paywall flash. This self-heals an already-stuck subscription.
+  - **Shell billing gate**: before redirecting to `/subscribe`, reconciles via `/api/stripe/sync` and only paywalls if still no access — so the post-checkout redirect lands in the app instead of bouncing.
+  - **`access/status`**: switched the user-subscription lookup from `.maybeSingle()` (throws on >1 row) to an array + `some(active)`, robust to re-subscribes.
+  - The webhook stays as the source of truth for ongoing status changes.
+- **Sign-out UX**: moved sign-out out of the buried middle-of-list row into a distinct, icon-labeled button in the account-menu footer next to Done (danger-tinted on hover); shows "Sign in" when signed out. New `.acct-foot` / `.acct-signout` styles.
+
+---
+
 ## Credit top-ups — buy more credits in test mode (2026-06-25)
 
 Built the "buy credits" purchase flow (was missing — only subscription checkout existed). One-time Stripe `payment` checkout → webhook grants credits to a persistent pool that does NOT reset with the monthly allowance.

@@ -10,9 +10,24 @@ export default function SubscribePage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
 
-  // If the user already has access (admin or active sub), don't show the paywall.
+  const [checking, setChecking] = useState(true);
+
+  // If the user already has access, skip the paywall. First reconcile with Stripe
+  // (covers a just-completed checkout whose webhook has not landed yet), then
+  // fall back to the plain access check.
   useEffect(() => {
-    fetch('/api/access/status').then((r) => r.json()).then((d) => { if (d?.access) router.replace('/insights'); }).catch(() => {});
+    let cancelled = false;
+    (async () => {
+      try {
+        const s = await fetch('/api/stripe/sync', { method: 'POST' }).then((r) => r.json()).catch(() => null);
+        if (!cancelled && s?.access) { router.replace('/insights'); return; }
+        const d = await fetch('/api/access/status').then((r) => r.json()).catch(() => null);
+        if (!cancelled && d?.access) { router.replace('/insights'); return; }
+      } finally {
+        if (!cancelled) setChecking(false);
+      }
+    })();
+    return () => { cancelled = true; };
   }, [router]);
 
   async function subscribe() {
@@ -36,6 +51,17 @@ export default function SubscribePage() {
   async function signOut() {
     try { if (supabaseConfigured) await createClient().auth.signOut(); } catch {}
     window.location.href = '/login';
+  }
+
+  if (checking) {
+    return (
+      <div className="sub-page">
+        <div className="sub-card" style={{ textAlign: 'center' }}>
+          <div className="sub-eyebrow">Align360</div>
+          <p className="sub-sub" style={{ marginTop: 18 }}>Checking your account&hellip;</p>
+        </div>
+      </div>
+    );
   }
 
   return (

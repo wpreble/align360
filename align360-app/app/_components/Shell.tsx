@@ -113,10 +113,19 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   // by default, so this is a no-op until billing is switched on.
   useEffect(() => {
     if (isBare || !supabaseConfigured) return;
-    fetch('/api/access/status')
-      .then((r) => r.json())
-      .then((d) => { if (d?.enforce && !d.access) router.replace('/subscribe'); })
-      .catch(() => {});
+    let cancelled = false;
+    (async () => {
+      try {
+        const d = await fetch('/api/access/status').then((r) => r.json());
+        if (cancelled || !d?.enforce || d.access) return;
+        // Self-heal before paywalling: reconcile subscription state straight from
+        // Stripe (covers a just-completed checkout whose webhook has not landed).
+        const s = await fetch('/api/stripe/sync', { method: 'POST' }).then((r) => r.json()).catch(() => null);
+        if (cancelled || s?.access) return;
+        router.replace('/subscribe');
+      } catch { /* fail open */ }
+    })();
+    return () => { cancelled = true; };
   }, [isBare, pathname, router]);
 
   // Who's signed in (for the account panel + sign out).
@@ -293,11 +302,6 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             ) : (
               <button className="acct-item" disabled><span>Plan &amp; billing</span><span className="acct-soon">Soon</span></button>
             )}
-            {email ? (
-              <button className="acct-item" onClick={signOut}><span>Sign out</span><span className="acct-val">&rarr;</span></button>
-            ) : (
-              <a className="acct-item" href="/login" style={{ textDecoration: 'none' }}><span>Sign in</span><span className="acct-val">&rarr;</span></a>
-            )}
 
             <div className="acct-section-label">Preferences</div>
             <button className="acct-item" onClick={toggleTheme}><span>Appearance</span><span className="acct-val">{theme === 'dark' ? 'Dark' : 'Light'}</span></button>
@@ -323,7 +327,20 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             </button>
             <div className="acct-note">Your data is saved to your account and syncs across your devices.</div>
 
-            <button className="acct-done" onClick={() => setAccountOpen(false)}>Done</button>
+            <div className="acct-foot">
+              {email ? (
+                <button className="acct-signout" onClick={signOut}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
+                  Sign out
+                </button>
+              ) : (
+                <a className="acct-signout" href="/login">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><path d="M10 17l5-5-5-5" /><path d="M15 12H3" /></svg>
+                  Sign in
+                </a>
+              )}
+              <button className="acct-done" onClick={() => setAccountOpen(false)}>Done</button>
+            </div>
           </div>
         </div>
       )}
