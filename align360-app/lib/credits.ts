@@ -81,3 +81,10 @@ export function topupPriceCents(credits: number): number {
 export function creditsForTopup(priceCents: number): number {
   return Math.round((priceCents / 100) / USD_PER_CREDIT_SELL);
 }
+
+/** Top-up packs offered in the UI (credits). Price derives from topupPriceCents:
+ *  at $0.03/credit that is $15 / $45 / $150. */
+export const CREDIT_PACKS = [500, 1500, 5000] as const;
+export function isValidPack(credits: number): boolean {
+  return (CREDIT_PACKS as readonly number[]).includes(credits);
+}

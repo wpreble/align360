@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getStripe, stripeConfigured } from '@/lib/stripe/client';
 import { createServiceClient } from '@/lib/supabase/server';
+import { ALPHA_FREE_ALLOWANCE } from '@/lib/credits';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -70,7 +71,21 @@ export async function POST(req: Request) {
     case 'checkout.session.completed': {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const s = event.data.object as any;
-      if (s.subscription) await upsertSub(await stripe.subscriptions.retrieve(s.subscription, undefined, acctOpts));
+      if (s.mode === 'payment' && s.metadata?.kind === 'topup' && s.payment_status === 'paid') {
+        // One-time credit top-up → grant to the persistent pool (idempotent via the
+        // stripe_events dedupe above, so this runs once per event).
+        const credits = parseInt(s.metadata.credits || '0', 10);
+        if (credits > 0 && s.metadata.owner_id) {
+          await db.rpc('credit_grant_topup', {
+            p_owner_type: s.metadata.owner_type || 'user',
+            p_owner_id: s.metadata.owner_id,
+            p_credits: credits,
+            p_allowance: ALPHA_FREE_ALLOWANCE,
+          });
+        }
+      } else if (s.subscription) {
+        await upsertSub(await stripe.subscriptions.retrieve(s.subscription, undefined, acctOpts));
+      }
       break;
     }
     default:

@@ -107,6 +107,15 @@ a { color:inherit; text-decoration:none; }
 .acct-item:not(:disabled):hover { background:var(--bg-chip); }
 .acct-item:disabled { opacity:.5; cursor:default; }
 .acct-soon { font-family:var(--font-brand); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); border:1px solid var(--border); border-radius:999px; padding:2px 8px; }
+
+/* Buy-credits pack chooser */
+.acct-packs { display:flex; flex-direction:column; gap:6px; padding:2px 2px 6px; }
+.acct-pack { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--bg-surface); color:var(--text-primary); font-size:14px; transition:border-color .15s, background .15s; }
+.acct-pack:not(:disabled):hover { border-color:var(--accent); background:var(--fig-wash); }
+[data-theme='dark'] .acct-pack:not(:disabled):hover { background:rgba(185,143,168,.1); }
+.acct-pack:disabled { opacity:.55; cursor:default; }
+.acct-pack-p { font-family:var(--font-brand); font-weight:600; color:var(--accent); }
+.acct-pack-note { font-size:11px; color:var(--text-muted); line-height:1.4; padding:2px 2px 0; }
 .acct-val { font-size:13px; color:var(--accent); font-weight:600; }
 .acct-item.danger { color:#B5566A; }
 .acct-item.danger:hover { background:rgba(181,86,106,.08); }

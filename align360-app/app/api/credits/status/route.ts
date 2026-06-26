@@ -22,6 +22,7 @@ export async function GET() {
       granted: row.granted,
       used: row.used,
       remaining: row.remaining,
+      topup: row.topup ?? 0,
       periodEnd: row.period_end,
     });
   } catch {

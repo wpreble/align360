@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getChats, deleteChat, renameChat, getName, setName, isOnboarded, resetAll, STORE_EVENT, type ChatSession } from '@/lib/storage';
 import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import { wipeCloud } from '@/lib/sync';
+import { CREDIT_PACKS, topupPriceCents } from '@/lib/credits';
 import AlignMark from './AlignMark';
 import AccountSync from './AccountSync';
 
@@ -38,8 +39,32 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const [accountOpen, setAccountOpen] = useState(false);
   const [theme, setTheme] = useState('light');
   const [email, setEmail] = useState<string | null>(null);
-  const [credits, setCredits] = useState<{ remaining: number; granted: number } | null>(null);
+  const [credits, setCredits] = useState<{ remaining: number; granted: number; topup: number } | null>(null);
+  const [buyOpen, setBuyOpen] = useState(false);
+  const [buyBusy, setBuyBusy] = useState(false);
   const year = new Date().getFullYear();
+
+  const refreshCredits = useCallback(() => {
+    if (!supabaseConfigured) return;
+    fetch('/api/credits/status')
+      .then((r) => r.json())
+      .then((d) => { if (d?.available) setCredits({ remaining: d.remaining, granted: d.granted, topup: d.topup ?? 0 }); })
+      .catch(() => {});
+  }, []);
+
+  const buyCredits = async (creditAmt: number) => {
+    setBuyBusy(true);
+    try {
+      const r = await fetch('/api/stripe/topup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ credits: creditAmt }) });
+      const d = await r.json();
+      if (d.url) { window.location.href = d.url; return; }
+      window.alert(d.error || 'Could not start checkout. Make sure billing is configured.');
+    } catch {
+      window.alert('Could not start checkout.');
+    } finally {
+      setBuyBusy(false);
+    }
+  };
 
   const refreshChats = useCallback(() => setChats(getChats()), []);
 
@@ -98,8 +123,15 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!supabaseConfigured) return;
     createClient().auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null)).catch(() => {});
-    fetch('/api/credits/status').then((r) => r.json()).then((d) => { if (d?.available) setCredits({ remaining: d.remaining, granted: d.granted }); }).catch(() => {});
-  }, []);
+    refreshCredits();
+    // Returning from a successful top-up checkout: the webhook grants async, so
+    // re-fetch shortly after to reflect the new balance.
+    try {
+      if (new URLSearchParams(window.location.search).get('topup') === 'success') {
+        setTimeout(refreshCredits, 2500);
+      }
+    } catch {}
+  }, [refreshCredits]);
 
   const signOut = async () => {
     try { if (supabaseConfigured) await createClient().auth.signOut(); } catch {}
@@ -236,9 +268,31 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               <div className="acct-item" style={{ cursor: 'default' }}><span>Signed in as</span><span className="acct-val">{email}</span></div>
             ) : null}
             {credits ? (
-              <div className="acct-item" style={{ cursor: 'default' }}><span>Credits this month</span><span className="acct-val">{credits.remaining} / {credits.granted}</span></div>
+              <div className="acct-item" style={{ cursor: 'default' }}>
+                <span>Credits this month</span>
+                <span className="acct-val">{credits.remaining} / {credits.granted}{credits.topup > 0 ? ` (+${credits.topup})` : ''}</span>
+              </div>
             ) : null}
-            <button className="acct-item" disabled><span>Plan &amp; billing</span><span className="acct-soon">Soon</span></button>
+            {email ? (
+              <>
+                <button className="acct-item" onClick={() => setBuyOpen((v) => !v)} aria-expanded={buyOpen}>
+                  <span>Buy credits</span><span className="acct-val">{buyOpen ? '–' : '+'}</span>
+                </button>
+                {buyOpen && (
+                  <div className="acct-packs">
+                    {CREDIT_PACKS.map((c) => (
+                      <button key={c} className="acct-pack" disabled={buyBusy} onClick={() => buyCredits(c)}>
+                        <span className="acct-pack-c">{c.toLocaleString()} credits</span>
+                        <span className="acct-pack-p">${(topupPriceCents(c) / 100).toFixed(0)}</span>
+                      </button>
+                    ))}
+                    <div className="acct-pack-note">Opens Stripe checkout. Credits never expire.</div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <button className="acct-item" disabled><span>Plan &amp; billing</span><span className="acct-soon">Soon</span></button>
+            )}
             {email ? (
               <button className="acct-item" onClick={signOut}><span>Sign out</span><span className="acct-val">&rarr;</span></button>
             ) : (

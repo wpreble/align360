@@ -4,6 +4,19 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Credit top-ups — buy more credits in test mode (2026-06-25)
+
+Built the "buy credits" purchase flow (was missing — only subscription checkout existed). One-time Stripe `payment` checkout → webhook grants credits to a persistent pool that does NOT reset with the monthly allowance.
+
+- **`supabase/migrations/0008_topups.sql`** (new, MUST be applied in the Supabase SQL editor, after 0003 + 0007): adds `credit_balances.credits_topup`; rewrites `credit_status` (remaining = monthly-left + top-up pool; returns `topup`; must drop/recreate since the return shape changed) and `credit_charge` (consumes the monthly allowance first, overflow draws down the top-up pool; the monthly reset preserves the pool); adds `credit_grant_topup(owner_type, owner_id, credits, allowance)` (SECURITY DEFINER, granted to service_role) called by the webhook.
+- **`lib/credits.ts`**: `CREDIT_PACKS = [500, 1500, 5000]` (at $0.03/credit → $15/$45/$150) + `isValidPack`.
+- **`app/api/stripe/topup/route.ts`** (new): auth'd `payment`-mode checkout with inline `price_data`, reuses/creates the Stripe customer, metadata `{kind:'topup', owner_id, credits}`, success/cancel back to `/chat?topup=…`.
+- **`app/api/stripe/webhook/route.ts`**: `checkout.session.completed` now branches — a paid `topup` session calls `credit_grant_topup`; otherwise the existing subscription path. Idempotent via the `stripe_events` dedupe.
+- **`app/api/credits/status/route.ts`**: returns `topup`. **Shell** account menu: "Buy credits" (signed-in only) expands a pack chooser → posts to the top-up route → redirects to Stripe; the monthly-credits row shows `(+N)` for the pool; balance re-fetches on `?topup=success`.
+- Verified: tsc + production build pass; account modal renders cleanly (Buy credits is correctly hidden when signed-out). **Manual steps to make it live-functional:** apply 0007 + 0008 in Supabase; ensure Stripe **test** keys + a webhook sending `checkout.session.completed` (+ `STRIPE_WEBHOOK_SECRET`) are set in Vercel. Full purchase flow is user-tested on the deployed app (Stripe + auth can't run in the local headless preview).
+
+---
+
 ## Chat polish — AI avatar, copy button, table overflow, mid-generation chat switch, themed loader (2026-06-25)
 
 - **AI message layout** (`app/chat/page.tsx`): assistant messages now render as a row of [Align360 logo avatar] + [bubble + actions]. The typing indicator gets the same avatar. New `.msg-row.ai` / `.msg-avatar` / `.msg-col` / `.msg-actions` styles in `globals.css`. The avatar reuses `<AlignMark/>` (fig on light, white on dark).
