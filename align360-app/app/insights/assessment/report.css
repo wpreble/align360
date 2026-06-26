@@ -42,12 +42,12 @@
 .report-noise { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .5;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); }
 
-/* floating controls */
-.report .rep-back { position: fixed; top: 16px; left: 16px; z-index: 30; display: inline-flex; align-items: center; gap: 6px;
-  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--ivory-dim);
-  background: rgba(10,10,16,.6); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px; transition: border-color .2s, color .2s; }
-.report .rep-back:hover { color: var(--accent-bright); border-color: var(--border-mid); }
-.report .rep-toolbar { position: fixed; top: 16px; right: 16px; z-index: 30; display: flex; gap: 8px; align-items: center; }
+/* Report header bar: sticky, spans the report (clear of the app sidebar). Back
+   on the LEFT (conventional), actions on the RIGHT. Transparent so content
+   scrolls under it; only the pill controls capture clicks. */
+.report .rep-bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; pointer-events: none; }
+.report .rep-bar > *, .report .rep-bar .rep-btn { pointer-events: auto; }
+.report .rep-bar-actions { display: flex; gap: 8px; align-items: center; }
 .report .rep-flag { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: .1em; color: var(--gold-dim); font-style: italic; }
 .report .rep-btn { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ivory-dim);
   background: rgba(10,10,16,.6); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px; transition: border-color .2s, color .2s; }
@@ -342,6 +342,6 @@
 }
 @media print {
   .report .reveal { opacity: 1 !important; transform: none !important; }
-  .report .rep-back, .report .rep-toolbar, .report .scroll-cue { display: none !important; }
+  .report .rep-bar, .report .scroll-cue { display: none !important; }
   .report .hero { min-height: auto; padding: 3rem 2rem; }
 }

@@ -83,14 +83,16 @@ export function CompletionBlock({ done }: { done: DoneMap }) {
 }
 
 export function RepChrome({ generated, demo, onRegen }: { generated: boolean; demo: boolean; onRegen: () => void }) {
-  // All controls live in the top-right toolbar over the dark canvas, so nothing
-  // overlaps the light app sidebar at top-left.
+  // Sticky header bar within the report (clear of the app sidebar): Back on the
+  // left where it belongs, actions on the right.
   return (
-    <div className="rep-toolbar">
+    <div className="rep-bar">
       <Link href="/insights" className="rep-btn">← Insights</Link>
-      {!generated && <span className="rep-flag">Preview</span>}
-      {!demo && <button className="rep-btn" onClick={onRegen}>↻ Regenerate</button>}
-      <button className="rep-btn primary" onClick={() => window.print()}>↓ PDF</button>
+      <div className="rep-bar-actions">
+        {!generated && <span className="rep-flag">Preview</span>}
+        {!demo && <button className="rep-btn" onClick={onRegen}>↻ Regenerate</button>}
+        <button className="rep-btn primary" onClick={() => window.print()}>↓ PDF</button>
+      </div>
     </div>
   );
 }
