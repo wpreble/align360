@@ -19,7 +19,10 @@
 
   position: relative;
   min-height: 100%;
-  margin: 0 auto;
+  /* Full width: .center-col is a flex column, and `margin:0 auto` on a flex item
+     overrides stretch and collapses it to content width (broke the loader, whose
+     content is tiny). width:100% keeps the dark canvas full-bleed in every state. */
+  width: 100%;
   background: var(--void);
   color: var(--ivory-dim);
   font-family: 'Crimson Pro', Georgia, serif;
@@ -52,7 +55,7 @@
 .report .rep-btn.primary { color: var(--accent-bright); border-color: var(--border-mid); }
 
 /* generating / loading state */
-.report-gen { min-height: 100%; display: grid; place-items: center; background: var(--void); color: var(--ivory-dim); padding: 3rem; text-align: center; }
+.report-gen { width: 100%; min-height: 100%; display: grid; place-items: center; background: var(--void); color: var(--ivory-dim); padding: 3rem; text-align: center; }
 
 /* ── HERO ── */
 .report .hero { min-height: 92vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 6rem 2rem; position: relative; overflow: hidden; text-align: center; z-index: 1; }
