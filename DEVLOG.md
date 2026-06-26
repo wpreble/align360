@@ -4,6 +4,17 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Fix chat file/image upload under GLM (attachment-aware model routing) (2026-06-26)
+
+Uploading an image or PDF in chat 502'd ("the assistant could not complete that request"). Root cause: chat runs on GLM via OpenRouter (`CHAT_MODEL=z-ai/glm-5.2`), but images are sent as `image_url` and PDFs as an OpenAI Files `file_id` — GLM/OpenRouter can read neither (server log: `400 You uploaded an unsupported image`).
+
+- **`app/api/chat/route.ts`**: detect whether any message carries an `image_url`/`file` part. If so AND `OPENAI_API_KEY` is set, route that request to OpenAI (`OPENAI_MODEL`, gpt-5.5) which supports vision + the Files API; text-only chat stays on cheap GLM. If no OpenAI key, the GLM path now FLATTENS attachment parts to the text plus a short note ("attached an image you can't view — ask them to describe it") instead of 502ing.
+- Verified live against the real keys: text-only → GLM returns fine; a canvas-generated image → routed to gpt-5.5, which read the image and returned its text. DOCX/plain-text uploads were already inline text (unaffected).
+- **Requires `OPENAI_API_KEY` in Vercel** for image/PDF analysis to actually work (it's the vision/Files provider); without it, attachments degrade gracefully rather than erroring.
+- Streaming note: yes, OpenRouter/GLM support SSE streaming (`stream:true`); the app currently awaits the full response. Adding token streaming is a separate enhancement (route returns a stream; client consumes it) — not done here.
+
+---
+
 ## Organization signup flow + report header bar fix (2026-06-26)
 
 - **Org signup**: `/subscribe` now has an Individual vs Organization choice (segmented control). Individual = the existing $49 checkout. Organization opens a longer form (org name, contact name, work email, seat stepper with a live `$19 × seats /month` total, min 5), then `createOrg(name)` (existing `create_organization` RPC, makes you the owner) → `/api/stripe/checkout` `mode:'org'` with `{orgId, seats, contactName, contactEmail}` → Stripe → success lands on `/org/[id]` to invite the team and assign seats.
