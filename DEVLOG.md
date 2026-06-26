@@ -4,6 +4,18 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Credit top-ups self-heal without the webhook (2026-06-25)
+
+Made buying credits work even with no Stripe webhook configured, mirroring the subscription sync.
+
+- **`0009_topup_ledger.sql`** (new, apply after 0008): `credit_topups` ledger keyed by Stripe checkout session id; `credit_grant_topup` gains `p_session_id` as the first arg and claims each session once (insert-on-conflict-do-nothing), so the webhook AND a reconcile sync can both call it without double-granting.
+- **`app/api/stripe/sync-credits/route.ts`** (new): lists the user's Stripe checkout sessions, and for each PAID `kind=topup` session calls the idempotent grant. No webhook needed.
+- **Webhook**: top-up grant now passes `p_session_id` (shares the ledger idempotency with the sync).
+- **Shell**: reconciles top-ups via `/api/stripe/sync-credits` on return from checkout (`?topup=success`) and whenever the account menu opens (covers "paid, closed the tab"), then refreshes the balance.
+- Verified: tsc + build pass. Full purchase still user-tested on deploy. **Apply 0007 + 0008 + 0009** in Supabase for credits to work.
+
+---
+
 ## Fix subscribe loop (subscribed → bounced back to /subscribe) + sign-out redesign (2026-06-25)
 
 - **Subscribe loop**: access was gated on a local `subscriptions` row that only the Stripe webhook writes, so a completed checkout whose webhook had not landed (or was unconfigured) left the user bounced back to `/subscribe`. Made activation authoritative:

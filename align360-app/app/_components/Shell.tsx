@@ -133,14 +133,22 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     if (!supabaseConfigured) return;
     createClient().auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null)).catch(() => {});
     refreshCredits();
-    // Returning from a successful top-up checkout: the webhook grants async, so
-    // re-fetch shortly after to reflect the new balance.
+    // Returning from a successful top-up checkout: reconcile the paid session
+    // straight from Stripe (no webhook dependency), then refresh the balance.
     try {
       if (new URLSearchParams(window.location.search).get('topup') === 'success') {
-        setTimeout(refreshCredits, 2500);
+        fetch('/api/stripe/sync-credits', { method: 'POST' }).catch(() => {}).finally(refreshCredits);
       }
     } catch {}
   }, [refreshCredits]);
+
+  // Opening the account menu reconciles any paid-but-not-yet-granted top-ups
+  // (covers the case where the user closed the tab before returning), then
+  // refreshes the displayed balance.
+  useEffect(() => {
+    if (!accountOpen || !supabaseConfigured) return;
+    fetch('/api/stripe/sync-credits', { method: 'POST' }).catch(() => {}).finally(refreshCredits);
+  }, [accountOpen, refreshCredits]);
 
   const signOut = async () => {
     try { if (supabaseConfigured) await createClient().auth.signOut(); } catch {}

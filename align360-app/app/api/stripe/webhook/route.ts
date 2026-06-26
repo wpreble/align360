@@ -77,6 +77,7 @@ export async function POST(req: Request) {
         const credits = parseInt(s.metadata.credits || '0', 10);
         if (credits > 0 && s.metadata.owner_id) {
           await db.rpc('credit_grant_topup', {
+            p_session_id: s.id,
             p_owner_type: s.metadata.owner_type || 'user',
             p_owner_id: s.metadata.owner_id,
             p_credits: credits,
