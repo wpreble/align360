@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
 
   const answers = body.demo ? demoAnswers() : body.answers || {};
   // Strip control chars/newlines so the name can't smuggle prompt instructions.
-  const name = (body.name || (body.demo ? 'Sample' : 'Friend')).replace(/[\u0000-\u001f]+/g, ' ').trim().slice(0, 60);
+  const name = (body.name || (body.demo ? 'Sample' : 'Friend')).replace(/[\u0000-\u001f]+/g, ' ').replace(/[‒-―]/g, '-').trim().slice(0, 60);
   const scores = computeScores(answers);
 
   if (!scores.completed.wiring && !scores.completed.orientation && !scores.completed.rejectionGift) {
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
   // OPENAI_MODEL/gpt-5.5 on OpenAI. No key → deterministic fallback so the page renders.
   const { model, useOpenRouter, apiKey } = resolveModel('REPORT_MODEL', process.env.OPENAI_MODEL || 'gpt-5.5');
   if (!apiKey) {
-    return NextResponse.json({ scores, profile: fallbackProfile(scores, name), generated: false });
+    return NextResponse.json({ scores, profile: deepStripDashes(fallbackProfile(scores, name)), generated: false });
   }
 
   const pre = await creditPrecheck();
@@ -149,6 +149,6 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'generation failed';
     console.error('profile generate error:', message);
-    return NextResponse.json({ scores, profile: fallbackProfile(scores, name), generated: false, warning: message });
+    return NextResponse.json({ scores, profile: deepStripDashes(fallbackProfile(scores, name)), generated: false, warning: message });
   }
 }

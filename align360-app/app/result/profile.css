@@ -174,7 +174,10 @@
 /* Floating back button — sits at the top-left of the profile area (tracks the sidebar width). */
 .result-back{position:fixed;top:14px;left:calc(var(--col-left,0px) + 16px);z-index:41;display:flex;align-items:center;gap:6px;padding:8px 15px;border-radius:999px;background:rgba(13,10,20,.6);backdrop-filter:saturate(140%) blur(10px);border:1px solid rgba(185,143,168,.22);color:#D9BBCB;font-family:var(--font-display,serif);font-size:13px;font-weight:600;transition:background .15s}
 .result-back:hover{background:rgba(185,143,168,.18)}
-.result-gen{flex:1;min-height:70vh;display:grid;place-items:center;text-align:center;color:#D6CDD3;background:#0D0A14;font-family:'Crimson Pro',serif}
+/* Theme-aware loader surface: follows the app's light/dark mode (the orbit's
+   fig/pink tones read on both). Always-dark report surfaces (.report-gen) set
+   their own dark bg + light text, and .genx-msg inherits color from here. */
+.result-gen{flex:1;min-height:70vh;display:grid;place-items:center;text-align:center;color:var(--text-secondary);background:var(--bg-body);font-family:'Crimson Pro',serif}
 .result-gen .gen-pulse{width:54px;height:54px;border-radius:50%;margin:0 auto 24px;background:radial-gradient(circle,#B98FA8,#6E3F5F);animation:genpulse 1.7s ease-in-out infinite}
 @keyframes genpulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.18);opacity:.5}}
 
@@ -400,7 +403,7 @@
 .genx-dot.d1 { animation:genxorbit 3.4s linear infinite; }
 .genx-dot.d2 { background:#D9BBCB; animation:genxorbit 5s linear infinite reverse; }
 .genx-dot.d3 { background:#7E3A66; animation:genxorbit 6.6s linear infinite; }
-.genx-msg { font-family:'Crimson Pro',Georgia,serif; font-size:16.5px; color:#CFC6CC; letter-spacing:.01em; animation:genxfade .55s ease; }
+.genx-msg { font-family:'Crimson Pro',Georgia,serif; font-size:16.5px; color:inherit; opacity:.92; letter-spacing:.01em; animation:genxfade .55s ease; }
 @keyframes genxorbit { from { transform:rotate(0) translateX(50px) rotate(0); } to { transform:rotate(360deg) translateX(50px) rotate(-360deg); } }
 @keyframes genxpulse { 0%,100% { transform:scale(.82); opacity:.85; } 50% { transform:scale(1.18); opacity:1; } }
 @keyframes genxexpand { 0% { transform:scale(.5); opacity:.75; } 100% { transform:scale(2.6); opacity:0; } }

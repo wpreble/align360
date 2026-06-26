@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { clearProfile, clearClarityReport, CLARITY_SLUGS } from '@/lib/storage';
+import { clearProfile, clearClarityReport, clearAssessmentReport, CLARITY_SLUGS } from '@/lib/storage';
 
 type Option = { letter: string; text: string; giftTag?: string };
 type Q = { id: string; number: number; label: string; prompt: string; options: Option[]; section: string };
@@ -64,11 +64,12 @@ export default function Runner({ title, slug, questions }: { title: string; slug
       router.push(`/insights/clarity/${slug}`);
       return;
     }
-    // Core assessments: new answers invalidate the prior combined profile, then
-    // go straight to the profile page so it shows the generation loader and
-    // builds the fresh (dynamic) result, instead of bouncing to the hub.
+    // Core assessments: new answers invalidate this assessment's cached report
+    // AND the combined profile (now stale), then go straight to this
+    // assessment's own report page to show the generation loader and fresh result.
+    clearAssessmentReport(slug);
     clearProfile();
-    router.push('/insights/profile');
+    router.push(`/insights/assessment/${slug}`);
   }
 
   if (done) return null;

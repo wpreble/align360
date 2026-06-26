@@ -45,17 +45,24 @@ function ChatInner() {
   const fileRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const runHandledRef = useRef<string | null>(null);
+  // The chat id with an in-flight response. Used so the typing indicator and the
+  // disabled composer follow the chat you are *viewing* — switching to another
+  // chat mid-generation no longer leaves it stuck "thinking".
+  const pendingIdRef = useRef<string | null>(null);
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
   useEffect(() => {
     if (chatParam) {
       const s = getChat(chatParam);
-      if (s) { idRef.current = s.id; setMessages(s.messages); return; }
+      // Only show "thinking" if THIS chat is the one still generating.
+      if (s) { idRef.current = s.id; setMessages(s.messages); setSending(pendingIdRef.current === s.id); return; }
     }
     // When launching a framework (?run=), the run effect owns the initial
     // state — don't reset here (and don't fight React StrictMode's double-invoke).
     if (runParam) return;
     idRef.current = null;
     setMessages([]);
+    setSending(false);
   }, [chatParam, newParam, runParam]);
 
   useEffect(() => {
@@ -172,6 +179,7 @@ function ChatInner() {
 
     if (!idRef.current) idRef.current = newChatId();
     const id = idRef.current;
+    pendingIdRef.current = id;
     persist(next, id);
     const nm = getName();
     const profileContext = [
@@ -197,8 +205,24 @@ function ChatInner() {
       persist(finalMsgs, id);
       if (idRef.current === id) setMessages(finalMsgs);
     } finally {
+      if (pendingIdRef.current === id) pendingIdRef.current = null;
+      // Only clear the spinner if you are still viewing the chat that generated.
       if (idRef.current === id) setSending(false);
     }
+  }
+
+  function copyMsg(text: string, i: number) {
+    const flash = () => { setCopiedIdx(i); setTimeout(() => setCopiedIdx((c) => (c === i ? null : c)), 1600); };
+    const fallback = () => {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta); flash();
+      } catch { /* ignore */ }
+    };
+    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(flash).catch(fallback);
+    else fallback();
   }
 
   function persist(msgs: ChatMsg[], id: string) {
@@ -235,7 +259,21 @@ function ChatInner() {
           <div className="messages">
             {messages.map((m, i) =>
               m.role === 'assistant' ? (
-                <div key={i} className="bubble ai md" dangerouslySetInnerHTML={{ __html: renderMarkdown(m.text) }} />
+                <div key={i} className="msg-row ai">
+                  <span className="msg-avatar"><AlignMark /></span>
+                  <div className="msg-col">
+                    <div className="bubble ai md" dangerouslySetInnerHTML={{ __html: renderMarkdown(m.text) }} />
+                    <div className="msg-actions">
+                      <button className="msg-copy" onClick={() => copyMsg(m.text, i)} aria-label="Copy response" title="Copy">
+                        {copiedIdx === i ? (
+                          <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg> Copied</>
+                        ) : (
+                          <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg> Copy</>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <div key={i} className="bubble user">
                   {m.images?.map((src, j) => <img key={j} className="attach-thumb" src={src} alt="attachment" />)}
@@ -244,7 +282,12 @@ function ChatInner() {
                 </div>
               ),
             )}
-            {sending && <div className="typing-bubble"><span className="tdot" /><span className="tdot" /><span className="tdot" /></div>}
+            {sending && (
+              <div className="msg-row ai">
+                <span className="msg-avatar"><AlignMark /></span>
+                <div className="typing-bubble"><span className="tdot" /><span className="tdot" /><span className="tdot" /></div>
+              </div>
+            )}
             <div ref={endRef} />
           </div>
         )}

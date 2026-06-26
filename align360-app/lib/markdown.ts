@@ -93,7 +93,9 @@ export function renderMarkdown(md: string): string {
       i--; // step back; loop will increment
       const thead = '<thead><tr>' + header.map((c) => `<th>${inline(c)}</th>`).join('') + '</tr></thead>';
       const tbody = '<tbody>' + body.map((r) => '<tr>' + header.map((_, ci) => `<td>${inline(r[ci] || '')}</td>`).join('') + '</tr>').join('') + '</tbody>';
-      out.push(`<table>${thead}${tbody}</table>`);
+      // Wrap in a scroll container so a wide table scrolls inside the bubble
+      // instead of overflowing/clipping it.
+      out.push(`<div class="md-table-wrap"><table>${thead}${tbody}</table></div>`);
       continue;
     }
 

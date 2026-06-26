@@ -303,6 +303,20 @@ a { color:inherit; text-decoration:none; }
 .bubble { padding:14px 18px; border-radius:var(--radius-lg); line-height:1.6; word-wrap:break-word; }
 .bubble.user { align-self:flex-end; background:var(--bg-user); border-radius:var(--radius-lg) var(--radius-lg) 4px var(--radius-lg); max-width:80%; white-space:pre-wrap; }
 .bubble.ai { align-self:flex-start; background:var(--bg-ai); border:1px solid var(--border); border-radius:var(--radius-lg) var(--radius-lg) var(--radius-lg) 4px; max-width:92%; }
+
+/* AI message row: Align360 logo avatar + (bubble + copy action). min-width:0 on
+   the column lets it shrink so wide markdown tables scroll inside the bubble
+   instead of overflowing and clipping. */
+.msg-row.ai { align-self:flex-start; display:flex; gap:10px; align-items:flex-start; max-width:92%; }
+.msg-avatar { flex:none; width:30px; height:30px; border-radius:50%; display:grid; place-items:center; background:var(--bg-surface); border:1px solid var(--border); margin-top:2px; overflow:hidden; }
+.msg-avatar .align-mark { height:17px; }
+.msg-col { min-width:0; display:flex; flex-direction:column; gap:4px; }
+.msg-row .bubble.ai { max-width:100%; }
+.msg-actions { display:flex; gap:4px; padding-left:4px; opacity:.85; }
+.msg-copy { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:500; color:var(--text-muted); padding:3px 8px; border-radius:7px; transition:background .15s, color .15s; }
+.msg-copy svg { width:13px; height:13px; }
+.msg-copy:hover { background:var(--fig-wash); color:var(--accent); }
+[data-theme='dark'] .msg-copy:hover { background:rgba(185,143,168,.12); }
 .bubble img.attach-thumb { max-width:220px; border-radius:10px; margin-bottom:8px; display:block; }
 
 /* Markdown inside AI bubbles */
@@ -551,8 +565,10 @@ a { color:inherit; text-decoration:none; }
 /* AI markdown tables + long tokens must not force horizontal page scroll. */
 .bubble { overflow-wrap:anywhere; }
 .bubble.ai.md code { overflow-wrap:anywhere; word-break:break-word; }
-.bubble.ai.md table { display:block; width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-.bubble.ai.md th, .bubble.ai.md td { white-space:nowrap; }
+.bubble.ai.md .md-table-wrap { max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:2px 0 12px; }
+.bubble.ai.md .md-table-wrap table { margin:0; }
+.bubble.ai.md table { display:table; width:100%; }
+.bubble.ai.md th, .bubble.ai.md td { white-space:normal; }
 
 /* Insights hub — had no phone breakpoint. */
 @media (max-width:520px) {

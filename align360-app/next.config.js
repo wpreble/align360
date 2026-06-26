@@ -8,6 +8,7 @@ const nextConfig = {
       '/api/chat': ['./content/**/*'],
       '/api/profile/generate': ['./content/**/*'],
       '/api/clarity/generate': ['./content/**/*'],
+      '/api/assessment/generate': ['./content/**/*'],
       '/assessment/[slug]': ['./content/**/*'],
       '/discover/[slug]': ['./content/landing/**/*'],
     },

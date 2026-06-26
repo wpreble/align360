@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
   const answers = body.demo ? demoAnswers(slug) : body.answers || {};
   // Strip control chars/newlines so the name can't smuggle prompt instructions
   // into the system prompt where it's interpolated.
-  const name = (body.name || (body.demo ? 'Sample' : 'Friend')).replace(/[\u0000-\u001f]+/g, ' ').trim().slice(0, 60);
+  const name = (body.name || (body.demo ? 'Sample' : 'Friend')).replace(/[\u0000-\u001f]+/g, ' ').replace(/[‒-―]/g, '-').trim().slice(0, 60);
   const scores = computeClarityScores(slug, answers);
 
   if (!scores) {
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
   // No key → deterministic fallback so the report still renders.
   const { model, useOpenRouter, apiKey } = resolveModel('REPORT_MODEL', process.env.OPENAI_MODEL || 'gpt-5.5');
   if (!apiKey) {
-    return NextResponse.json({ scores, narrative: fallbackClarityNarrative(scores, name), generated: false });
+    return NextResponse.json({ scores, narrative: deepStripDashes(fallbackClarityNarrative(scores, name)), generated: false });
   }
 
   const pre = await creditPrecheck();
@@ -195,6 +195,6 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'generation failed';
     console.error('clarity generate error:', message);
-    return NextResponse.json({ scores, narrative: fallbackClarityNarrative(scores, name), generated: false, warning: message });
+    return NextResponse.json({ scores, narrative: deepStripDashes(fallbackClarityNarrative(scores, name)), generated: false, warning: message });
   }
 }

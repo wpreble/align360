@@ -10,6 +10,7 @@ export const ANSWER_PREFIX = 'align360:answers:';
 export const NAME_KEY = 'align360:name';
 export const ONBOARDING_KEY = 'align360:onboarding';
 export const CLARITY_REPORT_PREFIX = 'align360:clarity:';
+export const ASSESSMENT_REPORT_PREFIX = 'align360:report:';
 export const STORE_EVENT = 'align360:store-changed';
 
 export const ASSESSMENT_SLUGS = ['wiring', 'orientation', 'rejection-gift'] as const;
@@ -119,6 +120,18 @@ export function setClarityReport(slug: string, report: unknown) {
 export function clearClarityReport(slug: string) {
   if (typeof window === 'undefined') return;
   try { localStorage.removeItem(CLARITY_REPORT_PREFIX + slug); window.dispatchEvent(new Event(STORE_EVENT)); } catch {}
+}
+
+/* ── Core assessment reports (one cached report per slug: wiring/orientation/rejection-gift) ── */
+export function getAssessmentReport(slug: string): any | null {
+  return read<any | null>(ASSESSMENT_REPORT_PREFIX + slug, null);
+}
+export function setAssessmentReport(slug: string, report: unknown) {
+  write(ASSESSMENT_REPORT_PREFIX + slug, report);
+}
+export function clearAssessmentReport(slug: string) {
+  if (typeof window === 'undefined') return;
+  try { localStorage.removeItem(ASSESSMENT_REPORT_PREFIX + slug); window.dispatchEvent(new Event(STORE_EVENT)); } catch {}
 }
 
 /* ── Chat sessions ── */

@@ -94,9 +94,10 @@ export default function InsightsHub() {
           const isDone = done[a.slug];
           return (
             <div key={a.slug} className={`ins-card${isDone ? ' done' : ''}`}>
-              {/* Whole-card click target (stretched link). */}
+              {/* Whole-card click target (stretched link): each core assessment has
+                  its own report; the combined profile lives on the hero CTA above. */}
               <Link
-                href={isDone ? '/insights/profile' : `/assessment/${a.slug}`}
+                href={isDone ? `/insights/assessment/${a.slug}` : `/assessment/${a.slug}`}
                 className="ins-card-cover"
                 aria-label={`${a.name}: ${isDone ? 'view your result' : 'take the assessment'}`}
               />
