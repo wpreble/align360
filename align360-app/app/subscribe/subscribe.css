@@ -19,3 +19,19 @@
 .sub-link:hover { color:var(--text-primary); text-decoration:underline; }
 .sub-err { font-size:13px; color:#a32d2d; background:rgba(163,45,45,.06); border:1px solid rgba(163,45,45,.2); border-radius:8px; padding:.6rem .8rem; margin-bottom:1rem; }
 .sub-note { font-size:12px; color:var(--text-muted); margin-top:1rem; line-height:1.5; }
+
+/* Individual vs Organization choice + org form */
+.sub-seg { display:flex; gap:6px; background:var(--bg-chip); border:1px solid var(--border); border-radius:10px; padding:4px; margin-bottom:1.25rem; }
+.sub-seg-btn { flex:1; padding:.6rem; border:none; background:none; border-radius:7px; font-size:14px; font-weight:600; color:var(--text-secondary); cursor:pointer; transition:background .15s, color .15s; }
+.sub-seg-btn.on { background:var(--fig); color:#fff; }
+.sub-field { display:block; text-align:left; margin-bottom:.9rem; }
+.sub-field > span { display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:.35rem; }
+.sub-field > span small { font-weight:400; color:var(--text-muted); }
+.sub-input { width:100%; background:var(--bg-input); border:1px solid var(--border); border-radius:9px; padding:.7rem .8rem; font-size:14px; color:var(--text-primary); font-family:inherit; }
+.sub-input:focus { outline:none; border-color:var(--accent); }
+.sub-seats { display:flex; align-items:center; gap:8px; }
+.sub-step { width:42px; height:42px; flex:none; border:1px solid var(--border); border-radius:9px; background:var(--bg-surface); color:var(--text-primary); font-size:18px; line-height:1; cursor:pointer; transition:border-color .15s; }
+.sub-step:hover { border-color:var(--accent); }
+.sub-seats-in { text-align:center; }
+.sub-total { text-align:left; font-family:var(--font-display); font-size:24px; font-weight:600; color:var(--text-primary); margin:1.1rem 0 1.25rem; }
+.sub-total small { font-family:var(--font-sans); font-size:13px; font-weight:400; color:var(--text-muted); margin-left:.4rem; }

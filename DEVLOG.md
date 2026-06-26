@@ -4,6 +4,16 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Organization signup flow + report header bar fix (2026-06-26)
+
+- **Org signup**: `/subscribe` now has an Individual vs Organization choice (segmented control). Individual = the existing $49 checkout. Organization opens a longer form (org name, contact name, work email, seat stepper with a live `$19 × seats /month` total, min 5), then `createOrg(name)` (existing `create_organization` RPC, makes you the owner) → `/api/stripe/checkout` `mode:'org'` with `{orgId, seats, contactName, contactEmail}` → Stripe → success lands on `/org/[id]` to invite the team and assign seats.
+- **Checkout route**: the org branch now sets the Stripe customer's name/email from the contact fields (control-char stripped).
+- **`/api/stripe/sync`** now reconciles ORG subscriptions too (orgs the user owns/admins), not just personal — so org access self-heals from Stripe without the webhook, same as individuals.
+- **Report header bar**: replaced the right-bunched toolbar with a sticky bar — Back (← Insights) on the LEFT, Regenerate/PDF on the right — that stays clear of the app sidebar. (Earlier same-day: fixed the generation loader collapsing to a narrow strip — `.report`/`.report-gen` are now `width:100%`, since `margin:0 auto` on a flex item shrinks it to content.)
+- Verified: tsc + production build pass. The org form + paywall render only for an authenticated, unsubscribed session (middleware-gated), so the visual is user-verified on deploy; the report header bar was verified live (back on the left at the report's left edge, clear of the sidebar).
+
+---
+
 ## Credit top-ups self-heal without the webhook (2026-06-25)
 
 Made buying credits work even with no Stripe webhook configured, mirroring the subscription sync.
