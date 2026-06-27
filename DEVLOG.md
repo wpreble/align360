@@ -4,6 +4,15 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Wiring Q16-19 removal + loader/onboarding polish + pending Samuel feedback (2026-06-26)
+
+- **Wiring for Impact → 15 questions** (`content/Assessments/Wiring for Impact.md`): removed Section F (Compressed Mode Detection, Q16-19) + its governance section per Samuel; header already said 15; scoring uses only Q1-15 gift tags. Verified the runner shows "1 of 15". His one prioritized ask — he's retaking.
+- **Report loader fixes**: the orbit animation only showed on result pages because `.genx`/`.gen-pulse` lived in `result/profile.css`; the per-assessment report page imports only `report.css`. Moved the shared loader styles to `globals.css` (loaded everywhere) so `GenLoader` animates on the report page too, desktop + mobile. (Earlier: `.report`/`.report-gen` set to `width:100%` so the loader stops collapsing to a narrow strip.)
+- **Onboarding first read**: bigger, more readable type (heading 40px, lead/second paragraph both 23px with the second italic instead of small/secondary), bigger primary-wiring card (fills width, name 58px), name capitalized.
+- **PENDING — Samuel's "align to the A360 standard" pass (1-7)**: parked until he sends the consolidated list + reference files. Tracked in memory `align360-pending-samuel-feedback.md`. Headlines: Impact-Readiness progression rubric (→ Insecurity/Awareness/Clarity/Alignment/Conviction/Impact), combined-profile AI-era cards (→4+) and capabilities 2×2 (→4 to fill the empty cell), and the Clarity conviction mini-row domains/percentages/PRIMARY GAP.
+
+---
+
 ## Fix chat file/image upload under GLM (attachment-aware model routing) (2026-06-26)
 
 Uploading an image or PDF in chat 502'd ("the assistant could not complete that request"). Root cause: chat runs on GLM via OpenRouter (`CHAT_MODEL=z-ai/glm-5.2`), but images are sent as `image_url` and PDFs as an OpenAI Files `file_id` — GLM/OpenRouter can read neither (server log: `400 You uploaded an unsupported image`).
