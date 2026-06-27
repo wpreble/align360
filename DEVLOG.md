@@ -4,12 +4,22 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Align to A360 standard: progression ladder rubric + 4-card profile sections (2026-06-27)
+
+The two *unambiguous* items from Samuel's standard mockups (where the target was exact). Commit `444bb1e`, live.
+
+- **Impact-Readiness progression ladder** (`lib/clarity-scoring.ts` + `app/insights/clarity/[slug]/_components/ClarityReport.tsx` + `app/insights/clarity/clarity.css`): the ladder strip now reads **Insecurity → Awareness → Clarity → Alignment → Conviction → Impact**, with Impact as a dark "goal" node. Implemented via a new `progression` array on the impact-readiness config that drives the ladder display, *decoupled* from the scoring `bands` that drive the headline level — so a score of 86 still reads "Convicted" (no headline regression) while the strip shows the noun stages. Verified live: all-D answers render the exact 6-node ladder, Conviction as "now", Impact as the dark goal.
+- **Combined-profile card counts** (`lib/profile.ts`, `PROFILE_SCHEMA_B`): legacy / AI-era / irreplaceable bumped 3 → **4** so the AI-era opportunity list and the capabilities 2×2 fill out (no empty 4th cell). Renderers already map all items; the grid is 2-col. Not live-verified (GLM-generated; GLM is loose on exact counts — if a regen ever shows 3, we'll need stricter enforcement). `fallbackProfile` still carries 1 each (degraded path only).
+- **Still parked** (need Samuel's spec/files, do NOT guess): the Clarity **conviction mini-row** (his standard shows ~4 domains with percentages + a PRIMARY GAP (n/10) tile; ours shows 6 domains without %), and the **broader 1-7 deliverable comparison** vs the A360 standard. Tracked in memory `align360-pending-samuel-feedback.md`.
+
+---
+
 ## Wiring Q16-19 removal + loader/onboarding polish + pending Samuel feedback (2026-06-26)
 
 - **Wiring for Impact → 15 questions** (`content/Assessments/Wiring for Impact.md`): removed Section F (Compressed Mode Detection, Q16-19) + its governance section per Samuel; header already said 15; scoring uses only Q1-15 gift tags. Verified the runner shows "1 of 15". His one prioritized ask — he's retaking.
 - **Report loader fixes**: the orbit animation only showed on result pages because `.genx`/`.gen-pulse` lived in `result/profile.css`; the per-assessment report page imports only `report.css`. Moved the shared loader styles to `globals.css` (loaded everywhere) so `GenLoader` animates on the report page too, desktop + mobile. (Earlier: `.report`/`.report-gen` set to `width:100%` so the loader stops collapsing to a narrow strip.)
 - **Onboarding first read**: bigger, more readable type (heading 40px, lead/second paragraph both 23px with the second italic instead of small/secondary), bigger primary-wiring card (fills width, name 58px), name capitalized.
-- **PENDING — Samuel's "align to the A360 standard" pass (1-7)**: parked until he sends the consolidated list + reference files. Tracked in memory `align360-pending-samuel-feedback.md`. Headlines: Impact-Readiness progression rubric (→ Insecurity/Awareness/Clarity/Alignment/Conviction/Impact), combined-profile AI-era cards (→4+) and capabilities 2×2 (→4 to fill the empty cell), and the Clarity conviction mini-row domains/percentages/PRIMARY GAP.
+- **PENDING — Samuel's "align to the A360 standard" pass (1-7)**: parked until he sends the consolidated list + reference files. Tracked in memory `align360-pending-samuel-feedback.md`. (UPDATE 2026-06-27, see entry above: the two unambiguous items — the Impact-Readiness progression rubric and the combined-profile 4-card sections — shipped in `444bb1e`. Still parked: the Clarity conviction mini-row domains/percentages/PRIMARY GAP, and the full 1-7 comparison.)
 
 ---
 
