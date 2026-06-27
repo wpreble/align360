@@ -156,6 +156,7 @@
 .clr-step.past { background: rgba(42, 18, 46, 0.05); border-color: rgba(42, 18, 46, 0.1); color: var(--muted); }
 .clr-step.now { background: var(--cherry); border-color: var(--cherry); color: #fff; }
 .clr-step.future { background: transparent; border-color: rgba(42, 18, 46, 0.12); color: rgba(122, 110, 126, 0.6); }
+.clr-step.goal { background: #2a122e; border-color: #2a122e; color: #fff; }
 .clr-arrow { color: var(--muted); font-size: 13px; }
 
 /* ── Domain cards ── */

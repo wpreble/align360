@@ -73,7 +73,7 @@ export default function ClarityReport({ scores, narrative }: { scores: ClaritySc
           <p className="clr-summary">{narrative.summary}</p>
           <div className="clr-ladder">
             {scores.ladder.map((b, i) => {
-              const cls = i < scores.level.index ? 'past' : i === scores.level.index ? 'now' : 'future';
+              const cls = b.goal ? 'goal' : i < scores.level.index ? 'past' : i === scores.level.index ? 'now' : 'future';
               return (
                 <span key={b.key} style={{ display: 'contents' }}>
                   <span className={`clr-step ${cls}`}>{b.label}</span>

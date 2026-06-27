@@ -7,7 +7,7 @@ import { getAssessment } from './assessments';
 
 export type ClaritySub = { label: string; domain: string; points: number; aiEra: boolean };
 export type ClarityDomain = { name: string; score: number; subs: ClaritySub[] };
-export type ClarityBand = { key: string; label: string };
+export type ClarityBand = { key: string; label: string; goal?: boolean };
 export type ClarityLevel = ClarityBand & { index: number };
 
 export type ClarityScores = {
@@ -34,7 +34,7 @@ export type ClarityScores = {
 };
 
 type BandDef = { key: string; label: string; min: number; max: number };
-type Cfg = { scoreName: string; bands: BandDef[] };
+type Cfg = { scoreName: string; bands: BandDef[]; progression?: string[] };
 
 /** Five-band ladders, sourced from the Drive result reports. */
 const CONFIG: Record<string, Cfg> = {
@@ -47,6 +47,10 @@ const CONFIG: Record<string, Cfg> = {
       { key: 'aligning', label: 'Aligning', min: 61, max: 80 },
       { key: 'convicted', label: 'Convicted', min: 81, max: 100 },
     ],
+    // Progression strip uses Samuel's A360 standard wording (noun stages) and adds
+    // Impact as the goal node beyond the top band. The headline level still uses the
+    // bands above (e.g. score 86 → "Convicted"); the ladder shows "Conviction → Impact".
+    progression: ['Insecurity', 'Awareness', 'Clarity', 'Alignment', 'Conviction', 'Impact'],
   },
   'value-spectrum': {
     scoreName: 'Value Score',
@@ -132,7 +136,9 @@ export function computeClarityScores(slug: string, answers: Record<string, strin
     scoreName: cfg.scoreName,
     overall,
     level: bandFor(cfg.bands, overall),
-    ladder: cfg.bands.map((b) => ({ key: b.key, label: b.label })),
+    ladder: cfg.progression
+      ? cfg.progression.map((label, i) => ({ key: `p${i}`, label, goal: i === cfg.progression!.length - 1 }))
+      : cfg.bands.map((b) => ({ key: b.key, label: b.label })),
     domains,
     subs,
     aiEra,
