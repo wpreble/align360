@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient, supabaseConfigured } from '@/lib/supabase/client';
+import { SIGNUPS_OPEN } from '@/lib/signups';
 
 export default function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   const router = useRouter();
@@ -25,6 +26,18 @@ export default function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
       <div className="auth-card">
         <h1 className="auth-title">Accounts not configured yet</h1>
         <p className="auth-sub">Supabase keys aren&apos;t set in this environment. Add them to <code>.env.local</code> and reload.</p>
+      </div>
+    );
+  }
+
+  // New-account signups are closed (safety guard). Existing users still sign in
+  // via /login; only the signup surface is shut off here.
+  if (mode === 'signup' && !SIGNUPS_OPEN) {
+    return (
+      <div className="auth-card">
+        <h1 className="auth-title">Sign-ups are closed</h1>
+        <p className="auth-sub">Align360 isn&apos;t open for new accounts right now. If you already have an account, you can sign in.</p>
+        <Link href="/login" className="auth-link">Go to sign in</Link>
       </div>
     );
   }
@@ -107,13 +120,15 @@ export default function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
         </button>
       </form>
 
-      <p className="auth-switch">
-        {mode === 'signup' ? (
-          <>Already have an account? <Link href="/login" className="auth-link">Sign in</Link></>
-        ) : (
-          <>New here? <Link href="/signup" className="auth-link">Create an account</Link></>
-        )}
-      </p>
+      {(mode === 'signup' || SIGNUPS_OPEN) && (
+        <p className="auth-switch">
+          {mode === 'signup' ? (
+            <>Already have an account? <Link href="/login" className="auth-link">Sign in</Link></>
+          ) : (
+            <>New here? <Link href="/signup" className="auth-link">Create an account</Link></>
+          )}
+        </p>
+      )}
     </div>
   );
 }
