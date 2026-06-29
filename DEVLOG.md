@@ -4,6 +4,18 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Chat precision: concise chat-only voice layer + GLM-vs-OpenAI A/B (2026-06-29)
+
+Samuel's chat feedback: primitive, too chatty / lacks precision, jargon, "not connected to user model." Root-cause diagnosis is in memory `align360-chat-precision.md`; this entry is the build. Scope was the **chat conversationally** (per Will: "I understand the results page stuff, I meant the chat").
+
+- **Chat-only voice layer** (`content/AI Model/Chat Delivery Style.md`, read by `lib/system-prompt.ts` `chatDeliveryStyle()`, appended in `app/api/chat/route.ts` after the base prompt and before the user profile): lead with the answer; match length to the message; drop the mandatory 5-element Context/Insight/Options/Tradeoffs/Reflection structure for ordinary turns; no closing reflective-question ritual; plain language (bans invented jargon like "clarity broker" / "Grounded Visionary"); and NEVER narrate backend/tool status (no "not loaded" / "still being built"). Applied to chat ONLY — report/profile generation is untouched, so nothing there regresses.
+- **Param tuning** (`lib/ai.ts` `genParams` gains an optional `temperature`; the chat call is now `maxTokens 1500` (was 3000) + `temperature 0.5`). Temperature is applied on the OpenRouter/GLM path only — gpt-5.5 rejects non-default temperature, so the OpenAI/attachment path is left untouched.
+- **GLM-vs-OpenAI A/B (real calls, local keys).** GLM 5.2 is NOT the bottleneck; the old prompt was. Old GLM: 510-722 completion tokens, 13-28s, forced report structure. New GLM (with the layer): casual 202 tok / 5s, job-decision 426 tok, "Run Impact Pathways" 416 tok with zero backend narration. GLM-new matches gpt-5.5 on quality and beats it on latency, so we keep GLM 5.2 (margins + open-source preference).
+- Verified: tsc + production build pass; a live GLM run confirms the new voice and the "Run Impact Pathways" backend-leak fix.
+- Not in this build (chat was the priority): the results-page jargon in `lib/profile.ts` / `lib/clarity.ts` (the "Evocative Two-Word Archetype" / "evocative" headline instructions) stays for the separate results-page A360 track. The chat layer already bans that jargon in conversation.
+
+---
+
 ## Align to A360 standard: progression ladder rubric + 4-card profile sections (2026-06-27)
 
 The two *unambiguous* items from Samuel's standard mockups (where the target was exact). Commit `444bb1e`, live.

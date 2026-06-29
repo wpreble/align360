@@ -43,3 +43,13 @@ export function buildSystemPrompt(): string {
 
   return sections.join('\n\n---\n\n');
 }
+
+/**
+ * Chat-only delivery-style layer. Appended to the system prompt for the live
+ * chat surface ONLY (not report/profile generation), to keep conversational
+ * responses concise and precise instead of defaulting to the heavy 5-element
+ * report structure. Editing the .md takes effect on the next request.
+ */
+export function chatDeliveryStyle(): string {
+  return safeRead('AI Model/Chat Delivery Style.md');
+}
