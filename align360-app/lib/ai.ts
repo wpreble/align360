@@ -53,13 +53,16 @@ export function parseJsonLoose<T = unknown>(text: string | null | undefined): T 
 
 export function genParams(
   useOpenRouter: boolean,
-  opts: { maxTokens: number; json?: boolean; reasoning?: 'off' | 'low' },
+  opts: { maxTokens: number; json?: boolean; reasoning?: 'off' | 'low'; temperature?: number },
 ): Record<string, unknown> {
   const p: Record<string, unknown> = {};
   if (opts.json) p.response_format = { type: 'json_object' };
   if (useOpenRouter) {
     p.max_tokens = opts.maxTokens;
     p.reasoning = opts.reasoning === 'off' ? { enabled: false } : { effort: 'low' };
+    // Temperature is applied on the OpenRouter path only. Some OpenAI models
+    // (e.g. gpt-5.5) reject non-default temperature, so we leave it unset there.
+    if (typeof opts.temperature === 'number') p.temperature = opts.temperature;
   } else {
     p.max_completion_tokens = opts.maxTokens;
     p.reasoning_effort = 'low';

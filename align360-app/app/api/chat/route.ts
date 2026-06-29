@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { buildSystemPrompt } from '@/lib/system-prompt';
+import { buildSystemPrompt, chatDeliveryStyle } from '@/lib/system-prompt';
 import { resolveModel, makeClient, genParams } from '@/lib/ai';
 import { creditPrecheck, meterUsage } from '@/lib/credit-metering';
 
@@ -60,6 +60,11 @@ export async function POST(req: NextRequest) {
 
   let systemPrompt = buildSystemPrompt();
 
+  // Chat-only voice layer: keep live replies concise and precise instead of the
+  // heavy report structure. Not applied to report/profile generation.
+  const style = chatDeliveryStyle();
+  if (style) systemPrompt += `\n\n---\n\n${style}`;
+
   // Make the user's assessment results instantly referenceable by the AI.
   const ctx = (body.profileContext || '').trim();
   if (ctx) {
@@ -67,8 +72,10 @@ export async function POST(req: NextRequest) {
   }
 
   const full = [{ role: 'system', content: systemPrompt }, ...prepared];
-  // Chat: no reasoning tokens (cheap/fast). Reports use reasoning:'low'.
-  const baseParams = { model, ...genParams(useOpenRouter, { maxTokens: 3000, reasoning: 'off' }) };
+  // Chat: no reasoning tokens (cheap/fast); lower temperature for precision and a
+  // tighter token ceiling as a brevity backstop (the voice layer does the real work).
+  // Reports use reasoning:'low'.
+  const baseParams = { model, ...genParams(useOpenRouter, { maxTokens: 1500, reasoning: 'off', temperature: 0.5 }) };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const run = (msgs: any) =>
     client.chat.completions.create({ ...baseParams, messages: msgs } as any);
