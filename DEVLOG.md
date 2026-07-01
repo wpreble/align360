@@ -4,6 +4,19 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Results-page rubric alignment: anti-drift lock + Value Spectrum 8-stage ladder + Conviction mini-row (2026-07-01)
+
+Samuel: the results pages weren't following the rubric, and the same answers yielded different results. Diagnosed by diffing the app against the hand-built Drive templates (folder `15UbTRCB8-uj-WOBe0plhFK76w9RT-FYa`), then aligned:
+
+- **Anti-drift lock** (`lib/storage.ts` `hashAnswers`; `app/insights/clarity/[slug]/page.tsx`; `app/insights/profile/page.tsx`): reports now cache keyed by a hash of the answers that produced them. Identical answers always return the same first-generated report (retaking with the same answers no longer yields a new narrative); changed answers invalidate and regenerate. Root cause of "same answers, different results" was the LLM narrative + the ~100%-generated combined profile regenerating on first-visit / Regenerate / cleared storage / new device — the *scores* were always deterministic. (Full cross-device determinism still needs server-side report storage; that's the localStorage→cloud track.)
+- **Impact Readiness hero** (`ClarityReport.tsx` + `clarity.css`): domains now render as **%** and a **Primary Gap n/10** tile was added (amber accent), matching the template. This is the previously-parked "conviction mini-row"; scoped to impact-readiness (Value Spectrum frames its lows as "refinements").
+- **Value Spectrum 8-stage ladder** (`lib/clarity-scoring.ts` + `ClarityReport.tsx`): the ladder now renders the template's 8 narrative stages (Inferiority Complex → Impostor Pattern → … → Authentic Rockstar) instead of the 5 numeric bands. Added `ladderNow` (current node index) decoupled from `level.index`: Impact Readiness tracks the band index with Impact as a goal node (`progressionGoal: true`); Value Spectrum places the score across the 8 stages (~12.5 pts each, so 92 → Authentic Rockstar). The headline level still comes from the 5 bands (no regression).
+- Bands confirmed: the app's canonical 20-pt bands are correct; the Drive HTML mockups' inline JS thresholds were looser (app wins).
+- Verified: tsc + production build pass. Live visual pending the deploy (local dev port was occupied by another process).
+- **Deferred (need Samuel's spec / narrative-prompt work):** Value Spectrum's "refinements (the four 7s)" section framing + the "perfect score" highlight when a dimension hits 100; and deterministic scaffolding for the combined profile (its Drive "Full User Model" spec was too large to fully extract this pass).
+
+---
+
 ## Chat voice: fold in Samuel's Master Chief prompt brief (prose-first) (2026-06-30)
 
 Samuel sent a formal "Master Chief System Prompt Brief" (6 blocks). Folded it into the chat-only voice layer (`content/AI Model/Chat Delivery Style.md`), building on the 2026-06-29 pass. Main upgrade: a hard **format prohibition** — default to natural prose, NO bullets / numbered lists / bold headers / sub-labels unless the user explicitly asks. (The first pass reduced verbosity but GLM still emitted bulleted "decks"; this kills that.) Also tightened per his blocks: capability-gap = one-sentence acknowledgment + a single recommendation (no options menu); user-model grounding names the specific fields (Conviction Score, Wiring, Value Spectrum, Release Threshold, active tensions); closing = at most one earned question. Verified against Samuel's Before/After benchmark via the GLM A/B — casual 116 tok, decision 210 tok, "Run Impact Pathways" 299 tok — all pure prose, one closing question, grounded in the profile, one-sentence gap ack.

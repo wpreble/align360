@@ -16,7 +16,7 @@ export const STORE_EVENT = 'align360:store-changed';
 export const ASSESSMENT_SLUGS = ['wiring', 'orientation', 'rejection-gift'] as const;
 export const CLARITY_SLUGS = ['impact-readiness', 'value-spectrum'] as const;
 
-export type StoredProfile = { profile: any; scores: any; generatedAt: string };
+export type StoredProfile = { profile: any; scores: any; generatedAt: string; answersHash?: string };
 export type ChatImage = string;
 export type ChatFileRef = { fileId: string; name: string };
 export type ChatMsg = { role: 'user' | 'assistant'; text: string; images?: ChatImage[]; files?: ChatFileRef[] };
@@ -39,6 +39,25 @@ function write(key: string, value: unknown) {
   } catch {
     /* ignore quota / serialization errors */
   }
+}
+
+/* ── Answer hashing (anti-drift) ──
+ * A generated report is reused only while the answers that produced it are
+ * unchanged. Hashing the answers means identical answers always return the same
+ * (first-generated) report — so retaking with the same answers no longer yields a
+ * different narrative — while changed answers correctly invalidate and regenerate.
+ * Order-insensitive so localStorage key ordering can't affect the hash. */
+function stableStringify(v: unknown): string {
+  if (v === null || typeof v !== 'object') return JSON.stringify(v);
+  if (Array.isArray(v)) return '[' + v.map(stableStringify).join(',') + ']';
+  const o = v as Record<string, unknown>;
+  return '{' + Object.keys(o).sort().map((k) => JSON.stringify(k) + ':' + stableStringify(o[k])).join(',') + '}';
+}
+export function hashAnswers(answers: unknown): string {
+  const str = stableStringify(answers ?? {});
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
 }
 
 /* ── Profile ── */

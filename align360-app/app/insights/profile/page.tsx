@@ -10,7 +10,7 @@ import GenLoader from '@/app/_components/GenLoader';
 import ClarityLayerSummary from '../_components/ClarityLayerSummary';
 import type { Profile } from '@/lib/profile';
 import type { Scores } from '@/lib/scoring';
-import { getAnswers, getProfile, setProfile } from '@/lib/storage';
+import { getAnswers, getProfile, setProfile, hashAnswers } from '@/lib/storage';
 
 type State =
   | { phase: 'loading' }
@@ -28,11 +28,13 @@ function ProfileInner() {
   const inFlightRef = useRef(false);
 
   const generate = useCallback(async (opts: { demo?: boolean; force?: boolean }) => {
+    const answers = getAnswers();
+    const answersHash = hashAnswers(answers);
     if (!opts.demo && !opts.force) {
       const saved = getProfile();
-      if (saved?.profile) { setState({ phase: 'ready', profile: saved.profile, scores: saved.scores, generated: true }); return; }
+      // Reuse the cached profile only if it was generated from these exact answers.
+      if (saved?.profile && saved.answersHash === answersHash) { setState({ phase: 'ready', profile: saved.profile, scores: saved.scores, generated: true }); return; }
     }
-    const answers = getAnswers();
     if (!opts.demo && Object.keys(answers).length === 0) { setState({ phase: 'empty' }); return; }
     if (inFlightRef.current) return; // dedupe concurrent runs (no double credit charge / race)
     inFlightRef.current = true;
@@ -49,7 +51,7 @@ function ProfileInner() {
       const data = await res.json();
       if (!aliveRef.current) return; // user navigated away mid-generation
       if (!res.ok) throw new Error(data.error || 'Generation failed');
-      if (!opts.demo) setProfile({ profile: data.profile, scores: data.scores, generatedAt: new Date().toISOString() });
+      if (!opts.demo) setProfile({ profile: data.profile, scores: data.scores, answersHash, generatedAt: new Date().toISOString() });
       setState({ phase: 'ready', profile: data.profile, scores: data.scores, generated: data.generated });
     } catch (err) {
       if (aliveRef.current) setState({ phase: 'error', message: err instanceof Error ? err.message : 'Unknown error' });

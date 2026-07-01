@@ -20,6 +20,9 @@ export type ClarityScores = {
   level: ClarityLevel;
   /** Ordered low → high band ladder, for the progression strip. */
   ladder: ClarityBand[];
+  /** Index of the current node within `ladder`. Decoupled from `level.index` so a
+   *  ladder can be finer-grained than the score bands (e.g. Value Spectrum's 8 stages). */
+  ladderNow: number;
   domains: ClarityDomain[];
   /** All sub-scores, flattened, in question order. */
   subs: ClaritySub[];
@@ -34,7 +37,11 @@ export type ClarityScores = {
 };
 
 type BandDef = { key: string; label: string; min: number; max: number };
-type Cfg = { scoreName: string; bands: BandDef[]; progression?: string[] };
+// progression: ordered ladder node labels (may be finer than `bands`).
+// progressionGoal true → the last node is a goal beyond the top band and the
+// "now" node tracks the band index (Impact Readiness). false/absent → the ladder
+// is a stage spectrum and the "now" node is the score placed across the N stages.
+type Cfg = { scoreName: string; bands: BandDef[]; progression?: string[]; progressionGoal?: boolean };
 
 /** Five-band ladders, sourced from the Drive result reports. */
 const CONFIG: Record<string, Cfg> = {
@@ -51,6 +58,7 @@ const CONFIG: Record<string, Cfg> = {
     // Impact as the goal node beyond the top band. The headline level still uses the
     // bands above (e.g. score 86 → "Convicted"); the ladder shows "Conviction → Impact".
     progression: ['Insecurity', 'Awareness', 'Clarity', 'Alignment', 'Conviction', 'Impact'],
+    progressionGoal: true,
   },
   'value-spectrum': {
     scoreName: 'Value Score',
@@ -60,6 +68,13 @@ const CONFIG: Record<string, Cfg> = {
       { key: 'emerging', label: 'Emerging Worth', min: 41, max: 60 },
       { key: 'confident', label: 'Confident Value', min: 61, max: 80 },
       { key: 'rockstar', label: 'Authentic Rockstar', min: 81, max: 100 },
+    ],
+    // The Value Spectrum template renders an 8-stage narrative ladder (finer than the
+    // 5 scoring bands above). The headline level still comes from the bands; the ladder
+    // "now" node is the overall score placed across these 8 stages (~12.5 pts each).
+    progression: [
+      'Inferiority Complex', 'Impostor Pattern', 'Value Perceiving', 'Value Aware',
+      'Value Aligned', 'Identity Aligned', 'Authentic', 'Authentic Rockstar',
     ],
   },
 };
@@ -130,15 +145,35 @@ export function computeClarityScores(slug: string, answers: Record<string, strin
     : null;
   const strengths = subs.filter((s) => s.points >= 10);
 
+  const level = bandFor(cfg.bands, overall);
+  let ladder: ClarityBand[];
+  let ladderNow: number;
+  if (cfg.progression) {
+    const n = cfg.progression.length;
+    if (cfg.progressionGoal) {
+      // Impact Readiness: nodes align to the score bands; the last node is the goal
+      // beyond the top band, and the current node tracks the band index.
+      ladder = cfg.progression.map((label, i) => ({ key: `p${i}`, label, goal: i === n - 1 }));
+      ladderNow = level.index;
+    } else {
+      // Value Spectrum: an N-stage spectrum; the current stage is the score placed
+      // across the N stages (clamped so a perfect 100 lands on the final stage).
+      ladder = cfg.progression.map((label, i) => ({ key: `p${i}`, label }));
+      ladderNow = Math.max(0, Math.min(n - 1, Math.floor((overall / 100) * n)));
+    }
+  } else {
+    ladder = cfg.bands.map((b) => ({ key: b.key, label: b.label }));
+    ladderNow = level.index;
+  }
+
   return {
     slug,
     title: assessment.title,
     scoreName: cfg.scoreName,
     overall,
-    level: bandFor(cfg.bands, overall),
-    ladder: cfg.progression
-      ? cfg.progression.map((label, i) => ({ key: `p${i}`, label, goal: i === cfg.progression!.length - 1 }))
-      : cfg.bands.map((b) => ({ key: b.key, label: b.label })),
+    level,
+    ladder,
+    ladderNow,
     domains,
     subs,
     aiEra,

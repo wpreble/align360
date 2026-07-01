@@ -9,7 +9,7 @@ import ClarityReport from './_components/ClarityReport';
 import GenLoader from '@/app/_components/GenLoader';
 import type { ClarityScores } from '@/lib/clarity-scoring';
 import type { ClarityNarrative } from '@/lib/clarity';
-import { getClarityAnswers, getClarityReport, setClarityReport, CLARITY_SLUGS } from '@/lib/storage';
+import { getClarityAnswers, getClarityReport, setClarityReport, hashAnswers, CLARITY_SLUGS } from '@/lib/storage';
 
 type State =
   | { phase: 'loading' }
@@ -35,14 +35,16 @@ function ClarityInner() {
         setState({ phase: 'unknown' });
         return;
       }
+      const answers = getClarityAnswers()[slug];
+      const answersHash = hashAnswers(answers || {});
       if (!opts.demo && !opts.force) {
         const saved = getClarityReport(slug);
-        if (saved?.narrative) {
+        // Reuse the cached report only if it was generated from these exact answers.
+        if (saved?.narrative && saved.answersHash === answersHash) {
           setState({ phase: 'ready', scores: saved.scores, narrative: saved.narrative, generated: true });
           return;
         }
       }
-      const answers = getClarityAnswers()[slug];
       if (!opts.demo && (!answers || Object.keys(answers).length === 0)) {
         setState({ phase: 'empty' });
         return;
@@ -62,7 +64,7 @@ function ClarityInner() {
         const data = await res.json();
         if (!aliveRef.current) return; // user navigated away mid-generation
         if (!res.ok) throw new Error(data.error || 'Generation failed');
-        if (!opts.demo) setClarityReport(slug, { scores: data.scores, narrative: data.narrative, name, generatedAt: new Date().toISOString() });
+        if (!opts.demo) setClarityReport(slug, { scores: data.scores, narrative: data.narrative, name, answersHash, generatedAt: new Date().toISOString() });
         setState({ phase: 'ready', scores: data.scores, narrative: data.narrative, generated: data.generated });
       } catch (err) {
         if (aliveRef.current) setState({ phase: 'error', message: err instanceof Error ? err.message : 'Unknown error' });
