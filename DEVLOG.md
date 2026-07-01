@@ -4,6 +4,14 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Chat voice: fold in Samuel's Master Chief prompt brief (prose-first) (2026-06-30)
+
+Samuel sent a formal "Master Chief System Prompt Brief" (6 blocks). Folded it into the chat-only voice layer (`content/AI Model/Chat Delivery Style.md`), building on the 2026-06-29 pass. Main upgrade: a hard **format prohibition** — default to natural prose, NO bullets / numbered lists / bold headers / sub-labels unless the user explicitly asks. (The first pass reduced verbosity but GLM still emitted bulleted "decks"; this kills that.) Also tightened per his blocks: capability-gap = one-sentence acknowledgment + a single recommendation (no options menu); user-model grounding names the specific fields (Conviction Score, Wiring, Value Spectrum, Release Threshold, active tensions); closing = at most one earned question. Verified against Samuel's Before/After benchmark via the GLM A/B — casual 116 tok, decision 210 tok, "Run Impact Pathways" 299 tok — all pure prose, one closing question, grounded in the profile, one-sentence gap ack.
+
+OPEN (needs Will's call): Samuel's Block 1 also names the assistant **"Master Chief™"**; the current identity in `System Prompt.md` §1 is "Align360." Adopted his VOICE (precision advisor, mentor not report generator) but not the NAME yet.
+
+---
+
 ## Chat precision: concise chat-only voice layer + GLM-vs-OpenAI A/B (2026-06-29)
 
 Samuel's chat feedback: primitive, too chatty / lacks precision, jargon, "not connected to user model." Root-cause diagnosis is in memory `align360-chat-precision.md`; this entry is the build. Scope was the **chat conversationally** (per Will: "I understand the results page stuff, I meant the chat").
