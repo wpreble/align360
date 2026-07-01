@@ -46,14 +46,23 @@ export default function ClarityReport({ scores, narrative }: { scores: ClaritySc
         <div className="clr-mini-row">
           {scores.domains.map((d) => (
             <div className="clr-mini" key={d.name}>
-              <div className="clr-mini-val">{d.score}</div>
+              <div className="clr-mini-val">{d.score}%</div>
               <div className="clr-mini-lbl">{d.name}</div>
             </div>
           ))}
           {scores.aiEra && (
             <div className="clr-mini">
-              <div className="clr-mini-val">{scores.aiEra.score}</div>
+              <div className="clr-mini-val">{scores.aiEra.score}%</div>
               <div className="clr-mini-lbl">AI-Era</div>
+            </div>
+          )}
+          {/* Primary Gap tile: the Impact Readiness template surfaces the lowest signal
+              as an n/10 gap tile in the hero. Value Spectrum frames its lows as
+              "refinements" instead, so this is scoped to impact-readiness. */}
+          {scores.slug === 'impact-readiness' && scores.primaryGap && (
+            <div className="clr-mini clr-mini-gap">
+              <div className="clr-mini-val">{scores.primaryGap.points}/10</div>
+              <div className="clr-mini-lbl">Primary Gap</div>
             </div>
           )}
         </div>

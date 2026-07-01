@@ -95,6 +95,8 @@
 }
 .clr-mini { text-align: center; }
 .clr-mini-val { font-family: 'Cormorant Garamond', 'Playfair Display', serif; font-size: 26px; color: var(--gold2); }
+/* Primary Gap tile stands out from the domain tiles: it's the one to act on. */
+.clr-mini-gap .clr-mini-val { color: var(--amber); }
 .clr-mini-lbl {
   font-size: 9px;
   font-weight: 500;
