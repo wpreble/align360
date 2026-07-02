@@ -4,6 +4,18 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Stripe IS LIVE: platform-mode go-live executed (2026-07-02)
+
+Align360 can now take real money. Executed on the **ascendance.one platform account** (`acct_1GbCOoBLDgd8WUrQ`) in PLATFORM mode (no Connect: live mode has zero connected accounts; Samuel's is test-only). Secrets hygiene: the live sk was never typed, displayed, or logged — every step piped it from Will's clipboard (`$(pbpaste)`) or from a shredded scratch file.
+
+- **Live products created** via `scripts/stripe-setup-products.ts --live --confirm`: `a360_individual_monthly` → `price_1ToaY6BLDgd8WUrQdWCYoYuU` ($49/mo, product `prod_UoCyVMx5daNiad`) and `a360_org_pilot_seat_monthly` → `price_1ToaY6BLDgd8WUrQbqM15hXD` ($19/seat/mo, product `prod_UoCyzkiuEFVi4V`), both with ALIGN branding (mark image, `ALIGN360` statement descriptor). Account-level branding deliberately untouched (shared services account, 22+ unrelated products).
+- **Live webhook endpoint** `we_1ToafEBLDgd8WUrQAAg6V8P9` → `https://align360-app.vercel.app/api/stripe/webhook`, enabled, 4 events (checkout.session.completed + customer.subscription.created/updated/deleted).
+- **Vercel env split by environment** (old single Preview+Production records were sensitive/unpullable, so they were rebuilt): **Production** = live sk + live pk + live whsec; **Preview** = test sk + test pk restored from `.env.local` (preview whsec intentionally dropped — it was inert, webhooks only ever pointed at prod; recreate a test endpoint if preview webhook testing is ever needed). Preview adds required the Vercel REST API (CLI `env add <name> preview` demands an interactive branch answer). `STRIPE_CONNECTED_ACCOUNT_ID` stays UNSET in prod → checkout code runs platform charges, no application fee.
+- **Deployed**: empty commit `b7c65e2` → fresh Production build (pk is build-inlined) → ● Ready; site 200, auth gating intact.
+- **Remaining human steps**: (1) Will: one real $49 checkout end-to-end, then refund it in the dashboard. (2) Re-confirm pilot pricing against the Jun-29 LOI before first org sale. (3) MIGRATION TO THE 50/50 SPLIT: Samuel must complete LIVE Connect onboarding on Ascendance; then set `STRIPE_CONNECTED_ACCOUNT_ID` (+ fee percent) in Vercel prod, re-run the setup script `--live --confirm` against his account (Direct Charges = objects live on the connected account), and redeploy. Until then Samuel's share settles out-of-band.
+
+---
+
 ## Final QA pass + Stripe go-live prep (2026-07-01)
 
 Pre-launch sweep before switching Stripe to live. Fixes:
