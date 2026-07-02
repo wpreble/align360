@@ -4,6 +4,17 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Settlement model confirmed: platform collects, manual payouts later (2026-07-02)
+
+Will: the Connect 50/50 split is deferred indefinitely (not just until Samuel's live onboarding). Operating model for now: **Ascendance collects 100% on the platform account; Samuel is paid out manually, later, after AI costs are subtracted.** No code change needed (already platform mode).
+
+For whoever runs the first settlement, the data is all captured:
+- **Revenue**: Stripe (live) — MUST filter to Align360 products only (the ascendance.one account is shared with other business lines): products carry `metadata.brand = 'Align360'`; subscriptions carry `metadata.owner_type/owner_id`. Net of refunds + Stripe processing fees.
+- **AI costs**: every metered AI call records actual cost as `cost_micros` (plus feature/model/tokens) via the `credit_charge` RPC (`lib/credit-metering.ts` → Supabase). Period AI cost = SUM(cost_micros)/1e6. Top-up purchases already carry margin (`USD_PER_CREDIT_SELL`).
+- **Open at first settlement**: the exact split base (e.g. 50% of net-after-AI-costs vs another formula) — decide with Samuel then. A `scripts/settlement-report.ts` can be built when the first payout approaches.
+
+---
+
 ## Individual pilot repriced $49 → $25 (2026-07-02, after go-live)
 
 Will: the pilot individual price is **$25/mo** (decision from the LOI thread with Samuel; supersedes the one-pager's $49 that the code was built from). Org stays $19/seat.
