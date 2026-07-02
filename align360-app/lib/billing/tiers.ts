@@ -25,8 +25,10 @@ export const TIERS: Tier[] = [
   {
     key: 'individual_monthly',
     productName: 'Align360 · Individual',
-    description: 'Individual plan, billed monthly. Alpha $49 (public release $99; alpha users grandfathered at $49 through first renewal).',
-    amountCents: 4900,
+    // 2026-07-02: $49 -> $25 per Will (pilot pricing from the LOI thread with
+    // Samuel; supersedes the $49 figure from the 2026-06 alpha one-pager).
+    description: 'Individual plan, billed monthly. Pilot price $25.',
+    amountCents: 2500,
     interval: 'month',
     perSeat: false,
     lookupKey: 'a360_individual_monthly',

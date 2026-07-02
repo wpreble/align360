@@ -62,9 +62,14 @@ export function monthlyCreditsForPlan(priceCents: number, share = AI_BUDGET_SHAR
   return Math.round(usdToCredits(aiBudgetUsd));
 }
 
-/** Per-plan monthly allowance (credits). Individual $49, org seat $19, at 12%. */
+/** Per-plan monthly allowance (credits).
+ *  Individual is priced $25 for the pilot (2026-07-02) but the allowance is HELD
+ *  at the $49-equivalent level (588) so pilot/alpha users' AI experience is
+ *  unchanged (ALPHA_FREE_ALLOWANCE derives from this too). At $25 that is ~24%
+ *  AI share instead of the 12% guardrail; if margins demand, switch to
+ *  monthlyCreditsForPlan(2500) (=300). Org seat stays $19 at 12%. */
 export const PLAN_ALLOWANCE = {
-  individual: monthlyCreditsForPlan(4900), // 588
+  individual: monthlyCreditsForPlan(4900), // 588 (held; see note above)
   org_seat: monthlyCreditsForPlan(1900),   // 228
 } as const;
 

@@ -113,7 +113,7 @@ export default function SubscribePage() {
           <>
             <div className="sub-plan">
               <div className="sub-plan-name">Individual</div>
-              <div className="sub-price"><span>$49</span>/month</div>
+              <div className="sub-price"><span>$25</span>/month</div>
               <ul className="sub-feats">
                 <li>Your full combined profile and every assessment</li>
                 <li>An AI guide that knows how you are wired</li>

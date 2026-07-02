@@ -55,6 +55,36 @@ async function main() {
       const p = found.data[0];
       const productId = typeof p.product === 'string' ? p.product : p.product.id;
       const price = `$${(p.unit_amount ?? 0) / 100}/${t.interval}${t.perSeat ? '/seat' : ''}`;
+      // Stripe prices are immutable: on an amount change, create a NEW price and
+      // move the lookup key onto it (transfer_lookup_key), then deactivate the old
+      // one. Existing subscriptions keep billing on the old (now-inactive) price;
+      // new checkouts pick up the new amount via the lookup key.
+      if (p.unit_amount !== t.amountCents) {
+        const target = `$${t.amountCents / 100}/${t.interval}${t.perSeat ? '/seat' : ''}`;
+        if (!confirm) {
+          console.log(`↻ would reprice  ${t.lookupKey}  ${price} → ${target}`);
+          continue;
+        }
+        const np = await stripe.prices.create(
+          {
+            product: productId,
+            unit_amount: t.amountCents,
+            currency: 'usd',
+            recurring: { interval: t.interval, usage_type: 'licensed' },
+            lookup_key: t.lookupKey,
+            transfer_lookup_key: true,
+          },
+          opts,
+        );
+        await stripe.prices.update(p.id, { active: false }, opts);
+        await stripe.products.update(
+          productId,
+          { name: t.productName, description: t.description, images: [BRAND_IMAGE], statement_descriptor: 'ALIGN360', metadata: { brand: 'Align360', tier: t.key } },
+          opts,
+        );
+        console.log(`↻ repriced  ${t.lookupKey}  ${price} → ${target}  (new ${np.id}, old ${p.id} deactivated)`);
+        continue;
+      }
       if (confirm) {
         // Idempotently (re)apply ALIGN branding to the existing product.
         await stripe.products.update(

@@ -4,6 +4,16 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Individual pilot repriced $49 → $25 (2026-07-02, after go-live)
+
+Will: the pilot individual price is **$25/mo** (decision from the LOI thread with Samuel; supersedes the one-pager's $49 that the code was built from). Org stays $19/seat.
+
+- `lib/billing/tiers.ts` 4900 → 2500 (+ provenance comment); `app/subscribe/page.tsx` displays $25.
+- **Credits allowance HELD at 588** (`lib/credits.ts` comment): the 12% guardrail formula would drop it to 300 at $25, which would silently shrink every alpha user's AI allowance (ALPHA_FREE_ALLOWANCE derives from it). Held at the $49-equivalent (~24% AI share at $25, GLM keeps it cheap); flip to `monthlyCreditsForPlan(2500)` if margins demand. WILL'S CALL.
+- `scripts/stripe-setup-products.ts` now REPRICES on amount mismatch: creates the new price with `transfer_lookup_key: true`, deactivates the old one, refreshes branding (existing subscriptions keep billing on their old price; new checkouts get the new amount). Ran on TEST (new `price_1Tob8pBLDgd8WUrQvoiAw8j3`) and LIVE (new `price_1TolSOBLDgd8WUrQemjKWCVI`, old `price_1ToaY6...dWCYoYuU` deactivated); live verified via API: individual $25 active, org $19 active. Reprice-before-deploy ordering so no window showed a lower price than Stripe charged.
+
+---
+
 ## Stripe IS LIVE: platform-mode go-live executed (2026-07-02)
 
 Align360 can now take real money. Executed on the **ascendance.one platform account** (`acct_1GbCOoBLDgd8WUrQ`) in PLATFORM mode (no Connect: live mode has zero connected accounts; Samuel's is test-only). Secrets hygiene: the live sk was never typed, displayed, or logged — every step piped it from Will's clipboard (`$(pbpaste)`) or from a shredded scratch file.
