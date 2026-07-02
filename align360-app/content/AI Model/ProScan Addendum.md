@@ -17,6 +17,8 @@ Three additions, four placements. Surgical insertions only — nothing existing 
 
 ## §5.1.1 Shadow Mode Capture Layer
 
+> **Status: DORMANT (2026-06-26).** The 4 Section F questions were removed from the live Wiring for Impact assessment per Samuel, so this layer currently captures no data. Do not administer Section F questions or reference compressed-mode results for new takers. The spec below is retained for when the layer returns.
+
 **Purpose.** Every primary behavioral pattern has a *compressed form* — the version that surfaces when resources are low and pressure stays high. This layer captures it during Wiring for Impact (the 4 Section F questions). It does not evaluate weakness; it identifies the predictable edge-expression of each gift so the system can offer early awareness and protective guidance before compression occurs.
 
 **Why it matters.** Without this, the system can't distinguish a user who is *underperforming* from one *operating at the limit of their current energy architecture* — two states needing opposite responses.

@@ -15,23 +15,23 @@ The full question banks live as tracked markdown in `Assessments/`. **These are 
 
 | Assessment | Questions | File |
 |---|---|---|
-| Wiring for Impact | **15 core + 4 Section F (Compressed Mode) = 19** | `Assessments/Wiring for Impact.md` |
+| Wiring for Impact | **15** (the 4 Section F / Compressed Mode questions were removed 2026-06-26) | `Assessments/Wiring for Impact.md` |
 | Orientation for Impact | 12 | `Assessments/Orientation for Impact.md` |
 | Rejection Gift Finder | 12 | `Assessments/Rejection Gift Finder.md` |
 | Onboarding | 12 + 6 Section I (Current State) = 18 | `Assessments/Onboarding.md` |
 | B3 Wellness Baseline | 18 | `Assessments/B3 Wellness Baseline.md` |
 | B3 Daily Check-In | 3 + Q4 (Effort Value) | `Assessments/B3 Daily Check-In.md` |
 
-> **There is no 36-question version of Wiring for Impact.** Any reference to "36 questions" is an error; the assessment is 15 core + 4 Section F. See `AI-Era Calibration Addendum.md` Part C.
+> **There is no 36-question version of Wiring for Impact.** Any reference to "36 questions" is an error. The live assessment is **15 questions**; the former 4 Section F questions were removed on 2026-06-26 (see below) and must not be administered.
 
 **Wiring for Impact** maps 9 gifts: Realist, Supporter, Doer, Organizer, Explainer, Integrator, Enterpriser, Encourager, Wise Observer.
-**Orientation for Impact** maps 5 types: Analytical, Relational, Practical, Strategic, Imaginative.
+**Orientation for Impact** maps 5 types: Truth-Seeker, Builder, Explainer, Supporter, Starter (per the assessment file and scoring engine; an older draft's "Analytical/Relational/Practical/Strategic/Imaginative" naming is obsolete).
 **Rejection Gift Finder** maps the gift categories surfaced in `Assessments/Rejection Gift Finder.md` (Insight/Abstract Questioner, Pattern Seer, etc.).
 
 ## Governance addenda (apply to interpretation, not to questions)
 
 - **`AI-Era Calibration Addendum.md`** — DISRUPTION_POSTURE values, legacy-vs-AI-era signal rules, capability-vs-role distinction, §8.2 AI-Era Calibration Feedback Protocol. Governs the **AI-Era Intelligence** section of the combined profile result.
-- **`ProScan Addendum.md`** — §5.1.1 Shadow Mode Capture (Wiring Section F), Current State Calibration Layer + Presence Gap Score (Onboarding Section I), §7.1 Effort Value Assessment (B3 Daily Q4), §8.1 Identity State Interpretation Protocol (Foundational Self vs. Current Self language governance).
+- **`ProScan Addendum.md`** — §5.1.1 Shadow Mode Capture (Wiring Section F — currently dormant: those questions were removed from the live assessment 2026-06-26), Current State Calibration Layer + Presence Gap Score (Onboarding Section I), §7.1 Effort Value Assessment (B3 Daily Q4), §8.1 Identity State Interpretation Protocol (Foundational Self vs. Current Self language governance).
 
 The operational essence of both addenda is already encoded in System Prompt §14 (Background Systems). These files hold the granular detail (score tables, exact label formats, canonical statements) for when an output needs it.
 

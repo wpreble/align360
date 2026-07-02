@@ -14,7 +14,12 @@
  *   STRIPE_SECRET_KEY=sk_test_... STRIPE_CONNECTED_ACCOUNT_ID=acct_... \
  *     npx tsx scripts/stripe-setup-products.ts --confirm
  *
- * Refuses to run against a live (sk_live_) key.
+ * LIVE mode (go-live, 2026-07-01): a sk_live_ key additionally requires the
+ * explicit --live flag, so an accidental live run stays impossible:
+ *   STRIPE_SECRET_KEY=sk_live_... STRIPE_CONNECTED_ACCOUNT_ID=acct_... \
+ *     npx tsx scripts/stripe-setup-products.ts --live            (dry run)
+ *   STRIPE_SECRET_KEY=sk_live_... STRIPE_CONNECTED_ACCOUNT_ID=acct_... \
+ *     npx tsx scripts/stripe-setup-products.ts --live --confirm  (create)
  */
 import Stripe from 'stripe';
 import { TIERS } from '../lib/billing/tiers';
@@ -27,11 +32,18 @@ const BRAND_IMAGE = 'https://align360-app.vercel.app/brand/align-mark-fig.png';
 async function main() {
   const key = process.env.STRIPE_SECRET_KEY;
   const acct = process.env.STRIPE_CONNECTED_ACCOUNT_ID;
-  if (!key) throw new Error('STRIPE_SECRET_KEY is required (use a sk_test_ key).');
-  if (key.startsWith('sk_live_')) throw new Error('Refusing to run against a LIVE key. Use sk_test_.');
+  if (!key) throw new Error('STRIPE_SECRET_KEY is required.');
+  const live = process.argv.includes('--live');
+  if (key.startsWith('sk_live_') && !live) {
+    throw new Error('LIVE key detected. Re-run with the explicit --live flag to operate on live mode.');
+  }
+  if (live && !key.startsWith('sk_live_')) {
+    throw new Error('--live was passed but the key is not a sk_live_ key.');
+  }
   const confirm = process.argv.includes('--confirm');
 
   const stripe = new Stripe(key);
+  if (live) console.log('*** LIVE MODE ***');
   // Direct Charges → create on the connected account when set; otherwise create on
   // the platform account (test/dev before Samuel has connected). Idempotent per account.
   const opts: Stripe.RequestOptions = acct ? { stripeAccount: acct } : {};

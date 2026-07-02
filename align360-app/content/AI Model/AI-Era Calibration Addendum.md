@@ -68,8 +68,8 @@ Must never present opportunity signals as stable assessments of fit when market 
 
 ## Part C — What Does Not Change
 
-The five assessment question sets — **Wiring for Impact (15 + 4 Section F), Orientation for Impact (12), Rejection Gift Finder (12), Onboarding (Q1–Q18, + the Section I / Q19 calibration addition), and B3** — do **not** require changes for AI-era optimization. This is by design: what they measure (how someone is wired, how they see, what adversity forged, how the body performs today) are **pre-market signals** describing how a person is built, not where the market is.
+The five assessment question sets — **Wiring for Impact (15; the 4 Section F questions were removed 2026-06-26), Orientation for Impact (12), Rejection Gift Finder (12), Onboarding (Q1–Q18, + the Section I / Q19 calibration addition), and B3** — do **not** require changes for AI-era optimization. This is by design: what they measure (how someone is wired, how they see, what adversity forged, how the body performs today) are **pre-market signals** describing how a person is built, not where the market is.
 
 > All AI-era calibration happens in the **interpretation layer** (governance rules, opportunity-signal logic, result sequencing). The **measurement layer stays timeless.** This separation is what makes Align360 durable across market conditions rather than obsolete with them.
 
-> *(This Part C is the authoritative confirmation that there is no "36-question" Wiring assessment — Wiring is 15 core + 4 Section F.)*
+> *(This Part C is the authoritative confirmation that there is no "36-question" Wiring assessment. The live Wiring assessment is 15 questions; the former Section F set was removed on 2026-06-26.)*

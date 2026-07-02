@@ -4,6 +4,17 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Final QA pass + Stripe go-live prep (2026-07-01)
+
+Pre-launch sweep before switching Stripe to live. Fixes:
+
+- **Chat no longer promises 19 Wiring questions.** Q16-19 / Section F were removed from the live assessment on 2026-06-26, but the AI content still instructed 19: `System Prompt.md` §12.2 + §13 (now 15, with an explicit "do not administer" note), `Knowledge File — Part 1.md` count table + 36-question note, `AI-Era Calibration Addendum.md` Part C (both mentions), and `ProScan Addendum.md` §5.1.1 (marked **DORMANT**, spec retained). This was visible in Samuel's chat snippets ("19 questions, 15 core + 4 about how you operate under pressure").
+- **Orientation naming corrected in the Knowledge File**: the five orientations are **Truth-Seeker / Builder / Explainer / Supporter / Starter** (per the assessment file + `lib/report-scoring.ts`); the stale "Analytical/Relational/Practical/Strategic/Imaginative" list is marked obsolete. NOTE: Samuel's DesignSuite collateral PDF still shows the old list — flagged to Will (his collateral, not app code).
+- Removed `content/AI Model/Chat Delivery Style 2.md` (untracked byte-identical duplicate of the first-pass voice layer, superseded by Samuel's brief; git history retains it at `e71dca7`).
+- **Stripe go-live enabled in tooling**: `scripts/stripe-setup-products.ts` now accepts sk_live_ keys behind an explicit `--live` flag (still refuses live without it; dry-run stays the default). `.env.example` updated: live keys are sanctioned (2026-07-01) and belong in Vercel only. Pricing confirmed against the latest reachable source (`align360_alpha_pilot_onepager`, 2026-06, encoded in `lib/billing/tiers.ts` commit ff4836b): **Individual $49/mo** (public $99 later, alpha grandfathered), **Team Alpha Pilot $19/seat/mo, min 5 seats**; sales-led commercial tiers ($3k-$10k flat + seats, Founders Circle $35/seat) stay invoice-based, not self-serve. The Jun-29 LOI lives in Will's direct thread with Samuel (not reachable from tooling) — pricing to be re-confirmed against it before/at first org invoice.
+
+---
+
 ## Results-page rubric alignment: anti-drift lock + Value Spectrum 8-stage ladder + Conviction mini-row (2026-07-01)
 
 Samuel: the results pages weren't following the rubric, and the same answers yielded different results. Diagnosed by diffing the app against the hand-built Drive templates (folder `15UbTRCB8-uj-WOBe0plhFK76w9RT-FYa`), then aligned:
