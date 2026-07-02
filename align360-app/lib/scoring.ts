@@ -19,7 +19,9 @@ export type AnswerSet = Record<string, string>;
 
 /**
  * Tally gift tags from a set of answers against an assessment's question bank.
- * Compound tags ("Realist/Explainer") split; first part weighted 1.0, extras 0.6.
+ * Compound tags ("Realist/Explainer") split; first part weighted 1.0, extras 0.5
+ * (governance-doc rule: secondary gift gets 50% of points; changed from 0.6 on
+ * 2026-07-02, approved by Samuel). Keep in sync with lib/report-scoring.ts tally.
  */
 function tallyTags(slug: string, answers: AnswerSet): Record<string, number> {
   const assessment = getAssessment(slug);
@@ -41,7 +43,7 @@ function tallyTags(slug: string, answers: AnswerSet): Record<string, number> {
     if (opt.giftTag.includes(':')) continue;
     const parts = opt.giftTag.split('/').map((p) => p.trim()).filter(Boolean);
     parts.forEach((p, i) => {
-      counts[p] = (counts[p] || 0) + (i === 0 ? 1 : 0.6);
+      counts[p] = (counts[p] || 0) + (i === 0 ? 1 : 0.5);
     });
   }
   return counts;
@@ -73,7 +75,10 @@ export function computeScores(answers: {
   const oCounts = answers.orientation ? tallyTags('orientation', answers.orientation) : {};
   const rCounts = answers['rejection-gift'] ? tallyTags('rejection-gift', answers['rejection-gift']) : {};
 
-  const wRanked = rank(wCounts);
+  // Wiring uses Samuel's canonical 78-leader scale (matches lib/report-scoring.ts,
+  // changed from 88 on 2026-07-02) so the combined profile and the wiring report
+  // show the same measurements. Orientation/rejection scales intentionally untouched.
+  const wRanked = rank(wCounts, 78);
   const oRanked = rank(oCounts);
   const rRanked = rank(rCounts);
 

@@ -5,7 +5,7 @@ import { WIRING_GIFTS } from './scoring';
 // (Wiring for Impact, Orientation for Impact, Rejection Gift Finder). Unlike the
 // Clarity Layer (numeric 0-100 per option), these tally archetype TAGS from the
 // chosen options and rank them. Each report has its own shape:
-//   - Wiring:     9 gifts, strength-scaled (top ≈ 88)
+//   - Wiring:     9 gifts, strength-scaled (top ≈ 78, Samuel's canonical scale)
 //   - Orientation: 5 orientations, share-of-total scaled (sums ≈ 100)
 //   - Rejection:  5 gift CATEGORIES (share-scaled) + a dominant SIGNATURE TRAIT
 // Tags are read from each option's `→ Tag` annotation (parsed in lib/assessments).
@@ -43,29 +43,36 @@ function chosenOptions(slug: string, answers: Record<string, string>): Chosen[] 
   return out;
 }
 
-/** Weighted tally of tags, optionally restricted to a universe. First tag 1.0, extras 0.6. */
+/** Weighted tally of tags, optionally restricted to a universe. First tag 1.0,
+ *  extras 0.5 (the governance doc's rule: secondary gift gets 50% of points;
+ *  changed from 0.6 on 2026-07-02, approved by Samuel). Keep in sync with
+ *  lib/scoring.ts tallyTags. */
 function tally(chosen: Chosen[], universe?: readonly string[]): Record<string, number> {
   const counts: Record<string, number> = {};
   for (const c of chosen) {
     c.tags.forEach((t, i) => {
       if (universe && !universe.includes(t)) return;
-      counts[t] = (counts[t] || 0) + (i === 0 ? 1 : 0.6);
+      counts[t] = (counts[t] || 0) + (i === 0 ? 1 : 0.5);
     });
   }
   return counts;
 }
 
-/** Strength scale: leader ≈ 88, floor 8 so every bar is visible. Used for Wiring. */
+/** Strength scale: leader ≈ 78, floor 8 so every bar is visible. Used for Wiring.
+ *  78 is Samuel's canonical measurement scale (his WFI standard shows the top
+ *  gift at 78%); changed from 88 on 2026-07-02 per Will. Keep in sync with the
+ *  same constant in lib/scoring.ts (combined profile) so surfaces agree. */
 function rankStrength(counts: Record<string, number>, universe: readonly string[]): Tally[] {
   const max = Math.max(1, ...universe.map((t) => counts[t] || 0));
   return universe
     .map((tag) => {
       const score = counts[tag] || 0;
-      const pct = score ? Math.max(8, Math.round((score / max) * 88)) : 8;
+      const pct = score ? Math.max(8, Math.round((score / max) * 78)) : 8;
       return { tag, score, pct, dim: false };
     })
     .sort((a, b) => b.score - a.score)
-    .map((t, i) => ({ ...t, dim: i > 1 && t.pct < 50 }));
+    // 44 keeps the same relative dim cutoff the old 50 had on the 88 scale.
+    .map((t, i) => ({ ...t, dim: i > 1 && t.pct < 44 }));
 }
 
 /** Share scale: each tag as a % of total tag weight (sums ≈ 100). Orientation + Rejection. */
@@ -80,12 +87,15 @@ function rankShare(counts: Record<string, number>, universe: readonly string[]):
     .map((t, i) => ({ ...t, dim: i > 1 && t.pct < 15 }));
 }
 
+// Governance-doc confidence bands (approved by Samuel 2026-07-02): blended when
+// the top two are within 5 points, clear primary at a 7+ point gap. The low-signal
+// Emerging floor is kept as a guard for scattered share-scale results.
 function confidenceBand(ranked: Tally[]): string {
   const top = ranked[0]?.pct ?? 0;
   const gap = top - (ranked[1]?.pct ?? 0);
   if (top < 24) return 'Emerging';
-  if (gap <= 6) return 'Blended Primary';
-  if (gap >= 18) return 'Clear Primary';
+  if (gap <= 5) return 'Blended Primary';
+  if (gap >= 7) return 'Clear Primary';
   return 'Clear';
 }
 
@@ -187,7 +197,7 @@ export function scoreAssessment(slug: string, answers: Record<string, string>): 
       primaryPct: orientations[0]?.pct || 0,
       secondary: orientations[1]?.tag || 'Builder',
       secondaryPct: orientations[1]?.pct || 0,
-      blended: gap <= 8,
+      blended: gap <= 5, // governance-doc blended rule (was 8)
       confidence: confidenceBand(orientations),
       answered,
       total,
@@ -201,10 +211,17 @@ export function scoreAssessment(slug: string, answers: Record<string, string>): 
   for (const c of chosen)
     c.tags.forEach((t, i) => {
       if ((REJECTION_CATEGORIES as readonly string[]).includes(t)) return;
-      if (!WIRING_GIFTS.includes(t as (typeof WIRING_GIFTS)[number])) traitCounts[t] = (traitCounts[t] || 0) + (i === 0 ? 1 : 0.6);
+      if (!WIRING_GIFTS.includes(t as (typeof WIRING_GIFTS)[number])) traitCounts[t] = (traitCounts[t] || 0) + (i === 0 ? 1 : 0.5);
     });
   const signatureTrait = Object.entries(traitCounts).sort((a2, b2) => b2[1] - a2[1])[0]?.[0] || 'Paradigm Challenger';
   const primary = categories[0]?.tag || 'Perspective';
+  // Story archetype comes from the user's OWN film-narrative-arc answer (its
+  // category tag), not from the overall primary category. Approved by Samuel
+  // 2026-07-02: his Perspective-primary result carries "The Misunderstood
+  // Visionary" because his film-arc answer was the Creativity option. Falls back
+  // to the overall-primary mapping when that question is unanswered.
+  const filmArc = chosen.find((c) => /film|narrative arc/i.test(c.label)) || chosen.find((c) => c.qid === 'q11');
+  const archetypeKey = filmArc?.tags.find((t) => (REJECTION_CATEGORIES as readonly string[]).includes(t)) || primary;
   return {
     kind: 'rejection-gift',
     slug: 'rejection-gift',
@@ -213,7 +230,7 @@ export function scoreAssessment(slug: string, answers: Record<string, string>): 
     primary,
     primaryPct: categories[0]?.pct || 0,
     signatureTrait,
-    storyArchetypeHint: ARCHETYPE_BY_CATEGORY[primary] || 'The Misunderstood Visionary',
+    storyArchetypeHint: ARCHETYPE_BY_CATEGORY[archetypeKey] || 'The Misunderstood Visionary',
     confidence: confidenceBand(categories),
     answered,
     total,

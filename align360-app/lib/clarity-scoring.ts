@@ -83,7 +83,16 @@ export function isClaritySlug(slug: string): boolean {
   return slug in CONFIG;
 }
 
-const clamp100 = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
+// Half-to-even rounding (banker's), clamped to 0-100. Matches Samuel's canonical
+// Impact Readiness tiles, where 92.5 renders as 92 but 77.5 renders as 78; plain
+// round-half-up would show 93/93/93 and break measurement parity with his standard.
+const clamp100 = (n: number) => {
+  const x = Math.min(100, Math.max(0, n));
+  const scaled = Math.round(x * 1e6) / 1e6; // strip float dust (e.g. 92.50000000000001)
+  const floor = Math.floor(scaled);
+  if (Math.abs(scaled - floor - 0.5) < 1e-9) return floor % 2 === 0 ? floor : floor + 1;
+  return Math.round(scaled);
+};
 
 function bandFor(bands: BandDef[], score: number): ClarityLevel {
   const i = bands.findIndex((b) => score >= b.min && score <= b.max);

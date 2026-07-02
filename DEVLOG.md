@@ -25,6 +25,24 @@ Will: the pilot individual price is **$25/mo** (decision from the LOI thread wit
 
 ---
 
+## Scoring rubric LOCKED + measurement parity with Samuel's canonical results (2026-07-02)
+
+Samuel's email: app results differ from his original Claude results on the same answers. Diagnosed (hand-scored his exact answers through our engine + read the gov-doc scoring rubric), then locked a canonical rubric behind a permanent parity test.
+
+**Root cause.** Impact Readiness + Value Spectrum overall scores already matched (deterministic 0/3/7/10; 86 Convicted + 92 Authentic Rockstar). WFI/OFI/RGF diverged because his originals were **LLM-judgment-scored** — the gov-doc rubric is written for a 1-5 Likert instrument, not the multiple-choice format, so the original Claude session improvised numbers no formula (or re-run) can reproduce (e.g. "Organizer 78 primary" when the raw tally favors Realist). Fix = agree one repeatable rubric, not chase the old numbers. Detail in memory `align360-pending-samuel-feedback.md`.
+
+**Canonical rubric encoded (approved — Will on #1; Samuel by email "yes for both" on #2/#3):**
+- **#1 Wiring leader scale 88 → 78** (Samuel's standard), in BOTH engines so surfaces agree: `report-scoring.ts` `rankStrength` (dim cutoff rescaled 50→44) and `scoring.ts` `rank(wCounts, 78)` (combined profile).
+- **#2 Compound-tag weights**: secondary gift 0.6 → **0.5** (gov doc: 50%), both engines. **Confidence bands** now gov-doc: Blended Primary at gap ≤ 5, Clear Primary at gap ≥ 7 (`report-scoring.ts`; orientation `blended` 8 → 5).
+- **#3 Rejection story archetype** now derives from the user's own **film-narrative-arc answer** (its category tag), not the overall primary — so Samuel's Perspective-primary result correctly carries "The Misunderstood Visionary" (from his Creativity film-arc pick). Falls back to the primary-category map when Q11 is unanswered.
+- **Domain-tile rounding fix** (`clarity-scoring.ts` `clamp100` → round-half-to-even): the deployed `Math.round` turned Samuel's 92.5 IR domains into **93** and 77.5 into 78; his canonical shows **92 / 78**. Banker's rounding is the only simple rule reproducing both (92.5→92, 77.5→78). A real IR domain-tile discrepancy the overall-only check had missed; overall/AI-Era unaffected (no .5 values).
+
+**Locked with a parity test** — `align360-app/scripts/parity-check.ts` runs Samuel's exact answers through all five assessments and asserts the canonical numbers (Wiring Realist 78 / Doer 59 / Organizer 59 / … Clear Primary, both engines identical; Orientation Builder 42 / Truth-Seeker 38 Blended; RGF Perspective 44 / "Paradigm Challenger" / "Misunderstood Visionary"; IR 86 Convicted, domains 92/92/92/78/75, AI-Era 94; VS 92 Authentic Rockstar). Green. Any future engine change that breaks parity fails loudly (`npx tsx scripts/parity-check.ts`). tsc + production build pass.
+
+**Still open (non-blocking):** the Doer/Organizer 59-tie secondary NAME (both engines agree on numbers; tie-break rule unspecified) and 4 answer→tag deltas vs Samuel's refined-questions doc (WFI Q4-A, Q12-C; OFI Q6-A, Q11-E — content-file tags, a separate audit). NOTE: reports cache client-side — Samuel must tap **Regenerate** to see new numbers on an existing report.
+
+---
+
 ## Stripe IS LIVE: platform-mode go-live executed (2026-07-02)
 
 Align360 can now take real money. Executed on the **ascendance.one platform account** (`acct_1GbCOoBLDgd8WUrQ`) in PLATFORM mode (no Connect: live mode has zero connected accounts; Samuel's is test-only). Secrets hygiene: the live sk was never typed, displayed, or logged — every step piped it from Will's clipboard (`$(pbpaste)`) or from a shredded scratch file.
