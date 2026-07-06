@@ -28,7 +28,7 @@
 .org-invites { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.75rem; }
 .org-invite { display: flex; gap: 1rem; align-items: center; font-size: 13px; color: #5a4f5e; background: #faf9f8; border: 1px solid rgba(42,18,46,0.08); border-radius: 9px; padding: 0.5rem 0.85rem; }
 .org-invite span { flex: 1; }
-.org-err { color: #a32d2d; background: rgba(163,45,45,0.06); border: 1px solid rgba(163,45,45,0.18); border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 13px; margin-top: 0.75rem; }
+.org-err { color: #a32d2d; background: rgba(163,45,45,0.06); border: 1px solid rgba(163,45,45,0.18); border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 13px; margin-top: 0.75rem; overflow-wrap: anywhere; word-break: break-word; }
 .org-msg { color: #0f6e56; background: rgba(15,110,86,0.06); border: 1px solid rgba(15,110,86,0.18); border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 13px; margin-top: 0.75rem; word-break: break-all; }
 
 /* Mobile (audited 2026-06-25): the members table overflowed on long emails and
@@ -43,4 +43,8 @@
   .org-table { table-layout: fixed; }
   .org-table th, .org-table td { padding: 0.5rem 0.4rem; word-break: break-word; }
   .org-invite { flex-wrap: wrap; gap: 0.5rem 1rem; }
+  /* 16px prevents iOS zoom-on-focus for the name/email/seats inputs + role select. */
+  .org-input { font-size: 16px; }
+  /* Copy link / Revoke get a real tap height (Revoke is destructive). */
+  .org-invite .org-link { min-height: 40px; display: inline-flex; align-items: center; padding: 6px 4px; }
 }

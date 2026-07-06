@@ -1,6 +1,7 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "align360", "runtimeExecutable": "bash", "runtimeArgs": ["-c", "cd align360-app && npm run dev"], "port": 3000 }
+    { "name": "align360", "runtimeExecutable": "bash", "runtimeArgs": ["-c", "cd align360-app && npm run dev"], "port": 3000 },
+    { "name": "align360-test", "runtimeExecutable": "bash", "runtimeArgs": ["-c", "cd align360-app && NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= npm run dev"], "port": 3000, "autoPort": true }
   ]
 }

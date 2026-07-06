@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { isAdminEmail } from '@/lib/admin';
+import { isTeamEmail } from '@/lib/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -18,7 +18,7 @@ export async function GET() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ enforce, access: false, signedIn: false });
 
-    if (isAdminEmail(user.email)) return NextResponse.json({ enforce, access: true, admin: true, plan: 'admin' });
+    if (isTeamEmail(user.email)) return NextResponse.json({ enforce, access: true, admin: true, team: true, plan: 'team' });
 
     // Array (not maybeSingle): a user can have more than one subscription row
     // (e.g. re-subscribe after cancel), and maybeSingle throws on >1 row.

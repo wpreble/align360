@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { costUsd, creditsFor, ALPHA_FREE_ALLOWANCE } from '@/lib/credits';
-import { isAdminEmail } from '@/lib/admin';
+import { isTeamEmail } from '@/lib/admin';
 
 // Server-side credit metering for the AI routes. Everything here is BEST-EFFORT
 // and FAILS OPEN: if the user is not signed in, the RPCs are missing, or anything
@@ -17,7 +17,7 @@ export async function creditPrecheck(): Promise<{ ok: boolean; remaining: number
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { ok: true, remaining: null };
-    if (isAdminEmail(user.email)) return { ok: true, remaining: null }; // internal admin: unlimited
+    if (isTeamEmail(user.email)) return { ok: true, remaining: null }; // internal team: unlimited
     const { data, error } = await supabase.rpc('credit_status', { p_allowance: ALPHA_FREE_ALLOWANCE });
     const row = Array.isArray(data) ? data[0] : data;
     if (error || !row) return { ok: true, remaining: null };
@@ -38,7 +38,7 @@ export async function meterUsage(feature: string, model: string, inputTokens: nu
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    if (isAdminEmail(user.email)) return; // internal admin: not metered
+    if (isTeamEmail(user.email)) return; // internal team: not metered
     const credits = Math.max(1, Math.round(creditsFor(model, inTok, outTok)));
     const costMicros = Math.round(costUsd(model, inTok, outTok) * 1e6);
     await supabase.rpc('credit_charge', {

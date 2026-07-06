@@ -4,6 +4,45 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Assessment report PDF export fixed - was clipped to one page (2026-07-03)
+
+PDF download on every results page is `window.print()` + a print stylesheet (browser "Save as PDF"; no library). The **combined-profile** (`/insights/profile`) and **clarity** (`/insights/clarity/[slug]`) reports print correctly: both import `result/profile.css`, whose `@media print` releases the app shell's one-screen clip (html/body `overflow:hidden` + `.center-col` = the `height:100dvh` scroll container -> `overflow:visible; height:auto`), hides chrome, and preserves the dark background via `print-color-adjust:exact`. The **assessment** reports (wiring/orientation/rejection) imported ONLY `report.css`, whose `@media print` hid the top bar and un-hid scroll-reveal blocks but did NOT release that clip - so their PDFs came out **clipped to a single page**.
+
+Fix: mirrored profile.css's release into `report.css` `@media print` (`@page{margin:0}`; release html/body/`.app-layout`/`.center-col`; hide `.sidebar/.mobile-bar/...`; `.report{min-height:auto}`; `.report .chapter{page-break-inside:avoid}`; void `#070709` background + `print-color-adjust:exact`). Verified in-browser: applying the page's print rules to the wiring demo expands `documentElement.scrollHeight` **720px -> 5704px (~5 A4 pages)**, sidebar hidden, full-bleed dark preserved (print-simulated screenshot confirms). Profile + clarity independently confirmed to carry the `.center-col` release in print media.
+
+Also set `.claude/launch.json` align360-test `autoPort:true` so the preview server runs on a free port when 3000 is taken by another project.
+
+---
+
+## Mobile-responsiveness audit + fixes (2026-07-03)
+
+Full pass over the interface at phone widths (360-414px): a live sweep of every reachable page at 375px (zero horizontal overflow on landing, login, signup, onboarding, chat + drawer, assessment, insights, resources, frameworks, org, and the dense clarity report) PLUS a 7-dimension adversarial static audit (20 agents covering overflow, iOS input-zoom, touch targets, safe-area/dvh, grid collapse, overlays, word-break). Overflow, grid-collapse, and overlays came back clean, confirming the app is fundamentally well-built for mobile (viewportFit:cover, clamp() type, hamburger drawer, grid collapses at 600/700/760px). **12 real issues found and fixed; 3 audit findings rejected as false positives** (landing 100vh, two word-break claims that do not break at 390px).
+
+Found in the live sweep:
+- **`.org-err`** (org.css): a long error URL (Supabase/Stripe) could not wrap, forcing the page to 447px and clipping the Create button. Added `overflow-wrap:anywhere; word-break:break-word` (matches `.org-msg`).
+- **`.ob-progress`** (globals.css): the 21 onboarding step-dots (262px) overflowed past the logo. Shrank dots/gap in the `@media(max-width:640px)` block so all 21 fit (`progRight` 387 -> 357).
+
+Found + verified by the audit (all fixed):
+- **iOS zoom-on-focus** (any input under 16px auto-zooms Safari): `.auth-input`, `.sub-input`, `.org-input` (incl. the role `<select>`), `.ch-edit` all bumped to 16px on mobile - matching the `.acct-field input` / `.ob-input` / `.composer-input` pattern already used elsewhere.
+- **Safe-area / notch** (viewportFit:cover but ZERO `env(safe-area-inset-*)` in the codebase): the chat composer (`.chat-input-area`) and drawer footer (`.sidebar-foot`) sat under the home indicator. Added `calc(... + env(safe-area-inset-bottom))` to their bottom padding (0 on non-notched devices, so desktop unaffected).
+- **Sub-44px touch targets**: remove-attachment x (`.attach-pill .x`, was ~14px) -> 32px hit area; org invite Copy link / Revoke (`.org-link`) -> 40px min-height; subscribe plan toggle (`.sub-seg-btn`, ~36px) -> 44px.
+- **Word-break**: signed-in email in the account modal (`.acct-val`) could clip on long addresses -> `min-width:0; overflow-wrap:anywhere; word-break:break-word`.
+
+Files: `app/globals.css`, `app/login/auth.css`, `app/subscribe/subscribe.css`, `app/org/org.css`. CSS-only; desktop unaffected (fixes scoped to mobile media queries or `env()` which resolves to 0 on desktop). Verified live/synthetically at 375px: computed input font-sizes now 16px, attach-x 32x32, `.acct-val` wraps, 0 overflow on all reachable pages, no compile errors.
+
+---
+
+## Internal team grandfathered to unlimited credits ("Team" classification) (2026-07-03)
+
+Will: classify the founding team (Will, Samuel, Drew) as **Team** with **no credit limits** (grandfathered, unlimited). Reused the existing internal allowlist rather than a new plan.
+
+- `lib/admin.ts`: renamed `ADMIN_EMAILS`/`isAdminEmail` to `TEAM_EMAILS`/`isTeamEmail` (the list already meant "internal team, unlimited + paywall bypass"). Added `drewcline168@gmail.com` (Drew) alongside `wllprbl@gmail.com` (Will). **Samuel is pending his Align360 sign-in email** (placeholder comment in the file) since it is not his crownedbowman/Workspace address by default and was not on record.
+- Consumers updated: `lib/credit-metering.ts` (precheck returns unlimited, usage not metered), `app/api/access/status/route.ts` (now returns `plan: 'team', team: true`; `plan` is not consumed by the client, so this is a label only).
+- `app/api/credits/status/route.ts`: new short-circuit returns `{ unlimited: true }` for team emails so the account panel shows **"Unlimited"** instead of a bounded ratio; `Shell.tsx` renders that and hides the Buy-credits row for team accounts.
+- Mechanism is enforcement-agnostic: works whether `CREDITS_ENFORCED`/`BILLING_ENABLED` are on or off, so it stays correct when enforcement flips on. Server-side only, cannot be self-granted from the client. Typecheck clean.
+
+---
+
 ## Settlement model confirmed: platform collects, manual payouts later (2026-07-02)
 
 Will: the Connect 50/50 split is deferred indefinitely (not just until Samuel's live onboarding). Operating model for now: **Ascendance collects 100% on the platform account; Samuel is paid out manually, later, after AI costs are subtracted.** No code change needed (already platform mode).

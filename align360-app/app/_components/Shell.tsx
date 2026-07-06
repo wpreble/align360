@@ -39,7 +39,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const [accountOpen, setAccountOpen] = useState(false);
   const [theme, setTheme] = useState('light');
   const [email, setEmail] = useState<string | null>(null);
-  const [credits, setCredits] = useState<{ remaining: number; granted: number; topup: number } | null>(null);
+  const [credits, setCredits] = useState<{ remaining: number; granted: number; topup: number; unlimited?: boolean } | null>(null);
   const [buyOpen, setBuyOpen] = useState(false);
   const [buyBusy, setBuyBusy] = useState(false);
   const year = new Date().getFullYear();
@@ -48,7 +48,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     if (!supabaseConfigured) return;
     fetch('/api/credits/status')
       .then((r) => r.json())
-      .then((d) => { if (d?.available) setCredits({ remaining: d.remaining, granted: d.granted, topup: d.topup ?? 0 }); })
+      .then((d) => { if (d?.available) setCredits(d.unlimited ? { remaining: 0, granted: 0, topup: 0, unlimited: true } : { remaining: d.remaining, granted: d.granted, topup: d.topup ?? 0 }); })
       .catch(() => {});
   }, []);
 
@@ -287,10 +287,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             {credits ? (
               <div className="acct-item" style={{ cursor: 'default' }}>
                 <span>Credits this month</span>
-                <span className="acct-val">{credits.remaining} / {credits.granted}{credits.topup > 0 ? ` (+${credits.topup})` : ''}</span>
+                <span className="acct-val">{credits.unlimited ? 'Unlimited' : `${credits.remaining} / ${credits.granted}${credits.topup > 0 ? ` (+${credits.topup})` : ''}`}</span>
               </div>
             ) : null}
-            {email ? (
+            {email && !credits?.unlimited ? (
               <>
                 <button className="acct-item" onClick={() => setBuyOpen((v) => !v)} aria-expanded={buyOpen}>
                   <span>Buy credits</span><span className="acct-val">{buyOpen ? '–' : '+'}</span>

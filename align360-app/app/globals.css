@@ -116,7 +116,7 @@ a { color:inherit; text-decoration:none; }
 .acct-pack:disabled { opacity:.55; cursor:default; }
 .acct-pack-p { font-family:var(--font-brand); font-weight:600; color:var(--accent); }
 .acct-pack-note { font-size:11px; color:var(--text-muted); line-height:1.4; padding:2px 2px 0; }
-.acct-val { font-size:13px; color:var(--accent); font-weight:600; }
+.acct-val { font-size:13px; color:var(--accent); font-weight:600; min-width:0; overflow-wrap:anywhere; word-break:break-word; text-align:right; }
 .acct-item.danger { color:#B5566A; }
 .acct-item.danger:hover { background:rgba(181,86,106,.08); }
 .acct-val.danger { color:#B5566A; font-weight:600; }
@@ -358,7 +358,7 @@ a { color:inherit; text-decoration:none; }
 .tdot:nth-child(2) { animation-delay:.18s; } .tdot:nth-child(3) { animation-delay:.36s; }
 @keyframes tdot { 0%,70%,100% { opacity:.3; transform:translateY(0); } 35% { opacity:1; transform:translateY(-5px); } }
 
-.chat-input-area { padding:12px 24px 20px; }
+.chat-input-area { padding:12px 24px calc(20px + env(safe-area-inset-bottom)); }
 .attach-row { max-width:768px; margin:0 auto 8px; display:flex; gap:8px; flex-wrap:wrap; }
 .attach-pill { display:flex; align-items:center; gap:8px; padding:6px 8px 6px 6px; background:var(--bg-chip); border:1px solid var(--border); border-radius:10px; font-size:12px; color:var(--text-secondary); }
 .attach-pill img { width:34px; height:34px; object-fit:cover; border-radius:6px; }
@@ -516,6 +516,10 @@ a { color:inherit; text-decoration:none; }
 .pg-note strong { color:var(--text-primary); font-weight:600; }
 @media (max-width:640px) {
   .ob-header { padding:18px 18px 0; }
+  /* 21 step-dots at 6px + 6px gap overflow beside the logo on phones — shrink to fit. */
+  .ob-progress { gap:4px; }
+  .prog-dot { width:5px; height:5px; }
+  .prog-dot.active { width:14px; }
   .ob-body { padding:20px 18px 48px; justify-content:flex-start; padding-top:28px; }
   .ob-question { font-size:30px; }
   .ob-options, .ob-options.compact { grid-template-columns:repeat(2,1fr); gap:10px; }
@@ -550,7 +554,7 @@ a { color:inherit; text-decoration:none; }
   .runner-q { font-size:24px; }
   .assess-intro h1 { font-size:32px; }
   .chat-topbar { padding:12px 16px; }
-  .chat-input-area { padding:10px 14px 16px; }
+  .chat-input-area { padding:10px 14px calc(16px + env(safe-area-inset-bottom)); }
 }
 
 /* ═══════════════════════════════════════════════
@@ -634,6 +638,12 @@ a { color:inherit; text-decoration:none; }
   .composer-btn, .send-btn { width:40px; height:40px; }
   .composer-btn svg { width:21px; height:21px; }
   .char-count { display:none; }
+  /* Anti-zoom on the chat rename input (matches .acct-field input above). */
+  .ch-edit { font-size:16px; }
+  /* Remove-attachment × needs a real tap target; negative margin keeps the pill compact. */
+  .attach-pill .x { min-width:32px; min-height:32px; display:grid; place-items:center; padding:0; margin:-6px -4px -6px 0; }
+  /* Drawer footer clears the home indicator on notched phones (env=0 elsewhere). */
+  .sidebar-foot { padding-bottom:calc(12px + env(safe-area-inset-bottom)); }
 }
 
 /* Onboarding: comfier option + Back/Skip tap targets (the option list is

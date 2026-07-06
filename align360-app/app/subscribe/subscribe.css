@@ -35,3 +35,9 @@
 .sub-seats-in { text-align:center; }
 .sub-total { text-align:left; font-family:var(--font-display); font-size:24px; font-weight:600; color:var(--text-primary); margin:1.1rem 0 1.25rem; }
 .sub-total small { font-family:var(--font-sans); font-size:13px; font-weight:400; color:var(--text-muted); margin-left:.4rem; }
+
+/* Mobile: 16px inputs prevent iOS zoom-on-focus; taller segmented toggle for thumbs. */
+@media (max-width:600px) {
+  .sub-input { font-size:16px; }
+  .sub-seg-btn { min-height:44px; padding:.75rem .6rem; }
+}

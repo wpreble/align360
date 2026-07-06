@@ -341,7 +341,17 @@
   .report .chapter { padding: 4rem 1.25rem; }
 }
 @media print {
+  @page { margin: 0; }
+  /* The app shell clips to one screen (html/body overflow:hidden, .center-col is
+     the height:100dvh scroll container). Release those so the whole report flows
+     across pages instead of printing a single clipped page. Mirrors profile.css. */
+  html, body { height: auto !important; overflow: visible !important; background: #070709 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .sidebar, .mobile-bar, .reopen-tab, .drawer-scrim, .ip-notice { display: none !important; }
+  .app-layout { display: block !important; height: auto !important; grid-template-columns: 1fr !important; }
+  .center-col { display: block !important; height: auto !important; overflow: visible !important; }
+  .report { min-height: auto !important; }
   .report .reveal { opacity: 1 !important; transform: none !important; }
   .report .rep-bar, .report .scroll-cue { display: none !important; }
   .report .hero { min-height: auto; padding: 3rem 2rem; }
+  .report .chapter { page-break-inside: avoid; }
 }
