@@ -3,9 +3,10 @@
 // be self-granted from the client, so it is not publicly accessible.
 // Entries must be lowercase (matching lowercases the incoming email).
 export const TEAM_EMAILS = [
-  'wllprbl@gmail.com',      // Will
-  'drewcline168@gmail.com', // Drew
-  'samuel@align360.io',     // Samuel (Ngu) — Google Workspace on align360.io
+  'wllprbl@gmail.com',              // Will
+  'drewcline168@gmail.com',         // Drew
+  'feelinglikechocolate@gmail.com', // Drew (Feeling Like Chocolate company gmail)
+  'samuel@align360.io',             // Samuel (Ngu) — Google Workspace on align360.io
 ];
 
 export function isTeamEmail(email?: string | null): boolean {

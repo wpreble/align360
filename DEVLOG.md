@@ -6,7 +6,9 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ## Samuel grandfathered to unlimited (2026-07-06)
 
-Added `samuel@align360.io` (Samuel Ngu; Google Workspace on align360.io, confirmed from the Supabase user list) to `TEAM_EMAILS` in lib/admin.ts. The internal team (Will, Drew, Samuel) is now fully grandfathered to unlimited / no metering / paywall bypass. **Open question:** Drew is grandfathered as `drewcline168@gmail.com`, but a separate `feelinglikechocolate@gmail.com` profile also carries the name "Drew" - unconfirmed which account Drew actually signs in with, so his unlimited grant may not land until that's resolved.
+Added `samuel@align360.io` (Samuel Ngu; Google Workspace on align360.io, confirmed from the Supabase user list) to `TEAM_EMAILS` in lib/admin.ts. Also added `feelinglikechocolate@gmail.com` (Drew's FLC company gmail, per Will) so Drew is covered regardless of which login he uses. Internal team (Will, Drew x2, Samuel) grandfathered to unlimited / no metering / paywall bypass.
+
+User-list audit (11 profiles): **no "yerik"/erik account exists.** THREE profiles carry the name "Drew": `drewcline168@gmail.com` + `feelinglikechocolate@gmail.com` (both now allowlisted) + `azkeeper10@gmail.com` (**not yet added — pending Will's confirm it's the same Drew**). Will also has alt accounts not allowlisted: `will@covenantlabs.ai`, `ironvader@gmail.com` ("Will Prebletwo"). The rest are test accounts (asdf@, asef@, ansh@yopmail, sumitmca11@).
 
 ---
 
