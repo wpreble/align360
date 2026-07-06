@@ -5,7 +5,7 @@
 export const TEAM_EMAILS = [
   'wllprbl@gmail.com',      // Will
   'drewcline168@gmail.com', // Drew
-  // Samuel — add his Align360 sign-in email here to grandfather him too.
+  'samuel@align360.io',     // Samuel (Ngu) — Google Workspace on align360.io
 ];
 
 export function isTeamEmail(email?: string | null): boolean {

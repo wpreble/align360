@@ -4,6 +4,12 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Samuel grandfathered to unlimited (2026-07-06)
+
+Added `samuel@align360.io` (Samuel Ngu; Google Workspace on align360.io, confirmed from the Supabase user list) to `TEAM_EMAILS` in lib/admin.ts. The internal team (Will, Drew, Samuel) is now fully grandfathered to unlimited / no metering / paywall bypass. **Open question:** Drew is grandfathered as `drewcline168@gmail.com`, but a separate `feelinglikechocolate@gmail.com` profile also carries the name "Drew" - unconfirmed which account Drew actually signs in with, so his unlimited grant may not land until that's resolved.
+
+---
+
 ## Assessment report PDF export fixed - was clipped to one page (2026-07-03)
 
 PDF download on every results page is `window.print()` + a print stylesheet (browser "Save as PDF"; no library). The **combined-profile** (`/insights/profile`) and **clarity** (`/insights/clarity/[slug]`) reports print correctly: both import `result/profile.css`, whose `@media print` releases the app shell's one-screen clip (html/body `overflow:hidden` + `.center-col` = the `height:100dvh` scroll container -> `overflow:visible; height:auto`), hides chrome, and preserves the dark background via `print-color-adjust:exact`. The **assessment** reports (wiring/orientation/rejection) imported ONLY `report.css`, whose `@media print` hid the top bar and un-hid scroll-reveal blocks but did NOT release that clip - so their PDFs came out **clipped to a single page**.
