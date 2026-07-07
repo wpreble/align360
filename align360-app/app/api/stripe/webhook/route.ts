@@ -92,6 +92,7 @@ export async function POST(req: Request) {
         await hubspotUpsertContact(s.customer_details?.email || s.customer_email, {
           ...splitName(s.customer_details?.name),
           lifecyclestage: 'customer',
+          align360_source: 'stripe_checkout',
         });
       }
       break;

@@ -31,6 +31,14 @@ export default function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
 
   const supabase = createClient();
 
+  // Best-effort CRM capture for the flows that skip /auth/callback (email+password
+  // signup with an immediate session, and email+password login). The route reads the
+  // email from the server session cookie, not from here. keepalive lets it survive the
+  // navigation that follows. Fire-and-forget: never blocks or fails the auth UX.
+  function captureContact() {
+    void fetch('/api/hubspot/capture', { method: 'POST', keepalive: true }).catch(() => {});
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setErr('');
@@ -44,10 +52,14 @@ export default function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
         });
         if (error) throw error;
         const { data: { session } } = await supabase.auth.getSession();
-        if (session) { router.push(next); router.refresh(); } else { setSent(true); }
+        // Session present → confirmation is off and we won't hit the callback, so
+        // capture here. No session → a confirmation email was sent; the callback
+        // captures on click.
+        if (session) { captureContact(); router.push(next); router.refresh(); } else { setSent(true); }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        captureContact();
         router.push(next);
         router.refresh();
       }

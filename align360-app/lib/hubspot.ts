@@ -1,8 +1,14 @@
 // Best-effort HubSpot CRM sync for the marketing pipeline (contacts → segmentation
 // → email). Everything here is ENV-GATED (HUBSPOT_TOKEN) and FAILS OPEN: with no
-// token, a network error, or a bad response, the calling flow (signup, checkout,
-// webhook) proceeds untouched. Mirrors the credit-metering "best-effort" pattern —
-// CRM sync must never break auth or billing.
+// token, a network error, a bad response, OR a slow/hung HubSpot, the calling flow
+// (signup, checkout, webhook) proceeds untouched. Mirrors the credit-metering
+// "best-effort" pattern — CRM sync must never break auth or billing.
+//
+// Latency matters as much as errors: several call sites AWAIT this before doing
+// user-facing work (the checkout route before creating the Stripe session, the auth
+// callback before redirecting, the webhook before returning 200 to Stripe). So the
+// fetch is bounded by a short AbortSignal timeout — a degraded HubSpot can add a
+// couple of seconds at most, never stall a request into a serverless 5xx.
 //
 // Runtime credential: a HubSpot Private App token (Settings → Integrations →
 // Private Apps) with scopes `crm.objects.contacts.read` + `crm.objects.contacts.write`.
@@ -24,6 +30,12 @@ type ContactProps = {
   // 'lead' for signups, 'customer' for paid. Omit to avoid moving a contact
   // backwards (e.g. don't stamp 'lead' on a returning customer's login).
   lifecyclestage?: 'subscriber' | 'lead' | 'marketingqualifiedlead' | 'customer' | string;
+  // Custom HubSpot contact property (internal name `align360_source`, created in
+  // the portal). Marks how a contact entered — 'app_signup' | 'org_checkout_lead'
+  // | 'stripe_checkout'. Any value means "originated from Align360"; the paid/lead
+  // split is carried by lifecyclestage, not this. MUST exist in HubSpot before we
+  // send it — an unknown property 400s the whole upsert (and we fail open → no contact).
+  align360_source?: 'app_signup' | 'org_checkout_lead' | 'stripe_checkout' | string;
   [k: string]: string | undefined;
 };
 
@@ -47,12 +59,17 @@ export async function hubspotUpsertContact(email: string | null | undefined, pro
       method: 'POST',
       headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ inputs: [{ idProperty: 'email', id: addr, properties }] }),
+      // Hard cap so a slow/hung HubSpot can never block an awaiting caller (checkout,
+      // auth callback, webhook) into a serverless timeout. On abort, fetch rejects and
+      // the catch below swallows it — fail open, same as any other error.
+      signal: AbortSignal.timeout(3000),
     });
     if (!res.ok) {
       // Log without throwing so the caller (auth/checkout) is never affected.
       console.error('hubspot upsert failed:', res.status, (await res.text()).slice(0, 300));
     }
   } catch (e) {
+    // Includes AbortError/TimeoutError from the signal above — intentionally non-fatal.
     console.error('hubspot upsert error:', e instanceof Error ? e.message : e);
   }
 }

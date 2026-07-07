@@ -21,7 +21,10 @@ export async function GET(request: Request) {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user?.email) {
-          await hubspotUpsertContact(user.email, splitName(user.user_metadata?.full_name || user.user_metadata?.name));
+          await hubspotUpsertContact(user.email, {
+            ...splitName(user.user_metadata?.full_name || user.user_metadata?.name),
+            align360_source: 'app_signup',
+          });
         }
       } catch { /* never block auth */ }
       return NextResponse.redirect(`${origin}${next}`);

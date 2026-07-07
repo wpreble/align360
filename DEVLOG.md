@@ -4,6 +4,20 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## HubSpot capture gaps closed + fetch hardened + segment lists (2026-07-07)
+
+Closed the two capture gaps left from the initial HubSpot wiring, added the source property + segmentation lists, and hardened the fetch after an adversarial review of the diff.
+
+- **Email/password signup + login** (which skip `/auth/callback`): new server route `app/api/hubspot/capture/route.ts` (POST) upserts the contact. SECURITY: it reads the email ONLY from the server Supabase session cookie, never from the request body, so a caller can only ever upsert their own authenticated address (a forged cross-site POST just re-upserts the victim's own email). `AuthForm` fires it (keepalive fetch) after an immediate-session signup and after email/pw login.
+- **Org lead capture**: `app/api/stripe/checkout/route.ts` upserts the org-form `contactEmail` as a lead BEFORE payment, only when present (so the "buy more seats" path is skipped). No lifecyclestage, so an admin who is already a customer is never downgraded.
+- **`align360_source` custom property**: created in HubSpot (single-line text, internal name `align360_source`). Every upsert stamps it — 'app_signup' (signup/login/callback), 'org_checkout_lead' (org form), 'stripe_checkout' (paid webhook). Created BEFORE deploy on purpose: an unknown property 400s the whole batch/upsert and, because we fail open, that would silently drop every contact.
+- **Two active lists** (built in the HubSpot UI — the API/MCP cannot create lists): "Align360 Paid Customers" (Lifecycle stage = Customer, objectLists id 14) and "Align360 App Contacts" (Align360 Source is known, id 15). Both auto-update.
+- **Hardening (from an adversarial multi-lens review)**: `hubspotUpsertContact` now bounds its fetch with `AbortSignal.timeout(3000)`. The try/catch already failed open on errors but NOT on latency — a slow/hung HubSpot could block an awaiting caller (checkout before the Stripe call, the callback before redirect, the webhook) past the serverless limit and 5xx the request. The timeout caps that at ~3s and the abort is swallowed by the existing catch. Also escaped a pre-existing literal-control-char regex in the checkout route (raw NUL/0x1f bytes → `\x00-\x1f`) that made git treat the file as binary; behavior identical.
+
+Verified: tsc clean; the exact deployed payload (`batch/upsert` with `idProperty:email` + `lifecyclestage` + `align360_source`) tested live against the token = 200 with all fields set; test contacts cleaned up.
+
+---
+
 ## HubSpot CRM sync wired for signups + paid customers (2026-07-07)
 
 Added a best-effort HubSpot contact sync so signups and paid conversions flow into the CRM for segmentation and email. All of it is env-gated on `HUBSPOT_TOKEN` and fails open: no token, a network error, or a bad response never blocks auth or billing (same best-effort pattern as credit metering).
