@@ -4,6 +4,31 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## HubSpot CRM sync wired for signups + paid customers (2026-07-07)
+
+Added a best-effort HubSpot contact sync so signups and paid conversions flow into the CRM for segmentation and email. All of it is env-gated on `HUBSPOT_TOKEN` and fails open: no token, a network error, or a bad response never blocks auth or billing (same best-effort pattern as credit metering).
+
+- **New helper** `lib/hubspot.ts`: `hubspotUpsertContact(email, props)` does an idempotent upsert by email via the CRM v3 batch/upsert API; empty props are dropped so we never blank an existing field. `splitName()` maps a display name to firstname/lastname.
+- **Signup + login capture** (`app/auth/callback/route.ts`): after a successful `exchangeCodeForSession`, every Google / email-confirmed user is upserted as a contact. No lifecyclestage here, so a returning customer is never downgraded.
+- **Paid capture** (`app/api/stripe/webhook/route.ts`): on `checkout.session.completed` with a subscription, the buyer is upserted with `lifecyclestage: customer` (email from Stripe Checkout's collected details). That is the segmentation axis for a "paid customers" active list in HubSpot.
+- **Runtime credential**: created a HubSpot Service Key "Align360 Site Sync" (scopes `crm.objects.contacts.read` + `crm.objects.contacts.write`), stored as `HUBSPOT_TOKEN` in Vercel production (encrypted). Token validated against the CRM API (200) before wiring. The MCP connection used during setup is a separate, chat-only credential and is NOT what the deployed app uses.
+
+Not yet done (follow-ups): capture email/password signups that skip email confirmation (they get a session without hitting the callback); capture the org-checkout lead form; create the `align360_source` custom property and the active lists in the HubSpot UI (the API/MCP cannot create lists or custom properties).
+
+---
+
+## align360.io LIVE: DNS moved to Namecheap, web on Vercel, email on Google Workspace (2026-07-06)
+
+Migrated `align360.io` off the old team's Hostinger setup. Nameservers switched to **Namecheap BasicDNS** (`dns1/dns2.registrar-servers.com`) and the whole zone rebuilt in Namecheap Advanced DNS (the cutover had actually already been flipped on the Namecheap side; records were live, not dormant).
+
+- **Web → Vercel** (`wprebles-projects/align360-app`): `A @ 216.198.79.1`, `CNAME www cname.vercel-dns.com`, `TXT _vercel vc-domain-verify=align360.io,44f36c2cf218915769c9` (apex) + a SECOND `TXT _vercel vc-domain-verify=www.align360.io,4f4941c7d9d38b9042d1` (www needed its own verification — the domain was still linked to the old Vercel account).
+- **Email → Google Workspace** (Namecheap zone was pre-staged for it; completed the gaps): `MX smtp.google.com`, `DKIM google._domainkey`, plus **added** `SPF (v=spf1 include:_spf.google.com ~all)` and `DMARC (v=DMARC1; p=none)`. NOTE: the old Hostinger MX/SPF/DKIM/autodiscover were NOT carried over — Will confirmed `samuel@align360.io` is a working Google Workspace mailbox, so mail now routes to Google.
+- **Vercel**: verified apex + www via the `_vercel` TXTs; set `align360.io` to **serve Production directly** (Vercel had mis-configured it to redirect apex→www, which would have broken users on the unverified www); set `www.align360.io` to **307-redirect to align360.io** (canonical = apex). A "DNS Change Recommended" soft-warning remains on www (Vercel's newer `vercel-dns-017` CNAME target) — the old `cname.vercel-dns.com` works, left as-is.
+
+**Validated live:** `align360.io` 200 + valid SSL serving the app; `http→https` 308; `www.align360.io` 307 → apex with valid SSL; MX/SPF/DKIM/DMARC all resolving. Open nits: www redirect is 307 (temporary) — bump to 308 permanent for canonical SEO when convenient; and send a test email to `samuel@align360.io` to confirm Google delivery (the one thing not verifiable from here).
+
+---
+
 ## Samuel grandfathered to unlimited (2026-07-06)
 
 Added `samuel@align360.io` (Samuel Ngu; Google Workspace on align360.io, confirmed from the Supabase user list) to `TEAM_EMAILS` in lib/admin.ts. Also added `feelinglikechocolate@gmail.com` (Drew's FLC company gmail, per Will) so Drew is covered regardless of which login he uses. Internal team (Will, Drew x2, Samuel) grandfathered to unlimited / no metering / paywall bypass.

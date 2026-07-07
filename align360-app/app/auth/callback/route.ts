@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { hubspotUpsertContact, splitName } from '@/lib/hubspot';
 
 // OAuth + email-confirmation landing: exchange the code for a session, then
 // redirect into the app (or back to the originating page via ?next=).
@@ -13,7 +14,18 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(`${origin}${next}`);
+    if (!error) {
+      // Best-effort CRM capture: every Google / email-confirmed signup + login becomes
+      // a HubSpot contact. No lifecyclestage here, so a returning customer is never
+      // downgraded (paid conversion stamps 'customer' via the Stripe webhook).
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.email) {
+          await hubspotUpsertContact(user.email, splitName(user.user_metadata?.full_name || user.user_metadata?.name));
+        }
+      } catch { /* never block auth */ }
+      return NextResponse.redirect(`${origin}${next}`);
+    }
   }
   return NextResponse.redirect(`${origin}/login?error=auth`);
 }

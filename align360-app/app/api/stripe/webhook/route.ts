@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getStripe, stripeConfigured } from '@/lib/stripe/client';
 import { createServiceClient } from '@/lib/supabase/server';
 import { ALPHA_FREE_ALLOWANCE } from '@/lib/credits';
+import { hubspotUpsertContact, splitName } from '@/lib/hubspot';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -86,6 +87,12 @@ export async function POST(req: Request) {
         }
       } else if (s.subscription) {
         await upsertSub(await stripe.subscriptions.retrieve(s.subscription, undefined, acctOpts));
+        // Best-effort CRM: mark the paying buyer a customer in HubSpot (segmentation +
+        // the "paid customers" list). Email comes from Stripe Checkout's collected details.
+        await hubspotUpsertContact(s.customer_details?.email || s.customer_email, {
+          ...splitName(s.customer_details?.name),
+          lifecyclestage: 'customer',
+        });
       }
       break;
     }
