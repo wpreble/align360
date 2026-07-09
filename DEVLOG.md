@@ -4,6 +4,19 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Internal admin dashboard at /admin with payout-split calculator (2026-07-09)
+
+Built a gated internal dashboard so the team can see signups/revenue and compute rev-share, instead of querying Supabase/Stripe by hand.
+
+- **Dedicated admin auth**, separate from the app's Supabase user accounts (`lib/admin/auth.ts`): password login checked against scrypt hashes in the `ADMIN_USERS` env var (JSON `[{email,salt,hash}]`), session is a short-lived (12h) HMAC-signed httpOnly cookie signed with `ADMIN_SESSION_SECRET`. No new npm deps — all Node `crypto`. Constant-time compares; generic login error (no user enumeration). Two users provisioned to start: Will + Samuel (passwords delivered out-of-band, only hashes stored).
+- **Routes**: `/admin` (server-gated → `/admin/login`), `/admin/login`, and `/api/admin/{login,logout,metrics,payouts}`. Added `/admin` + `/api/admin` to the Supabase middleware public list so the user-auth gate doesn't bounce admins to the app login — the admin routes self-gate via the admin session (page redirect + `requireAdmin()` 401 on every API route).
+- **Metrics** (`/api/admin/metrics`): signups (Supabase auth admin, total + recent) and active paying customers + MRR/ARR pulled from **Stripe live** at runtime — so test subscriptions are excluded automatically (live key only returns live objects).
+- **Payout split** (`/api/admin/payouts`): sums Stripe balance transactions over a date range into gross / fees / refunds / net, then the UI applies an editable split % (default 50/50 Ascendance/Align360, matching `STRIPE_APPLICATION_FEE_PERCENT=50`) on a net-or-gross basis. Presets for this-month / last-month / 30d / all-time. This is a manual-payout tool because Connect isn't active in prod (no `STRIPE_CONNECTED_ACCOUNT_ID`), so all revenue currently lands in the Ascendance platform account.
+
+Verified: `next build` clean; the whole login → cookie → gated-metrics flow smoke-tested against production.
+
+---
+
 ## HubSpot capture gaps closed + fetch hardened + segment lists (2026-07-07)
 
 Closed the two capture gaps left from the initial HubSpot wiring, added the source property + segmentation lists, and hardened the fetch after an adversarial review of the diff.
