@@ -33,11 +33,15 @@ export async function GET(req: Request) {
   let currency = 'usd';
   let live: boolean | null = null;
   try {
+    // BalanceTransaction has no `livemode` field, so probe mode from a charge (which
+    // does). This reflects the key's mode, i.e. whether these figures are real money.
+    const probe = await stripe.charges.list({ limit: 1 });
+    live = probe.data[0] ? probe.data[0].livemode : null;
+
     const CAP = 5000;
     // Auto-paginate balance transactions in the window. `net` already nets out fees
     // and refunds, so summing net over income + refund types = true net revenue.
     for await (const txn of stripe.balanceTransactions.list({ created: { gte, lte }, limit: 100 })) {
-      if (live == null) live = !!(txn as { livemode?: boolean }).livemode;
       if (txn.currency) currency = txn.currency;
       const t = txn.type;
       if (t === 'charge' || t === 'payment') {
