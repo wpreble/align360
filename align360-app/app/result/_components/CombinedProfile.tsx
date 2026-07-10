@@ -141,7 +141,9 @@ export default function CombinedProfile({ profile: p, scores }: { profile: Profi
             <div className="cur-title">{p.currency.title}</div>
             <div className="cur-sub">{p.currency.sub}</div>
             <div className="cur-rows">
-              {p.currency.rows.map((r, i) => (
+              {/* Highest-value currency first (Drew feedback): stable descending sort
+                  by percent so the strongest driver is always on top. Copy, don't mutate. */}
+              {[...p.currency.rows].sort((a, b) => b.pct - a.pct).map((r, i) => (
                 <div className="cr" key={i}>
                   <span className="cr-name">{r.name}</span>
                   <span className="cr-track">

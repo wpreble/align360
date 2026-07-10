@@ -186,7 +186,11 @@
 @media (max-width: 860px) {
   .auth-page { grid-template-columns: 1fr; }
   .auth-aside { display: none; }
-  .auth-main { padding: 2rem 1.25rem; }
+  /* Top-align + let the whole page scroll instead of flex-centering inside a
+     fixed-height column. The flex + margin:auto centering clipped the tall signup
+     card on iOS Safari, so the submit button was unreachable (can't scroll to it). */
+  .auth-main { padding: 2rem 1.25rem; display: block; overflow: visible; }
+  .auth-main-inner { margin: 0 auto; }
   .auth-brand-mobile { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 1.75rem; }
   .auth-brand-mobile .align-mark { height: 28px; }
   .auth-wordmark.dark { color: var(--text-primary); }

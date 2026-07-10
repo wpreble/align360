@@ -4,6 +4,15 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Quick-win fixes from #aligndev feedback: mobile signup scroll + currency sort (2026-07-10)
+
+- **iOS signup couldn't scroll to finish** (Yerik): the auth form column centered the card with `display:flex` + `margin:auto` inside a grid item, which clipped the tall signup card on iOS Safari so the "Create account" button was unreachable. On mobile (<=860px) the card now top-aligns (`display:block`, `.auth-main-inner { margin:0 auto }`) and the page scrolls (already `height:auto` + `min-height:100dvh`). Verified at 375px in the dev preview — the full form incl. the submit button renders in normal flow. (Chromium, not iOS Safari — Yerik to reconfirm on device.)
+- **Currency map ordering** (Drew): the "True Riches Currency Map" ("How opportunity flows to you") rendered in a fixed category order (Knowledge, Integrity, Honor, Relationships, Favor, Money) instead of by value, so Relationships (95%) sat 4th and Money (25%) mid-list. Now sorted by percent descending (non-mutating copy) so the strongest driver is always on top. One change in `CombinedProfile.tsx` covers both `/result` and `/insights/profile`.
+
+Still open from that channel: results non-determinism (the big one — same inputs → different %s / gifts flipping 0↔100%), and the Google sign-in consent screen showing the raw Supabase ref instead of "Align360."
+
+---
+
 ## Internal admin dashboard at /admin with payout-split calculator (2026-07-09)
 
 Built a gated internal dashboard so the team can see signups/revenue and compute rev-share, instead of querying Supabase/Stripe by hand.
