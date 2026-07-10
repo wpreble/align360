@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
   const genOnce = async (schema: string) => {
     const c = await client.chat.completions.create({
       model,
-      ...genParams(useOpenRouter, { maxTokens: 9000, json: true, reasoning: 'off' }),
+      ...genParams(useOpenRouter, { maxTokens: 9000, json: true, reasoning: 'off', temperature: 0 }),
       messages: [
         { role: 'system', content: sys },
         { role: 'user', content: `You are generating part of a combined Align360 identity profile ("Combined in an AI-Era" format). Return ONLY a single valid JSON object, no markdown fences or prose. Participant assessment data:\n\n${summary}\n\n${schema}` },
@@ -140,6 +140,30 @@ export async function POST(req: NextRequest) {
   try {
     const [a, b] = await Promise.all([gen(PROFILE_SCHEMA_A), gen(PROFILE_SCHEMA_B)]);
     const profile = deepStripDashes({ ...fallbackProfile(scores, name), ...a.parsed, ...b.parsed }) as Profile;
+
+    // DETERMINISM: the model is allowed to invent the gift `pct`/`name` in its JSON,
+    // so regenerations produced different numbers (a gift flipping 0%<->100%, or
+    // landing in the wrong slot). Re-pin the three gift signals + hero pills to the
+    // COMPUTED scores so the same answers always yield the same numbers. The model
+    // keeps the prose (desc/edge); it never owns the numbers. Order is fixed:
+    // I = Wiring, II = Orientation, III = Rejection Gift.
+    // (The currency constellation is NOT pinned here — it has no deterministic source
+    // among the three primary assessments yet; pending Samuel's scoring decision.)
+    const pinned = [
+      { name: scores.wiring.primary, pct: scores.wiring.ranked[0]?.pct },
+      { name: scores.orientation.primary, pct: scores.orientation.ranked[0]?.pct },
+      { name: scores.rejectionGift.primary, pct: scores.rejectionGift.ranked[0]?.pct },
+    ];
+    if (Array.isArray(profile.signals?.items)) {
+      profile.signals.items = profile.signals.items.map((it, i) =>
+        pinned[i] ? { ...it, name: pinned[i].name ?? it.name, pct: pinned[i].pct ?? it.pct } : it,
+      );
+    }
+    if (Array.isArray(profile.hero?.pills) && profile.hero.pills.length >= 3) {
+      const vals = [scores.wiring.primary, scores.orientation.primary, scores.rejectionGift.primary];
+      profile.hero.pills = profile.hero.pills.map((pill, i) => (vals[i] ? { ...pill, value: vals[i]! } : pill));
+    }
+
     const ok = Object.keys(a.parsed).length > 0 || Object.keys(b.parsed).length > 0;
     const debug = req.nextUrl.searchParams.has('debug')
       ? { finishA: a.finish, finishB: b.finish, lenA: a.len, lenB: b.len, keysA: Object.keys(a.parsed), keysB: Object.keys(b.parsed) }

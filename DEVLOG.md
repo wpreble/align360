@@ -4,6 +4,18 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Profile determinism: gift scores locked to computed answers (2026-07-10)
+
+#aligndev feedback (Samuel + Drew): the combined Full Identity Profile changed its percentages on every regeneration — a gift flipping 0%↔100%, gifts landing in the wrong slot, order shuffling — so it "reads random/sketchy." Root cause: the profile prompt schema (`lib/profile.ts`) told the model to emit the numbers itself (`"pct":<number>`, `"currency":{rows:[{pct:<0-100>}]}`), and the shallow merge in the route (`{ ...fallbackProfile(scores), ...model }`) let the model's invented values overwrite the deterministic fallback that already had the real computed scores.
+
+Fix (`app/api/profile/generate/route.ts`): after the merge, **re-pin the three gift signals (I=Wiring, II=Orientation, III=Rejection Gift) and the hero pills to `computeScores`** — name + pct come from the deterministic scores, the model keeps only the prose (desc/edge). Also set `temperature: 0` (genParams applies it on the OpenRouter path; OpenAI reasoning models ignore it).
+
+Verified live (align360-test server, demo answers, two generations): gift names+pcts **identical** across runs [Wise Observer 78, Truth-Seeker 88, Resilience 88], hero pills identical, while the `desc` prose still varies (proves it genuinely regenerates — only the numbers are now locked).
+
+**Not fixed yet — needs Samuel:** the currency constellation (Knowledge…Money) has no deterministic source among the three primary assessments, so it's still LLM-generated. Left a code comment; awaiting Samuel's call on how it should be scored (pull from the Value Spectrum assessment, or a fixed formula). Also noted in that file: dead `PROFILE_SCHEMA_INSTRUCTION`, and the shallow merge can drop nested fields — both deferred.
+
+---
+
 ## Quick-win fixes from #aligndev feedback: mobile signup scroll + currency sort (2026-07-10)
 
 - **iOS signup couldn't scroll to finish** (Yerik): the auth form column centered the card with `display:flex` + `margin:auto` inside a grid item, which clipped the tall signup card on iOS Safari so the "Create account" button was unreachable. On mobile (<=860px) the card now top-aligns (`display:block`, `.auth-main-inner { margin:0 auto }`) and the page scrolls (already `height:auto` + `min-height:100dvh`). Verified at 375px in the dev preview — the full form incl. the submit button renders in normal flow. (Chromium, not iOS Safari — Yerik to reconfirm on device.)
