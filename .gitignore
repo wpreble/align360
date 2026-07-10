@@ -6,6 +6,7 @@
 # Operational / sensitive content — NOT for git
 Project Log/
 R&D/
+knowledge/
 
 # Internal agent plan/state scaffolding — local only (repo is public)
 .agent/
