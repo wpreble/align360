@@ -12,7 +12,9 @@ Fix (`app/api/profile/generate/route.ts`): after the merge, **re-pin the three g
 
 Verified live (align360-test server, demo answers, two generations): gift names+pcts **identical** across runs [Wise Observer 78, Truth-Seeker 88, Resilience 88], hero pills identical, while the `desc` prose still varies (proves it genuinely regenerates — only the numbers are now locked).
 
-**Not fixed yet — needs Samuel:** the currency constellation (Knowledge…Money) has no deterministic source among the three primary assessments, so it's still LLM-generated. Left a code comment; awaiting Samuel's call on how it should be scored (pull from the Value Spectrum assessment, or a fixed formula). Also noted in that file: dead `PROFILE_SCHEMA_INSTRUCTION`, and the shallow merge can drop nested fields — both deferred.
+**Not fixed yet — needs Samuel:** the currency constellation (Knowledge…Money) has no deterministic source among the three primary assessments, so it's still LLM-generated. Left a code comment; awaiting Samuel's call on how it should be scored (pull from the Value Spectrum assessment, or a fixed formula).
+
+Follow-up cleanups (same file, done): removed the dead unused `PROFILE_SCHEMA_INSTRUCTION` (~4.4KB); replaced the shallow spread merge with a `deepMerge()` so a partial nested object from the model can't drop the fallback's complete nested fields (e.g. `aiEra.moves`). Verified a demo generation still returns a complete profile (all sections + nested cards/moves/irreplaceable present) with gift numbers still pinned/stable.
 
 ---
 

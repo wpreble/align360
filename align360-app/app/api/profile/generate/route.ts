@@ -19,6 +19,22 @@ function deepStripDashes<T>(v: T): T {
   return v;
 }
 
+/**
+ * Deep-merge the model's output over the deterministic fallback. Nested objects merge
+ * recursively, so a partial object from the model (e.g. an `aiEra` with `cards` but no
+ * `moves`) can no longer wipe out the fallback's complete nested structure — the missing
+ * fields keep their fallback values. Arrays and primitives from the source still replace
+ * the base wholesale (the model returns complete arrays).
+ */
+function deepMerge(base: unknown, src: unknown): unknown {
+  const isObj = (x: unknown): x is Record<string, unknown> =>
+    typeof x === 'object' && x !== null && !Array.isArray(x);
+  if (!isObj(base) || !isObj(src)) return src === undefined ? base : src;
+  const out: Record<string, unknown> = { ...base };
+  for (const [k, v] of Object.entries(src)) out[k] = deepMerge(base[k], v);
+  return out;
+}
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -139,7 +155,11 @@ export async function POST(req: NextRequest) {
 
   try {
     const [a, b] = await Promise.all([gen(PROFILE_SCHEMA_A), gen(PROFILE_SCHEMA_B)]);
-    const profile = deepStripDashes({ ...fallbackProfile(scores, name), ...a.parsed, ...b.parsed }) as Profile;
+    // Deep-merge (not a shallow spread) so a partial nested object from the model
+    // can't drop the fallback's complete nested fields.
+    const profile = deepStripDashes(
+      deepMerge(deepMerge(fallbackProfile(scores, name), a.parsed), b.parsed),
+    ) as Profile;
 
     // DETERMINISM: the model is allowed to invent the gift `pct`/`name` in its JSON,
     // so regenerations produced different numbers (a gift flipping 0%<->100%, or
