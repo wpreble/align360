@@ -2,118 +2,109 @@ import type { Scores, Tally } from './scoring';
 import { WIRING_GIFTS } from './scoring';
 
 /**
- * Deterministic True-Riches currency scoring.
+ * Deterministic True-Currencies™ scoring — CANONICAL v2.
  *
- * Background: the combined profile's "currency constellation" %s used to be
- * invented by the LLM, so they flipped on every regeneration — the last
- * remaining source of non-determinism after the three gift signals were pinned
- * (see app/api/profile/generate/route.ts). Samuel's canonical "True Currencies"
- * scoring pack was never formally built, so this is the v1 gift -> currency map
- * drafted 2026-07-10 and approved by Will 2026-07-11, grounded in Samuel's
- * framework meanings. AI writes the words; this math sets the number — the same
- * lock the gift signals already use. Every link is tunable when his pack lands.
+ * Source of truth: Samuel's "Knowledge Pack Bundle Addendum v1.1", Section 3.8
+ * (the True Currencies Scoring Map, written for Will) + Governance v2.0 §5.2
+ * (the eight canonical currencies). Supersedes the v1 gift->currency draft
+ * (which had Favor/Money and no Courage/Creativity/Service).
  *
- * Each currency = a weighted blend of the relevant signal strengths (the 0-100
- * pct each gift / orientation / rejection category already scores), so no single
- * answer can swing it: every currency pulls from 3+ signals.
+ * The AI writes the interpretive words; this math sets the numbers — same lock
+ * the gift signals use. Currencies derive from Wiring + Orientation + Rejection
+ * Gift only (NOT Value Spectrum, NOT the daily check-in). Stable, not daily.
  *
- * "Conviction" is the market-facing name for Faith (Samuel: "Faith will become
- * conviction ... market facing names"). The other six names are the current app
- * names, pending his full market-phasing map.
+ * NAME RECONCILIATION (Samuel approved 2026-07-11: "let your agent do the job for
+ * now" = keep the app's current wiring/orientation type names and map them onto
+ * his scoring map, rather than migrating the app's taxonomy). The addendum keys
+ * off his canonical type names; the app runs its own set. Mapping used below:
+ *   Wiring   canonical -> app:
+ *     Realist->Realist, Organizer->Organizer, Supporter/Shepherd->Supporter,
+ *     Encourager/Connector->Encourager, Analyst/Researcher->Wise Observer,
+ *     Driver/Executor->Doer, Pioneer/Visionary->Enterpriser,
+ *     Creator/Innovator->Integrator (synthesis: "original architectures from
+ *       existing elements") + Enterpriser (visionary).  [judgment call]
+ *     App "Explainer" (clarity/communication of truth) -> feeds Knowledge/Honor. [judgment call]
+ *   Orientation canonical -> app (app has only 5):
+ *     Truth-Seeker->Truth-Seeker, Systems-Builder->Builder, People/Service/
+ *     Empathy-First->Supporter, Creative/Generative->Starter,
+ *     Justice/Standards->Truth-Seeker (proxy; app has no justice type).
+ *   Rejection: the addendum's primary currency inputs (Conviction, Courage, and
+ *     secondary Honor) key off the "resilience score"; the app's closest signal
+ *     is the Rejection Gift "Resilience" category strength, used here.
+ * The two [judgment call] links (Explainer, Integrator/Creator) are the only
+ * ambiguous ones — flagged to Samuel, easy to retune here.
+ *
+ * CALIBRATION NOTE: structure + ordering follow the addendum exactly; absolute
+ * magnitudes ride the app's existing pct scales (wiring leader ~78, orientation
+ * ~88), so a strong primary currency lands in the ~70-85 band rather than
+ * Samuel's exemplar ~92. Matching his exact magnitudes needs his normalization
+ * constants (a tunable follow-up); the number that governs the words is stable
+ * and correctly ranked, which is what fixes the flipping.
  */
 
-// Canonical order — Money last, per his framework ("money sits last; it is a
-// product of the other currencies").
+// Canonical order (Gov v2 §5.2). Renderer sorts by pct, so order is cosmetic.
 export const CURRENCIES = [
-  'Relationships',
+  'Knowledge',
   'Integrity',
   'Honor',
+  'Relationships',
+  'Courage',
+  'Creativity',
+  'Service',
   'Conviction',
-  'Knowledge',
-  'Favor',
-  'Money',
 ] as const;
 export type CurrencyName = (typeof CURRENCIES)[number];
 
-type Src = 'wiring' | 'orientation' | 'rejection';
-type Feed = { src: Src; tag: string; w?: number };
+type SrcKind = 'wiring' | 'orientation' | 'rejection';
+/** One weighted source per the addendum §3.8.1 split; `types` are APP type names. */
+type Source = { kind: SrcKind; weight: number; types: string[] };
 
-/**
- * v1 gift -> currency feeds: (assessment, signal tag, optional intra-currency
- * weight). Tags are matched loosely (case/spacing/hyphen-insensitive), so a
- * "Truth-Seeker" feed still resolves against a "Truth Seeker" score.
- */
-const FEEDS: Record<CurrencyName, Feed[]> = {
-  Relationships: [
-    { src: 'wiring', tag: 'Supporter' },
-    { src: 'wiring', tag: 'Integrator' },
-    { src: 'wiring', tag: 'Encourager' },
-    { src: 'orientation', tag: 'Supporter' },
-    { src: 'rejection', tag: 'Empathy' },
+// Per-currency source blends. Weights per Addendum §3.8.1 (sum to 1.0 each).
+const FEEDS: Record<CurrencyName, Source[]> = {
+  Knowledge: [
+    { kind: 'wiring', weight: 0.6, types: ['Realist', 'Organizer', 'Wise Observer', 'Explainer'] },
+    { kind: 'orientation', weight: 0.4, types: ['Truth-Seeker', 'Builder'] },
   ],
   Integrity: [
-    { src: 'wiring', tag: 'Realist' },
-    { src: 'wiring', tag: 'Organizer' },
-    { src: 'orientation', tag: 'Truth-Seeker' },
+    { kind: 'wiring', weight: 0.55, types: ['Organizer', 'Realist'] },
+    { kind: 'orientation', weight: 0.45, types: ['Truth-Seeker'] },
   ],
   Honor: [
-    { src: 'wiring', tag: 'Explainer' },
-    { src: 'wiring', tag: 'Wise Observer' },
-    { src: 'wiring', tag: 'Encourager' },
-    { src: 'orientation', tag: 'Explainer' },
-    { src: 'rejection', tag: 'Insight' },
-    { src: 'rejection', tag: 'Resilience' },
+    { kind: 'wiring', weight: 0.5, types: ['Encourager', 'Supporter'] },
+    { kind: 'rejection', weight: 0.5, types: ['Resilience'] },
+  ],
+  Relationships: [
+    { kind: 'wiring', weight: 0.65, types: ['Supporter', 'Encourager', 'Integrator'] },
+    { kind: 'orientation', weight: 0.35, types: ['Supporter'] },
+  ],
+  Courage: [
+    { kind: 'rejection', weight: 0.6, types: ['Resilience'] },
+    { kind: 'wiring', weight: 0.4, types: ['Doer', 'Enterpriser'] },
+  ],
+  Creativity: [
+    { kind: 'wiring', weight: 0.7, types: ['Integrator', 'Enterpriser'] },
+    { kind: 'orientation', weight: 0.3, types: ['Starter'] },
+  ],
+  Service: [
+    { kind: 'wiring', weight: 0.6, types: ['Supporter', 'Encourager'] },
+    { kind: 'orientation', weight: 0.4, types: ['Supporter'] },
   ],
   Conviction: [
-    { src: 'wiring', tag: 'Enterpriser' },
-    { src: 'wiring', tag: 'Encourager' },
-    { src: 'orientation', tag: 'Starter' },
-    { src: 'rejection', tag: 'Resilience' },
-    { src: 'rejection', tag: 'Perspective' },
-  ],
-  Knowledge: [
-    { src: 'wiring', tag: 'Realist' },
-    { src: 'wiring', tag: 'Explainer' },
-    { src: 'wiring', tag: 'Wise Observer' },
-    { src: 'wiring', tag: 'Doer' },
-    { src: 'orientation', tag: 'Truth-Seeker' },
-    { src: 'orientation', tag: 'Builder' },
-    { src: 'rejection', tag: 'Insight' },
-    { src: 'rejection', tag: 'Perspective' },
-    { src: 'rejection', tag: 'Creativity' },
-  ],
-  Favor: [
-    { src: 'wiring', tag: 'Integrator' },
-    { src: 'wiring', tag: 'Supporter' },
-    { src: 'wiring', tag: 'Enterpriser' },
-    { src: 'orientation', tag: 'Supporter' },
-    { src: 'orientation', tag: 'Starter' },
-  ],
-  Money: [
-    { src: 'wiring', tag: 'Doer' },
-    { src: 'wiring', tag: 'Organizer' },
-    { src: 'wiring', tag: 'Enterpriser' },
-    { src: 'orientation', tag: 'Builder' },
-    { src: 'rejection', tag: 'Creativity' },
+    { kind: 'rejection', weight: 0.65, types: ['Resilience'] },
+    { kind: 'wiring', weight: 0.35, types: ['Realist', 'Organizer'] },
   ],
 };
 
-/**
- * Post-blend multiplier per currency. Money is down-weighted so it trends
- * smallest ("output, not source") without forcing a fixed rank — the math still
- * decides the order.
- */
-const SCALE: Partial<Record<CurrencyName, number>> = { Money: 0.6 };
-
 /** Short context label under each bar; the LLM's prose overrides it when present. */
 export const CURRENCY_CTX: Record<CurrencyName, string> = {
-  Relationships: 'Trust-based connection',
-  Integrity: 'Credibility',
-  Honor: 'Earned respect',
-  Conviction: 'Conviction and resilience',
   Knowledge: 'Skill and wisdom',
-  Favor: 'Access and support',
-  Money: 'Output, not source',
+  Integrity: 'Values in action',
+  Honor: 'Kept commitments',
+  Relationships: 'Genuine connection',
+  Courage: 'Acting through risk',
+  Creativity: 'Original synthesis',
+  Service: 'Investment in others',
+  Conviction: 'Settled certainty',
 };
 
 const ORIENTATIONS = ['Truth-Seeker', 'Builder', 'Explainer', 'Supporter', 'Starter'] as const;
@@ -121,7 +112,7 @@ const REJECTION_CATEGORIES = ['Perspective', 'Insight', 'Creativity', 'Resilienc
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-/** normalized tag -> strength(pct); floor-fills the canonical set so unseen tags read 8, not missing. */
+/** normalized tag -> strength(pct); floor-fills the canonical set so unseen tags read 8. */
 function strengthMap(tallies: Tally[], canonical: readonly string[]): Map<string, number> {
   const m = new Map<string, number>();
   for (const t of tallies) m.set(norm(t.tag), t.pct);
@@ -131,24 +122,23 @@ function strengthMap(tallies: Tally[], canonical: readonly string[]): Map<string
 
 export type CurrencyScore = { name: CurrencyName; pct: number };
 
-/** Deterministic 0-100 for each of the 7 currencies, from the computed signals. */
+/** Deterministic 0-97 for each of the 8 canonical currencies from the computed signals. */
 export function computeCurrencies(scores: Scores): CurrencyScore[] {
-  const maps: Record<Src, Map<string, number>> = {
+  const maps: Record<SrcKind, Map<string, number>> = {
     wiring: strengthMap(scores.wiring.allNine, WIRING_GIFTS),
     orientation: strengthMap(scores.orientation.ranked, ORIENTATIONS),
     rejection: strengthMap(scores.rejectionGift.ranked, REJECTION_CATEGORIES),
   };
   return CURRENCIES.map((name) => {
     let acc = 0;
-    let wsum = 0;
-    for (const f of FEEDS[name]) {
-      const pct = maps[f.src].get(norm(f.tag)) ?? 8;
-      const w = f.w ?? 1;
-      acc += w * pct;
-      wsum += w;
+    for (const s of FEEDS[name]) {
+      // The strongest contributing type drives the source (the addendum's
+      // "primary boost" semantics), so a strong Realist reads high on Knowledge.
+      const strength = Math.max(...s.types.map((t) => maps[s.kind].get(norm(t)) ?? 8));
+      acc += s.weight * strength;
     }
-    const base = wsum > 0 ? acc / wsum : 8;
-    const pct = Math.round(base * (SCALE[name] ?? 1));
-    return { name, pct: Math.max(0, Math.min(100, pct)) };
+    // §3.8.4: never a "perfect" currency — cap at 97, always a growth edge.
+    const pct = Math.max(0, Math.min(97, Math.round(acc)));
+    return { name, pct };
   });
 }

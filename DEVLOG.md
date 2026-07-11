@@ -4,6 +4,18 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Currency constellation → CANONICAL 8 (Samuel's scoring map) (2026-07-11)
+
+Samuel sent the True Currencies scoring map (Knowledge Pack Bundle Addendum v1.1, §3.8 — via Slack DM) and greenlit the reconciliation ("let your agent do the job for now" = keep the app's wiring/orientation type names, map them onto his map; don't migrate the app taxonomy). Replaced the v1 draft (7 currencies incl. Favor/Money) with his **canonical 8**.
+
+- `lib/currency.ts` rewritten: `computeCurrencies` now returns **Knowledge, Integrity, Honor, Relationships, Courage, Creativity, Service, Conviction** — Favor + Money removed (Money is a downstream output per Gov v2 §5.2, not a currency). Each currency = a weighted blend of source strengths per addendum §3.8.1 (e.g. Knowledge = Wiring 60% [Realist/Organizer/Wise Observer/Explainer] + Orientation 40% [Truth-Seeker/Builder]; Conviction = Rejection 65% [Resilience] + Wiring 35% [Realist/Organizer]). Strongest contributing type drives each source ("primary boost"). Capped at 97 (§3.8.4 — never a "perfect" score).
+- **Name reconciliation** (app → Samuel's canonical, documented inline): Doer≈Driver, Wise Observer≈Analyst, Enterpriser≈Pioneer, Supporter/Organizer/Realist/Encourager direct. Two judgment calls flagged to Samuel: app "Explainer" → Knowledge/Honor, app "Integrator" → Creativity (synthesis). Rejection "resilience" input = the app's Rejection Gift Resilience category strength.
+- `lib/profile.ts`: schema currency rows → the canonical 8 (ctx labels only, numbers system-set); `fallbackProfile` + the route pinning were already generic and pick up 8 automatically.
+- Verified: hand-computed math matches (Realist/Organizer profile → Knowledge 82 / Integrity 83 / Conviction 73 / Courage 45 / Honor 39 / rest low), exactly the canonical 8, deterministic, all 0-97, `tsc` clean. Renderer + CSS already count-agnostic → 8 bars render as-is.
+- **Calibration note:** structure + ordering follow §3.8 exactly; absolute magnitudes ride the app's pct scales (primary currency ~70-85, vs Samuel's exemplar ~92). Matching his exact magnitudes needs his normalization constants — a tunable follow-up. Faith values-skin (§3.9.5, opt-in relabel of Conviction) also deferred: needs the onboarding faith signal threaded into the profile generator.
+
+---
+
 ## Currency constellation now deterministic (v1 gift → currency map) (2026-07-11)
 
 Killed the last regeneration-drift source in the combined profile. The "True Riches Currency Map" %s were LLM-invented, so they flipped on every regenerate (after the three gift signals were already pinned). Samuel confirmed his canonical "True Currencies" scoring pack was never formally built, so shipped the v1 gift → currency map my agent drafted 2026-07-10 (approved by Will 2026-07-11), tunable when his pack lands.
