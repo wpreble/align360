@@ -115,6 +115,7 @@ function rejectionSchema(s: RejectionScores): string {
 }
 Their five gift categories, ranked: ${list}. Primary category ${s.primary} (${s.primaryPct}%), dominant signature trait "${s.signatureTrait}".
 Pick parallels that genuinely fit the ${s.primary} gift; use real figures and accurate one-line framing.
+Rejection-gift safeguards (per the DesignSuite model): interpret rejection as signal, not harm; center the gift it revealed, not the rejection itself; emphasize growth and future contribution; never frame the person as a victim.
 ${GOV}`;
 }
 

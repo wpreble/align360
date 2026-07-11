@@ -4,6 +4,20 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Rejection Gift addendum: audited app vs Samuel's spec — mostly already built (2026-07-10)
+
+Samuel tagged a "Gift-First Signature Trait Model" addendum in the gov doc. Audited the app against it — it's ~90% already implemented:
+- 5 Gift Categories = `REJECTION_CATEGORIES` (Perspective/Insight/Creativity/Resilience/Empathy). ✅
+- 10 of his 12 Signature Traits are already tagged in the question bank and computed as `signatureTrait`. ✅ (missing: **Story Communicator**, **Future Architect** — no answer maps to them.)
+- Story-archetype layer exists (`ARCHETYPE_BY_CATEGORY`, per-category), logic Samuel-approved 2026-07-02.
+- The dedicated rejection report (`rejectionSchema` in `lib/report.ts` → `RejectionReport.tsx`) is already gift-first: reframes rejection as selection, real-figure parallels (his "Parable of Rejection"), signature trait + archetype, "competitive advantage not a soft skill."
+
+Did now: added the addendum's §12 ethical safeguards explicitly to the rejection generation prompt (rejection = signal not harm; center the gift, not the rejection; growth + future contribution; never victim framing).
+
+Needs Samuel (flagged): (1) which answers map to the 2 untagged traits; (2) archetype names — the app uses 5 evocative ones (The Outsider Who Was Right / Truth-Teller Who Saw First / Misunderstood Visionary / The One Who Kept Rising / The Wounded Healer) vs his addendum's 4 (Misunderstood Visionary / Sensitive Connector / Relentless Builder / Independent Thinker) — keep the app's or switch to his.
+
+---
+
 ## Profile determinism: gift scores locked to computed answers (2026-07-10)
 
 #aligndev feedback (Samuel + Drew): the combined Full Identity Profile changed its percentages on every regeneration — a gift flipping 0%↔100%, gifts landing in the wrong slot, order shuffling — so it "reads random/sketchy." Root cause: the profile prompt schema (`lib/profile.ts`) told the model to emit the numbers itself (`"pct":<number>`, `"currency":{rows:[{pct:<0-100>}]}`), and the shallow merge in the route (`{ ...fallbackProfile(scores), ...model }`) let the model's invented values overwrite the deterministic fallback that already had the real computed scores.
