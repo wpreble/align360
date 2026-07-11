@@ -1,4 +1,5 @@
 import type { Scores } from './scoring';
+import { computeCurrencies, CURRENCY_CTX } from './currency';
 
 export type Pill = { label: string; value: string };
 export type SignalItem = { n: string; category: string; name: string; pct: number; desc: string };
@@ -40,11 +41,11 @@ export const PROFILE_SCHEMA_A = `Return ONLY a valid JSON object (no markdown fe
   "hero": { "eyebrow": "Align360 · DesignSuite · Full Identity Profile", "title": "The <Evocative Two-Word Archetype>", "subtitle": "of <short phrase>", "description": "2 sentences on the convergence of the three assessments and what it means in an AI era", "pills": [{"label":"Wiring","value":"<primary wiring gift>"},{"label":"Orientation","value":"<primary orientation>"},{"label":"Gift","value":"<rejection gift>"}], "latin": "<short Latin motto>" },
   "signals": { "intro": "1 sentence", "items": [ {"n":"I","category":"Wiring for Impact","name":"<gift name>","pct":<number>,"desc":"2 sentences"}, {"n":"II","category":"Orientation for Impact","name":"<name>","pct":<number>,"desc":"2 sentences"}, {"n":"III","category":"Rejection Gift","name":"<name>","pct":<number>,"desc":"2 sentences"} ], "edge": {"label":"Combined Signal · Your Strategic Edge","title":"<one line; wrap 1-2 key phrases in <em></em>>","body":"3 sentences on the rare combination"} },
   "psr": [ {"kind":"p","label":"Under Pressure","heading":"<short>","body":"3 sentences"}, {"kind":"s","label":"Under Stress","heading":"<short>","body":"3 sentences"}, {"kind":"r","label":"Risk Posture","heading":"<short>","body":"3 sentences"} ],
-  "currency": { "title":"Currency constellation", "sub":"<one line>", "rows":[ {"name":"Knowledge","pct":<0-100>,"ctx":"<2-3 words>"}, {"name":"Integrity","pct":<n>,"ctx":"..."}, {"name":"Honor","pct":<n>,"ctx":"..."}, {"name":"Relationships","pct":<n>,"ctx":"..."}, {"name":"Favor","pct":<n>,"ctx":"..."}, {"name":"Money","pct":<n>,"ctx":"Output, not source"} ], "note":"2-3 sentences" },
+  "currency": { "title":"Currency constellation", "sub":"<one line>", "rows":[ {"name":"Relationships","ctx":"<2-3 words>"}, {"name":"Integrity","ctx":"..."}, {"name":"Honor","ctx":"..."}, {"name":"Conviction","ctx":"..."}, {"name":"Knowledge","ctx":"..."}, {"name":"Favor","ctx":"..."}, {"name":"Money","ctx":"Output, not source"} ], "note":"2-3 sentences" },
   "positioning": [ {"n":"I","label":"Identity Layer · Wiring & Orientation","value":"1 sentence"}, {"n":"II","label":"Transformation Layer · Rejection Gift","value":"1 sentence"}, {"n":"III","label":"Value Layer · True Riches Currency","value":"1 sentence"}, {"n":"IV","label":"Advantage Layer · Combined Edge","value":"1 sentence"}, {"n":"V","label":"Opportunity Layer · AI-Era Calibration","value":"1 sentence"} ],
   "closing": { "name":"<first name>", "title":"<same archetype as hero, full>", "latin":"<same Latin motto>", "note":"3 sentences, grounded and dignified" }
 }
-Honor the governance: present options not directives, never rank human worth, never manufacture urgency. Use the user's assessment data below to make every field specific to them.`;
+For "currency" keep all seven names and their order exactly as shown; the system sets each currency's percentage from the assessment scores, so provide only the short "ctx" label (2-3 words) per row, not a number. Honor the governance: present options not directives, never rank human worth, never manufacture urgency. Use the user's assessment data below to make every field specific to them.`;
 
 export const PROFILE_SCHEMA_B = `Return ONLY a valid JSON object (no markdown fences) with EXACTLY these keys:
 {
@@ -92,14 +93,9 @@ export function fallbackProfile(scores: Scores, name: string): Profile {
     currency: {
       title: 'Currency constellation',
       sub: 'The primary currencies are structural; they hold regardless of market conditions',
-      rows: [
-        { name: 'Knowledge', pct: 80, ctx: 'Primary currency' },
-        { name: 'Integrity', pct: 74, ctx: 'Irreplaceable by AI' },
-        { name: 'Honor', pct: 64, ctx: 'Strong' },
-        { name: 'Relationships', pct: 58, ctx: 'Moderate' },
-        { name: 'Favor', pct: 42, ctx: 'Developing' },
-        { name: 'Money', pct: 30, ctx: 'Output, not source' },
-      ],
+      // Deterministic 0-100 from the computed signals (same source the API route
+      // pins onto the AI-written profile), so the fallback matches the live path.
+      rows: computeCurrencies(scores).map((c) => ({ name: c.name, pct: c.pct, ctx: CURRENCY_CTX[c.name] })),
       note: 'A detailed currency reading generates when the narrative engine is connected.',
     },
     opportunity: {

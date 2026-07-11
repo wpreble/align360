@@ -4,6 +4,21 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Currency constellation now deterministic (v1 gift → currency map) (2026-07-11)
+
+Killed the last regeneration-drift source in the combined profile. The "True Riches Currency Map" %s were LLM-invented, so they flipped on every regenerate (after the three gift signals were already pinned). Samuel confirmed his canonical "True Currencies" scoring pack was never formally built, so shipped the v1 gift → currency map my agent drafted 2026-07-10 (approved by Will 2026-07-11), tunable when his pack lands.
+
+- New `lib/currency.ts` — `computeCurrencies(scores)`: each of 7 currencies = a weighted blend of the signal strengths (0-100 pct) the three primary assessments already compute. Every currency pulls from 3+ signals so no single answer swings it. Money is down-weighted (×0.6) so it trends smallest ("output, not source"); the math still sets the order. Loose tag matching (case/space/hyphen-insensitive) + floor-8 for unseen signals.
+- Added **Conviction** as the 7th currency — the market-facing name for Faith (Samuel: "Faith will become conviction … market facing names"). Other six names unchanged pending his full market-phasing map.
+- `app/api/profile/generate/route.ts` — after the gift-signal pinning, pins all 7 currency rows from `computeCurrencies`; the model now only supplies each row's short `ctx` label (preserved by name; falls back to `CURRENCY_CTX`). Same lock the gifts use: AI writes words, math sets numbers.
+- `lib/profile.ts` — `PROFILE_SCHEMA_A` currency block lists all 7 names/order and tells the model the pct is system-set (ctx only); `fallbackProfile` now derives its currency rows from `computeCurrencies` too, so the no-key path matches the live path.
+- Renderer already dynamic (sorts desc, any row count) — 7 bars render as-is.
+- Verified: same answers → identical numbers every run; distinct answers → distinct numbers; all pcts 0-100; Money lands last. `tsc --noEmit` clean.
+
+Still Samuel's to tune (not blocking): the per-link weights, the full market-phasing name map for the other six, and whether Money should be a fraction of the productive currencies rather than a down-weighted blend.
+
+---
+
 ## Rejection Gift addendum: audited app vs Samuel's spec — mostly already built (2026-07-10)
 
 Samuel tagged a "Gift-First Signature Trait Model" addendum in the gov doc. Audited the app against it — it's ~90% already implemented:

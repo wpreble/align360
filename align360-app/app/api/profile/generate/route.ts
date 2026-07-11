@@ -5,7 +5,10 @@ import { creditPrecheck, meterUsage } from '@/lib/credit-metering';
 import { getAssessment } from '@/lib/assessments';
 import { computeScores, type AnswerSet } from '@/lib/scoring';
 import { PROFILE_SCHEMA_A, PROFILE_SCHEMA_B, fallbackProfile, type Profile } from '@/lib/profile';
+import { computeCurrencies, CURRENCY_CTX } from '@/lib/currency';
 import { stripDashes } from '@/lib/markdown';
+
+const normName = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 
 /** Recursively apply house style (no em/en dashes) to every string field. */
 function deepStripDashes<T>(v: T): T {
@@ -182,6 +185,27 @@ export async function POST(req: NextRequest) {
     if (Array.isArray(profile.hero?.pills) && profile.hero.pills.length >= 3) {
       const vals = [scores.wiring.primary, scores.orientation.primary, scores.rejectionGift.primary];
       profile.hero.pills = profile.hero.pills.map((pill, i) => (vals[i] ? { ...pill, value: vals[i]! } : pill));
+    }
+
+    // DETERMINISM (currencies): the same lock, extended to the True-Riches
+    // currency constellation — previously the last regeneration-drift source in
+    // the profile. computeCurrencies() sets all 7 pcts from the signals; the
+    // model only contributes each row's short `ctx` label (preserved by name).
+    // See lib/currency.ts for the v1 gift -> currency map (approved 2026-07-11).
+    if (profile.currency) {
+      const llmCtx = new Map<string, string>();
+      if (Array.isArray(profile.currency.rows)) {
+        for (const r of profile.currency.rows) {
+          if (r && typeof r.name === 'string' && typeof r.ctx === 'string' && r.ctx.trim()) {
+            llmCtx.set(normName(r.name), r.ctx.trim());
+          }
+        }
+      }
+      profile.currency.rows = computeCurrencies(scores).map((c) => ({
+        name: c.name,
+        pct: c.pct,
+        ctx: llmCtx.get(normName(c.name)) ?? CURRENCY_CTX[c.name],
+      }));
     }
 
     const ok = Object.keys(a.parsed).length > 0 || Object.keys(b.parsed).length > 0;
