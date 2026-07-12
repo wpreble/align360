@@ -4,6 +4,19 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Lead gen: added the 3 score pages (conviction/wiring/value) → 8 total live (2026-07-12)
+
+Samuel tested a lead gen page and it bounced him to the OLD app (`align360.betaapp.io/auth/signup`). Diagnosed: the app already serves 5 industry lead gen pages at `align360.io/discover/<slug>` (career-clarity, coach-intelligence, csuite, workforce-intelligence, b3-daily), all CTA → `/signup` — but Samuel's Drive "Lead Gen (Map back to align)" folder holds 3 DIFFERENT score-based pages (Conviction/Wiring/Value Score) that were never ported, so they still pointed at betaapp.io. `align360.io/discover/conviction-score` was 404.
+
+Ported the 3 missing pages, mapped back to align:
+- New `content/landing/{conviction-score,wiring-score,value-score}.html` — built in the existing lean landing template (not the 250KB betaapp-era Drive HTML, which would clash and blow context), themed accurately from the canonical assessment defs: Conviction Score = Impact Readiness 5-stage ladder (Emerging→Catalytic); Value Score = Value Spectrum 8-stage ladder (Inferiority Complex→Authentic Rockstar); Wiring Score = wiring-profile framing. All CTA → `/signup`.
+- `lib/landing.ts` — added the 3 slugs to `LANDING_PAGES` (drives `generateStaticParams` + the 404 allowlist).
+- Verified: all 3 render 200 locally with correct titles + `/signup` CTA; conviction-score screenshot-confirmed on-brand. Now 8 lead gen pages total.
+
+Follow-up: these use our copy (accurate to the assessments), not Samuel's exact Drive designs — easy to swap his copy in later if he prefers.
+
+---
+
 ## Currency constellation → CANONICAL 8 (Samuel's scoring map) (2026-07-11)
 
 Samuel sent the True Currencies scoring map (Knowledge Pack Bundle Addendum v1.1, §3.8 — via Slack DM) and greenlit the reconciliation ("let your agent do the job for now" = keep the app's wiring/orientation type names, map them onto his map; don't migrate the app taxonomy). Replaced the v1 draft (7 currencies incl. Favor/Money) with his **canonical 8**.
