@@ -15,6 +15,8 @@ Ported the 3 missing pages, mapped back to align:
 
 Follow-up: these use our copy (accurate to the assessments), not Samuel's exact Drive designs — easy to swap his copy in later if he prefers.
 
+Update (same day): Samuel flagged AI-Era Readiness missing ("the one I started using"). Found his full Drive set is 10 pages (5 industry + 5 score: +Release Threshold, +AI-Era Readiness) and his `Leadgen Site Names & CRM` doc specifies intended slugs. Added `content/landing/ai-era-readiness.html` (slug `ai-era-readiness`, per his doc) — 9 total live. STILL a gap: `release-threshold` not built. SLUG mismatch vs his doc to resolve with Will/Samuel: his doc wants Conviction/Value as SUBDOMAINS (convictionscore/valuescore.align360.io) and Wiring as `wiring-profile` (I shipped `/discover/{conviction-score,value-score,wiring-score}` as paths, already posted to Slack — don't rename unilaterally).
+
 ---
 
 ## Currency constellation → CANONICAL 8 (Samuel's scoring map) (2026-07-11)
