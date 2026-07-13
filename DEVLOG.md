@@ -15,7 +15,7 @@ Ported the 3 missing pages, mapped back to align:
 
 Follow-up: these use our copy (accurate to the assessments), not Samuel's exact Drive designs — easy to swap his copy in later if he prefers.
 
-Update (same day): Samuel flagged AI-Era Readiness missing ("the one I started using"). Found his full Drive set is 10 pages (5 industry + 5 score: +Release Threshold, +AI-Era Readiness) and his `Leadgen Site Names & CRM` doc specifies intended slugs. Added `content/landing/ai-era-readiness.html` (slug `ai-era-readiness`, per his doc) — 9 total live. STILL a gap: `release-threshold` not built. SLUG mismatch vs his doc to resolve with Will/Samuel: his doc wants Conviction/Value as SUBDOMAINS (convictionscore/valuescore.align360.io) and Wiring as `wiring-profile` (I shipped `/discover/{conviction-score,value-score,wiring-score}` as paths, already posted to Slack — don't rename unilaterally).
+Update (same day): Samuel flagged AI-Era Readiness missing ("the one I started using"). Found his full Drive set is 10 pages (5 industry + 5 score: +Release Threshold, +AI-Era Readiness) and his `Leadgen Site Names & CRM` doc specifies intended slugs. Added `content/landing/ai-era-readiness.html` (slug `ai-era-readiness`) then `content/landing/release-threshold.html` (slug `release-threshold`) — **all 10 now live** at `align360.io/discover/*`, CTA → /signup, verified 200 on prod. **Will's call: the app is the source of truth for slugs** — keep the `/discover/{conviction-score,value-score,wiring-score}` PATHS as shipped; NOT chasing Samuel's doc's subdomain (convictionscore/valuescore.align360.io) or `wiring-profile` proposal. So the reconciliation is closed on our side.
 
 ---
 

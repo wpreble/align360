@@ -12,6 +12,7 @@ export const LANDING_PAGES = [
   { slug: 'wiring-score', title: 'Wiring Score' },
   { slug: 'value-score', title: 'Value Score' },
   { slug: 'ai-era-readiness', title: 'AI-Era Readiness' },
+  { slug: 'release-threshold', title: 'Release Threshold' },
 ] as const;
 
 export const LANDING_SLUGS = new Set<string>(LANDING_PAGES.map((p) => p.slug));

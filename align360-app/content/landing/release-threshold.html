@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Align · Release Threshold</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cherry:#2A122E;--cherry2:#4E0230;--obsidian:#0D0A14;--white:#FFFFFF;--gold:#C9A96E;--gold2:#E8C97E;--green:#27AE60;--amber:#C97A1A;--muted:rgba(255,255,255,.45);--mono:'IBM Plex Mono',monospace;--display:'Playfair Display',serif;--sans:'DM Sans',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--obsidian);color:rgba(255,255,255,.82);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 65% 55% at 50% -10%,rgba(78,2,48,.7),transparent 60%);pointer-events:none;z-index:0}
+.wrap{max-width:680px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,10,20,.9);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.05);height:52px;display:flex;align-items:center;justify-content:center}
+.nav-logo{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--white);display:flex;align-items:center;gap:8px}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 0 60px}
+.hero-eye{font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:.24em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:14px}
+.hero-eye::before,.hero-eye::after{content:'';width:24px;height:1px;background:rgba(201,169,110,.35)}
+.hero-h1{font-family:'Playfair Display',serif;font-size:clamp(32px,6vw,54px);font-weight:800;color:var(--white);line-height:1.05;letter-spacing:-.02em;margin-bottom:18px}
+.hero-h1 em{color:var(--gold2);font-style:italic}
+.hero-sub{font-size:15px;font-weight:300;color:var(--muted);line-height:1.8;max-width:500px;margin:0 auto 40px}
+
+/* RECOGNITION */
+.recog-section{padding:48px 0;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:48px}
+.recog-label{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.2em;text-transform:uppercase;text-align:center;margin-bottom:24px}
+.recog-grid{display:flex;flex-direction:column;gap:8px}
+.recog-item{display:flex;gap:12px;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);align-items:flex-start;text-align:left}
+.recog-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:5px}
+.recog-text{font-size:13px;color:rgba(255,255,255,.65);line-height:1.6}
+
+/* PARTIAL RESULT */
+.partial-section{margin-bottom:48px;text-align:center}
+.partial-label{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px}
+.partial-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);padding:20px;text-align:left;position:relative;overflow:hidden}
+.partial-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+
+/* CAPTURE */
+.capture-section{text-align:center;padding:40px 0;border-top:1px solid rgba(255,255,255,.05)}
+.capture-h{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:8px}
+.capture-sub{font-size:12px;color:var(--muted);margin-bottom:20px}
+.form-row{display:flex;max-width:400px;margin:0 auto 12px}
+.form-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-right:none;padding:13px 16px;color:var(--white);font-family:var(--sans);font-size:13px;outline:none}
+.form-input::placeholder{color:rgba(255,255,255,.22)}
+.form-btn{background:var(--cherry2);border:1px solid var(--cherry2);color:var(--white);font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;padding:13px 20px;cursor:pointer;white-space:nowrap}
+.form-note{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.2);letter-spacing:.08em;text-align:center}
+
+/* LADDER */
+.ladder{display:flex;flex-direction:column;gap:6px}
+.rung{display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}
+.rung-n{font-family:var(--mono);font-size:9px;color:rgba(201,122,26,.7);min-width:22px}
+.rung-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:var(--white)}
+.rung-desc{font-size:11px;color:rgba(255,255,255,.5);margin-left:auto;text-align:right}
+.rung.you{background:rgba(201,122,26,.11);border-color:rgba(201,122,26,.4)}
+
+footer{padding:32px 0;text-align:center;border-top:1px solid rgba(255,255,255,.04)}
+.footer-logo{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px}
+.footer-note{font-size:10px;color:rgba(255,255,255,.15)}
+.partial-card::before{background:linear-gradient(90deg,#7A4A0A,#C97A1A)}</style>
+</head>
+<body>
+<nav><div class="nav-logo" style="display:flex;align-items:center;gap:10px">
+  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+  <circle cx="20" cy="20" r="10" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <circle cx="20" cy="20" r="3" fill="white" opacity=".85"/>
+  <line x1="20" y1="2" x2="20" y2="10" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <line x1="20" y1="30" x2="20" y2="38" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <line x1="2" y1="20" x2="10" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <line x1="30" y1="20" x2="38" y2="20" stroke="white" stroke-width="1.2" stroke-opacity=".6"/>
+  <path d="M13 20 Q20 10 27 20" stroke="white" stroke-width="1" fill="none" stroke-opacity=".4"/>
+  <path d="M13 20 Q20 30 27 20" stroke="white" stroke-width="1" fill="none" stroke-opacity=".4"/>
+</svg>
+  <span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;letter-spacing:.12em;color:white">ALIGN</span>
+</div></nav>
+
+<div class="wrap">
+<div class="hero">
+  <div class="hero-eye">Value Spectrum · Release Threshold</div>
+  <h1 class="hero-h1">Your best work is ready.<br><em>Something edits it before it leaves.</em></h1>
+  <p class="hero-sub">Your Release Threshold reads the friction between what you are capable of and what you actually let out — the softener, the qualifier, the quieter version you ship at the last second. It is the most expensive gap most capable people never measure.</p>
+  <div class="capture-section">
+<div class="capture-h">Find your Release Threshold. Free.</div>
+<div class="capture-sub">Value Spectrum · 5 minutes · No card needed</div>
+<div class="form-row">
+<input class="form-input" type="email" placeholder="Enter your email to begin">
+<a class="form-btn" href="/signup">Begin →</a>
+</div>
+<div class="form-note">Free &nbsp;·&nbsp; No card needed &nbsp;·&nbsp; Your results are yours</div>
+</div>
+</div>
+
+<div class="recog-section">
+  <div class="recog-label">Do any of these sound familiar?</div>
+  <div class="recog-grid">
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">The work is done and good — and before you hit send, you add a line to soften how it lands. Every time.</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">"Just my two cents," "this might be off," "no worries if not." The qualifier goes on before anyone has pushed back.</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">You wait until you are certain it cannot be challenged — so the thing ships late, or smaller, or not at all.</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">People experience a fraction of what you are capable of, because the full version rarely makes it out of you intact.</div></div>
+    <div class="recog-item"><div class="recog-dot"></div><div class="recog-text">You have worked on your skill for years. You have never worked on the two-second gap between finished and delivered.</div></div>
+  </div>
+</div>
+
+<div class="partial-section">
+  <div class="partial-label">The release spectrum · where your work loses power at the last step</div>
+  <div class="partial-card">
+    <div class="ladder">
+      <div class="rung"><span class="rung-n">01</span><span class="rung-name">Heavy Softening</span><span class="rung-desc">Edited down before it ships</span></div>
+      <div class="rung"><span class="rung-n">02</span><span class="rung-name">Reflexive Qualifier</span><span class="rung-desc">The hedge is automatic</span></div>
+      <div class="rung you"><span class="rung-n">03</span><span class="rung-name">Occasional Softener</span><span class="rung-desc">Slips in under pressure</span></div>
+      <div class="rung"><span class="rung-n">04</span><span class="rung-name">Mostly Clean</span><span class="rung-desc">You let the work stand</span></div>
+      <div class="rung"><span class="rung-n">05</span><span class="rung-name">Full Release</span><span class="rung-desc">Complete, unqualified, delivered</span></div>
+    </div>
+    <div style="margin-top:14px;padding:10px 12px;background:rgba(201,122,26,.08);border-left:2px solid rgba(201,122,26,.35);font-size:12px;color:rgba(255,255,255,.55);line-height:1.6">The assessment names where you sit and, more usefully, which driver is adding the friction — validation dependency, fear of rejection, or a wiring pattern that overworks the last mile. That is the two seconds worth changing.</div>
+  </div>
+</div>
+
+<div class="capture-section">
+<div class="capture-h">Get your Release Threshold. Free.</div>
+<div class="capture-sub">5 minutes · No card needed · Your result is yours permanently</div>
+<div class="form-row">
+<input class="form-input" type="email" placeholder="Enter your email to begin">
+<a class="form-btn" href="/signup">Begin →</a>
+</div>
+<div class="form-note">Free &nbsp;·&nbsp; No card needed &nbsp;·&nbsp; Your results are yours</div>
+</div>
+</div>
+<footer>
+<div class="footer-logo">ALIGN · align360.io</div>
+<div class="footer-note">Free to start · No card required · Your results are yours</div>
+</footer>
+</body>
+</html>
