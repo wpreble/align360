@@ -4,6 +4,22 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Enterprise/team signup: public pricing page + org-first team signup (2026-07-13)
+
+Problem (Will): the app only had a Log In entry; no pricing page, no clear way to sign up as an organization, no enterprise path. Team buyers were forced to sign up as an individual first. **Key discovery:** the org/team/multi-seat system already exists end-to-end (DB `organizations`/`members`/`invitations`, per-seat Stripe price `a360_org_pilot_seat_monthly` $19/seat min 5, org-mode checkout, org dashboard, invites) — but the only entry was the "My team" tab on `/subscribe`, which sits *behind the paywall*. So the real gap was the front door, not the plumbing.
+
+Decision: individuals stay **onboarding-first** (product-led — preserves the "invest before you pay" mechanic); teams get an **org-first** front door; enterprise (25+) is **contact-us** (matches the sales-led commercial tiers already noted in `lib/billing/tiers.ts`).
+
+Shipped:
+- **`/pricing`** (new, public marketing page) — Individual $25/mo · **Team $19/seat (5–25, featured)** · Enterprise (Custom → `mailto:samuel@align360.io`). Reuses the landing nav/footer + palette (`app/pricing/page.tsx` + `pricing.css`).
+- **`/signup/team`** (new, public, **org-first**) — establishes the organization first (org name + seats 5–25), then the admin account (Google + email/password). Flow: `createOrg` → org-mode `/api/stripe/checkout` → org dashboard; falls back to the dashboard when checkout is unavailable. Handles fresh signup, OAuth/confirm return (`pendingOrg` in localStorage + `?complete=1`), and already-signed-in users. Reuses the exact `createOrg` + checkout the `/subscribe` "My team" tab uses.
+- **Landing** (`app/page.tsx`) — added a "Pricing" nav link + a **"For Teams"** hero button (ghost/outline, distinct from the filled Log In).
+- Exempted `/pricing` in `Shell` `BARE_PREFIXES` + middleware `PUBLIC_PREFIXES` (marketing page — no chrome/gate). `/signup/team` was already bare via the `/signup` prefix.
+
+Team = 5–25 seats; 25+ = Enterprise. Verified: `/pricing` + `/signup/team` render on-brand; `tsc` + `next build` clean. Follow-ups (not done): repoint the B2B lead-gen pages (csuite/workforce/coach) from `/signup` → `/pricing`; add an org entry to the app sidebar (the `/org` list is still orphaned); invites are share-link only (no email actually sent).
+
+---
+
 ## Lead gen: added the 3 score pages (conviction/wiring/value) → 8 total live (2026-07-12)
 
 Samuel tested a lead gen page and it bounced him to the OLD app (`align360.betaapp.io/auth/signup`). Diagnosed: the app already serves 5 industry lead gen pages at `align360.io/discover/<slug>` (career-clarity, coach-intelligence, csuite, workforce-intelligence, b3-daily), all CTA → `/signup` — but Samuel's Drive "Lead Gen (Map back to align)" folder holds 3 DIFFERENT score-based pages (Conviction/Wiring/Value Score) that were never ported, so they still pointed at betaapp.io. `align360.io/discover/conviction-score` was 404.

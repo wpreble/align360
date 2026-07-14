@@ -25,7 +25,10 @@ export default function Landing() {
             <AlignMark />
             <span className="lp-word">Align</span>
           </Link>
-          <Link href={ENTER} className="lp-btn primary small lp-nav-login">Log In</Link>
+          <div className="lp-nav-login" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <Link href="/pricing" className="lp-btn ghost small">Pricing</Link>
+            <Link href={ENTER} className="lp-btn primary small">Log In</Link>
+          </div>
         </div>
       </header>
 
@@ -40,7 +43,7 @@ export default function Landing() {
           <p className="lp-sub">Align360 solves what&apos;s urgent, then builds the clarity to ignite everything else. One system that actually knows how you&apos;re wired.</p>
           <div className="lp-hero-cta">
             <Link href={ENTER} className="lp-btn primary lp-magnetic">Discover Your Wiring <span className="lp-arrow" aria-hidden="true">→</span><span className="lp-spk s1" aria-hidden="true" /><span className="lp-spk s2" aria-hidden="true" /></Link>
-            <Link href={ENTER} className="lp-btn ghost">Log In</Link>
+            <Link href="/pricing" className="lp-btn ghost">For Teams</Link>
           </div>
         </div>
       </section>

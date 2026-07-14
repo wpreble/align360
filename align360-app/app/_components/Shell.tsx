@@ -97,7 +97,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   // this, an un-onboarded visitor on /login or /signup gets bounced to
   // /onboarding → middleware sends them back to /login → infinite loop, and the
   // auth pages wrongly render the full app sidebar.
-  const BARE_PREFIXES = ['/login', '/signup', '/auth', '/invite', '/subscribe'];
+  const BARE_PREFIXES = ['/login', '/signup', '/auth', '/invite', '/subscribe', '/pricing'];
   const isBare =
     pathname === '/' ||
     pathname === '/onboarding' ||
