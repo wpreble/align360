@@ -4,6 +4,20 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Team: login/signup entry, individual→team upgrade, org reachability + invite send (2026-07-14)
+
+Buttoning up the team flow before send-out. The org dashboard (`app/org/[id]`) already did seats / members / roles / invite-by-link — but it was **orphaned** (no way to reach it from the app), and there was no team entry on the auth page or upgrade path for individuals.
+
+- **Login/signup page** (`AuthForm`) — added a "Setting up Align360 for a team? → Set up a team" block below the login↔signup switch (`/signup/team`). New `.auth-team` styles.
+- **In-app reachability + upgrade** (`Shell`) — added a **"Team"** sidebar nav item → `/org`, and an account-panel **Team** section: "Your organization → Manage" (`/org`) and "Create or upgrade to a team → Add seats" (`/signup/team`). So an individual can upgrade (create an org + buy seats) straight from their account.
+- **Gate fix** — exempted `/org*` from the onboarding + paywall gates in `Shell` (`isOrgRoute`). A team admin is a buyer, not necessarily an individual user, so they now reach their org dashboard without being force-redirected to `/onboarding` or `/subscribe` first. (Previously, a fresh org owner landing on `/org/[id]?setup=1` would've been bounced to onboarding.)
+- **`/org` hub** — refactored to list your teams (Manage) or show a "Set up a team →" CTA that routes creation through the proper seats flow (`/signup/team`), instead of a bare `createOrg` with no seats.
+- **Invites are sendable** — the org dashboard invite rows now have a one-click **"Email"** (opens a prefilled `mailto:` to the invitee with the invite link) alongside "Copy link". (Auto-transactional invite email is still a follow-up — no email service wired.)
+
+Verified: signup team link renders; `tsc` + `next build` clean. Full logged-in create-team → dashboard → invite path is auth-gated (can't session-test locally) — worth a real-account smoke test before the big send.
+
+---
+
 ## Pricing: alpha tags everywhere + Enterprise contact form → HubSpot (2026-07-14)
 
 Two asks from Will: (1) mark all pricing as the alpha/pilot price (not forever), (2) make the Enterprise "Contact us" a real form into HubSpot (the mailto was a dead end).

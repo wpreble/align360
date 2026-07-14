@@ -179,6 +179,12 @@
 
 .auth-switch { text-align: center; font-size: 13px; color: var(--text-secondary); margin: 1.4rem 0 0; }
 .auth-link { color: var(--fig-mid); font-weight: 600; text-decoration: none; }
+
+/* Team / organization entry, below the login↔signup switch. */
+.auth-team { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); text-align: center; }
+.auth-team > span { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 0.6rem; }
+.auth-team-btn { display: inline-block; font-size: 13px; font-weight: 600; color: var(--fig-mid); border: 1px solid var(--border-strong); border-radius: 8px; padding: 0.5rem 1rem; text-decoration: none; transition: border-color 0.15s, background 0.15s; }
+.auth-team-btn:hover { border-color: var(--fig-mid); background: rgba(120, 90, 110, 0.06); }
 [data-theme='dark'] .auth-link { color: var(--fig-soft); }
 .auth-link:hover { text-decoration: underline; }
 

@@ -43,10 +43,10 @@ export default function OrgDashboard() {
     e.preventDefault();
     setErr(''); setMsg('');
     try {
-      const i = await createInvite(id, inviteEmail, inviteRole);
+      await createInvite(id, inviteEmail, inviteRole);
       setInviteEmail('');
       await refresh();
-      setMsg(`Invite created. Share this link: ${location.origin}/invite/${i.token}`);
+      setMsg('Invite created — copy or email the link below to send it.');
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Invite failed');
     }
@@ -119,6 +119,12 @@ export default function OrgDashboard() {
                 <div key={i.id} className="org-invite">
                   <span>{i.email} · {i.role}</span>
                   <button className="org-link" onClick={() => { navigator.clipboard?.writeText(`${location.origin}/invite/${i.token}`); setMsg('Invite link copied.'); }}>Copy link</button>
+                  <button className="org-link" onClick={() => {
+                    const link = `${location.origin}/invite/${i.token}`;
+                    const subject = `You're invited to ${org?.name || 'our team'} on Align360`;
+                    const body = `You've been invited to join ${org?.name || 'our team'} on Align360.\n\nAccept your invite:\n${link}\n\nAlign360 helps you understand how you're wired and put it to work.`;
+                    window.location.href = `mailto:${encodeURIComponent(i.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                  }}>Email</button>
                   <button className="org-link muted" onClick={async () => { await revokeInvite(i.id); refresh(); }}>Revoke</button>
                 </div>
               ))}

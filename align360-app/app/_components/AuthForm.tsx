@@ -126,6 +126,11 @@ export default function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
           <>New here? <Link href="/signup" className="auth-link">Create an account</Link></>
         )}
       </p>
+
+      <div className="auth-team">
+        <span>Setting up Align360 for a team?</span>
+        <Link href="/signup/team" className="auth-team-btn">Set up a team &rarr;</Link>
+      </div>
     </div>
   );
 }

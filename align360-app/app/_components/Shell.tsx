@@ -15,6 +15,7 @@ const NAV = [
   { key: 'insights', label: 'Insights', href: '/insights', icon: 'M3 3v18h18M7 14l4-4 3 3 5-6' },
   { key: 'frameworks', label: 'Frameworks', href: '/frameworks', icon: 'M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' },
   { key: 'resources', label: 'Resources', href: '/resources', icon: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' },
+  { key: 'team', label: 'Team', href: '/org', icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' },
 ];
 
 function Icon({ d }: { d: string }) {
@@ -103,16 +104,22 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     pathname === '/onboarding' ||
     BARE_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'));
 
+  // Org management (create/manage a team, seats, invites) is exempt from the
+  // personal-onboarding + paywall gates: a team admin is a buyer, not necessarily
+  // an individual user, and must reach their org dashboard without being forced
+  // through onboarding or their own subscription first.
+  const isOrgRoute = pathname.startsWith('/org');
+
   // Gate: first-time users go through onboarding before reaching the app.
   useEffect(() => {
-    if (!isBare && !isOnboarded()) router.replace('/onboarding');
-  }, [isBare, router]);
+    if (!isBare && !isOrgRoute && !isOnboarded()) router.replace('/onboarding');
+  }, [isBare, isOrgRoute, router]);
 
   // Billing gate: when enforcement is on (BILLING_ENABLED), users without access
   // (not an internal admin, no active subscription) are sent to /subscribe. Off
   // by default, so this is a no-op until billing is switched on.
   useEffect(() => {
-    if (isBare || !supabaseConfigured) return;
+    if (isBare || isOrgRoute || !supabaseConfigured) return;
     let cancelled = false;
     (async () => {
       try {
@@ -310,6 +317,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             ) : (
               <button className="acct-item" disabled><span>Plan &amp; billing</span><span className="acct-soon">Soon</span></button>
             )}
+
+            <div className="acct-section-label">Team</div>
+            <a className="acct-item" href="/org"><span>Your organization</span><span className="acct-val">Manage &rarr;</span></a>
+            <a className="acct-item" href="/signup/team"><span>Create or upgrade to a team</span><span className="acct-val">Add seats &rarr;</span></a>
 
             <div className="acct-section-label">Preferences</div>
             <button className="acct-item" onClick={toggleTheme}><span>Appearance</span><span className="acct-val">{theme === 'dark' ? 'Dark' : 'Light'}</span></button>
