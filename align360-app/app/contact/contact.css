@@ -1,0 +1,24 @@
+.ct-wrap { flex:1; width:100%; max-width:560px; margin:0 auto; padding:48px 24px 72px; }
+.ct-head { text-align:center; margin-bottom:26px; }
+.ct-eyebrow { font-family:'Jost',sans-serif; letter-spacing:.3em; text-transform:uppercase; font-size:11px; color:#7E1A4C; margin-bottom:14px; }
+.ct-title { font-family:'Playfair Display',Georgia,serif; font-weight:800; font-size:clamp(26px,4.5vw,38px); line-height:1.1; margin-bottom:12px; color:#1B0A24; }
+.ct-lead { font-size:15px; font-weight:300; color:#5A4656; line-height:1.6; }
+
+.ct-card { background:#fff; border:1px solid rgba(78,2,48,.12); border-radius:16px; padding:30px 28px; box-shadow:0 16px 44px -26px rgba(42,18,46,.45); }
+.ct-field { display:block; margin-bottom:16px; }
+.ct-field > span { display:block; font-size:12px; font-weight:600; color:#4E3A48; margin-bottom:6px; }
+.ct-input, .ct-select, .ct-textarea { width:100%; background:#FBF7F9; border:1px solid rgba(78,2,48,.16); border-radius:9px; padding:11px 13px; font-size:14px; color:#1B0A24; font-family:inherit; }
+.ct-input:focus, .ct-select:focus, .ct-textarea:focus { outline:none; border-color:#7E1A4C; }
+.ct-textarea { min-height:108px; resize:vertical; }
+.ct-btn { width:100%; background:linear-gradient(135deg,#7E1A4C,#4E0230); color:#fff; border:none; border-radius:8px; padding:13px; font-family:'Jost',sans-serif; font-size:15px; font-weight:500; cursor:pointer; transition:transform .15s, box-shadow .25s; box-shadow:0 14px 34px -16px rgba(78,2,48,.8); }
+.ct-btn:hover:not(:disabled) { transform:translateY(-1px); }
+.ct-btn:disabled { opacity:.6; cursor:default; }
+.ct-err { font-size:13px; color:#a32d2d; background:rgba(163,45,45,.06); border:1px solid rgba(163,45,45,.2); border-radius:8px; padding:.6rem .8rem; margin-bottom:14px; }
+.ct-note { font-size:12px; color:#8A7482; text-align:center; margin-top:14px; line-height:1.5; }
+
+.ct-ok { text-align:center; padding:12px 0; }
+.ct-ok-mark { display:inline-flex; align-items:center; justify-content:center; width:52px; height:52px; border-radius:50%; background:rgba(39,174,96,.12); color:#1A6B3A; font-size:26px; margin-bottom:14px; }
+.ct-ok-h { font-family:'Playfair Display',Georgia,serif; font-weight:700; font-size:22px; color:#1B0A24; margin-bottom:8px; }
+.ct-ok-p { font-size:14px; color:#5A4656; line-height:1.6; }
+
+@media (max-width:600px) { .ct-input, .ct-select, .ct-textarea { font-size:16px; } }

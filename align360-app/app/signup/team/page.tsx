@@ -167,6 +167,7 @@ export default function TeamSignupPage() {
           <div className="sub-plan">
             <div className="sub-plan-name">Team</div>
             <div className="sub-price"><span>${SEAT_USD}</span>/seat / month</div>
+            <div className="sub-alpha">Alpha pilot price</div>
             <ul className="sub-feats">
               <li>Everything in Individual, for every seat</li>
               <li>Invite your team by email and assign seats</li>
@@ -210,7 +211,7 @@ export default function TeamSignupPage() {
           <button className="sub-btn" type="submit" disabled={busy}>{busy ? 'One moment…' : authed ? 'Create organization →' : 'Create team account →'}</button>
         </form>
 
-        <p className="sub-note">Minimum 5 seats. Need 25+? <a href="/pricing" style={{ color: 'var(--accent)' }}>See Enterprise</a>. Secure checkout via Stripe.</p>
+        <p className="sub-note">Alpha pilot pricing, subject to change. Minimum 5 seats — need 25+? <a href="/contact" style={{ color: 'var(--accent)' }}>Contact us</a>. Secure checkout via Stripe.</p>
         <Link href="/pricing" className="sub-link">← Back to pricing</Link>
       </div>
     </div>

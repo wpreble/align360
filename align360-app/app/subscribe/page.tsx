@@ -114,6 +114,7 @@ export default function SubscribePage() {
             <div className="sub-plan">
               <div className="sub-plan-name">Individual</div>
               <div className="sub-price"><span>$25</span>/month</div>
+              <div className="sub-alpha">Alpha pilot price</div>
               <ul className="sub-feats">
                 <li>Your full combined profile and every assessment</li>
                 <li>An AI guide that knows how you are wired</li>
@@ -127,6 +128,7 @@ export default function SubscribePage() {
             <div className="sub-plan">
               <div className="sub-plan-name">Team</div>
               <div className="sub-price"><span>${ORG_SEAT_USD}</span>/seat / month</div>
+              <div className="sub-alpha">Alpha pilot price</div>
               <ul className="sub-feats">
                 <li>Everything in Individual, for every seat</li>
                 <li>Invite your team by email and assign seats</li>

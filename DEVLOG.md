@@ -4,6 +4,19 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Pricing: alpha tags everywhere + Enterprise contact form → HubSpot (2026-07-14)
+
+Two asks from Will: (1) mark all pricing as the alpha/pilot price (not forever), (2) make the Enterprise "Contact us" a real form into HubSpot (the mailto was a dead end).
+
+- **Alpha tagging** across every price surface: `/pricing` eyebrow → "Alpha Pricing", a "These are alpha pilot prices — they won't be this low forever" line, and an "Alpha price"/"Alpha pilot" pill on all three cards (`pricing.css` `.pr-alpha` + `.pr-alpha-line`). `/subscribe` (Individual + Team) and `/signup/team` get an "Alpha pilot price" pill via a new shared `.sub-alpha` class in `subscribe.css`; the team subnote notes alpha too.
+- **Enterprise contact form** — new `app/contact/page.tsx` (name · work email · organization · team size select · message) + new `app/api/contact/route.ts` → `hubspotUpsertContact`. Two-tier capture so a misconfigured property can never drop the lead: tier 1 = HubSpot default props (email/first/last/company/lifecyclestage='lead') always land; tier 2 = best-effort `message` (default form prop) + `align360_source='enterprise_contact'`. Fail-open (no token / hiccup → still returns ok). `/pricing` Enterprise "Contact us" and `/signup/team` "25+" now point to `/contact` (was `mailto:`).
+- Made `/contact` + `/api/contact` public in middleware `PUBLIC_PREFIXES`; `/contact` bare in `Shell`.
+- Verified: renders on-brand; form submit → success state; `/api/contact` returns ok on valid / 400 on bad email; `tsc` + `next build` clean.
+
+Note: `align360_source='enterprise_contact'` is a new value — if the HubSpot property is a restricted enum (not free text), that one tag silently won't stick (tier-1 lead still lands). Worth a 30-sec check in the portal.
+
+---
+
 ## Enterprise/team signup: public pricing page + org-first team signup (2026-07-13)
 
 Problem (Will): the app only had a Log In entry; no pricing page, no clear way to sign up as an organization, no enterprise path. Team buyers were forced to sign up as an individual first. **Key discovery:** the org/team/multi-seat system already exists end-to-end (DB `organizations`/`members`/`invitations`, per-seat Stripe price `a360_org_pilot_seat_monthly` $19/seat min 5, org-mode checkout, org dashboard, invites) — but the only entry was the "My team" tab on `/subscribe`, which sits *behind the paywall*. So the real gap was the front door, not the plumbing.

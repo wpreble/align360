@@ -9,10 +9,6 @@ export const metadata = {
     'Align360 pricing for individuals, teams of 5 to 25, and enterprises. Start free, then choose the plan that fits you or your organization.',
 };
 
-// Enterprise (25+) is sales-led — a direct line, not self-serve checkout.
-const ENTERPRISE_MAILTO =
-  'mailto:samuel@align360.io?subject=Align360%20Enterprise%20inquiry&body=Hi%20Samuel%2C%20we%27re%20interested%20in%20Align360%20for%2025%2B%20people.%20Here%27s%20a%20bit%20about%20our%20organization%3A';
-
 export default function Pricing() {
   return (
     <div className="pr">
@@ -29,9 +25,10 @@ export default function Pricing() {
 
       <main className="pr-main">
         <div className="pr-head">
-          <div className="pr-eyebrow">Pricing</div>
+          <div className="pr-eyebrow">Alpha Pricing</div>
           <h1 className="pr-title">Start free. <em>Grow when you&apos;re ready.</em></h1>
           <p className="pr-lead">Discover how you&apos;re wired at no cost. Subscribe when you want the full picture — for yourself, your team, or your whole organization.</p>
+          <p className="pr-alpha-line"><b>These are alpha pilot prices</b> — they won&apos;t be this low forever.</p>
         </div>
 
         <div className="pr-grid">
@@ -39,6 +36,7 @@ export default function Pricing() {
           <div className="pr-card">
             <div className="pr-tier">Individual</div>
             <div className="pr-for">For one person getting clarity.</div>
+            <div className="pr-alpha">Alpha price</div>
             <div className="pr-price"><b>$25</b><span>/month</span></div>
             <div className="pr-pricenote">Free to start &middot; no card needed</div>
             <ul className="pr-feats">
@@ -55,6 +53,7 @@ export default function Pricing() {
             <div className="pr-badge">Most popular</div>
             <div className="pr-tier">Team</div>
             <div className="pr-for">For teams of 5 to 25 people.</div>
+            <div className="pr-alpha">Alpha price</div>
             <div className="pr-price"><b>$19</b><span>/seat / month</span></div>
             <div className="pr-pricenote">Minimum 5 seats</div>
             <ul className="pr-feats">
@@ -70,6 +69,7 @@ export default function Pricing() {
           <div className="pr-card">
             <div className="pr-tier">Enterprise</div>
             <div className="pr-for">For 25+ and whole organizations.</div>
+            <div className="pr-alpha">Alpha pilot</div>
             <div className="pr-price custom"><b>Custom</b></div>
             <div className="pr-pricenote">Annual &middot; tailored to your org</div>
             <ul className="pr-feats">
@@ -78,7 +78,7 @@ export default function Pricing() {
               <li>Organizational intelligence and workforce insights</li>
               <li>SSO, security review, and custom terms</li>
             </ul>
-            <a href={ENTERPRISE_MAILTO} className="pr-cta ghost">Contact us &rarr;</a>
+            <Link href="/contact" className="pr-cta ghost">Contact us &rarr;</Link>
           </div>
         </div>
 
