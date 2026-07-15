@@ -165,10 +165,17 @@ export function computeClarityScores(slug: string, answers: Record<string, strin
       ladder = cfg.progression.map((label, i) => ({ key: `p${i}`, label, goal: i === n - 1 }));
       ladderNow = level.index;
     } else {
-      // Value Spectrum: an N-stage spectrum; the current stage is the score placed
-      // across the N stages (clamped so a perfect 100 lands on the final stage).
+      // Value Spectrum: an N-stage narrative ladder (finer than the 5 score bands).
+      // Highlight the "now" node by the SAME band the headline shows — mapped
+      // proportionally onto the N stages — so the title/paragraph and the progression
+      // strip agree (Drew, 2026-07-14: title said "Authentic Rockstar" while the ladder
+      // showed "Authentic", because the ladder used an even 8-way split while the
+      // headline used the 81+ band). Top band -> top stage, both "Authentic Rockstar".
       ladder = cfg.progression.map((label, i) => ({ key: `p${i}`, label }));
-      ladderNow = Math.max(0, Math.min(n - 1, Math.floor((overall / 100) * n)));
+      const bandMax = cfg.bands.length - 1;
+      ladderNow = bandMax > 0
+        ? Math.round((level.index / bandMax) * (n - 1))
+        : Math.max(0, Math.min(n - 1, Math.floor((overall / 100) * n)));
     }
   } else {
     ladder = cfg.bands.map((b) => ({ key: b.key, label: b.label }));

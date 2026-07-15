@@ -4,6 +4,19 @@ Running log of the Align360 app build. Newest section first. The app lives in `a
 
 ---
 
+## Drew tester fixes: pricing scroll, login re-onboarding, user-model↔test %, Value Spectrum stage (2026-07-14)
+
+Four bugs Drew flagged testing tonight.
+
+- **`/pricing` + `/contact` wouldn't scroll** (clipped on laptop, impossible on phone). Root cause: globals.css sets `html,body{overflow:hidden}` for the chat shell; the landing works because `.lp` owns its scroll — my `.pr` wrapper used `min-height` with no `overflow-y`. Fix (`pricing.css`): `.pr { height:100dvh; overflow-y:auto }`. Verified scrollable on mobile.
+- **Every login forced the onboarding/preliminary test again** (workaround: reload). Race: logout clears localStorage, and Shell's onboarding gate ran `isOnboarded()`=false *before* AccountSync restored cloud→local. Fix: AccountSync dispatches an `align360:synced` signal on all terminal paths; Shell's gate waits for it (`hydrated`, 4s fallback) before redirecting. So returning users are no longer bounced. (Needs a real login/logout smoke test.)
+- **User-model %s ≠ individual-test %s** (wiring matched at 78, but orientation showed 88% vs 46% on the test, rejection 88% vs 58%). Root cause: the combined profile pinned from `computeScores` (strength-88 scale) while the per-test reports use `report-scoring` (share scale). Fix (`app/api/profile/generate/route.ts`): pin the three signal name+pct from `scoreAssessment` — the exact function the `/insights` reports use. Verified: user model now shows Orientation 32% / Rejection 28% (share), matching the tests; wiring still 78%.
+- **Value Spectrum: title/paragraph "Authentic Rockstar" but progression "Authentic".** The headline used the 81+ score band while the ladder used an even 8-way split (Rockstar only ≥87.5). Fix (`lib/clarity-scoring.ts`): the stage-spectrum ladder's "now" node now derives from the same band as the headline (proportional map, top band → top stage) — so title/paragraph/ladder agree with no regeneration or result change.
+
+Verified: `tsc` + `next build` clean; pricing scroll + %-match confirmed live-locally. Follow-up: the Value Spectrum's 5 band names vs 8 ladder-stage names still differ for the *middle* bands (a vocabulary reconciliation to Samuel's canonical 8 stages), and the onboarding-race fix wants a real login/logout smoke test.
+
+---
+
 ## Team: login/signup entry, individual→team upgrade, org reachability + invite send (2026-07-14)
 
 Buttoning up the team flow before send-out. The org dashboard (`app/org/[id]`) already did seats / members / roles / invite-by-link — but it was **orphaned** (no way to reach it from the app), and there was no team entry on the auth page or upgrade path for individuals.

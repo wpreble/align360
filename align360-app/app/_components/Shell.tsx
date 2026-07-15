@@ -110,10 +110,24 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   // through onboarding or their own subscription first.
   const isOrgRoute = pathname.startsWith('/org');
 
+  // Wait for AccountSync to restore cloud→local state before the onboarding gate
+  // decides. On login the previous logout cleared localStorage, so isOnboarded()
+  // reads false until the cloud pull lands — without this, a returning, already-
+  // onboarded user gets bounced to /onboarding on every login (Drew, 2026-07-14).
+  const [hydrated, setHydrated] = useState(!supabaseConfigured);
+  useEffect(() => {
+    if (!supabaseConfigured || hydrated) return;
+    if ((window as unknown as { __a360synced?: boolean }).__a360synced) { setHydrated(true); return; }
+    const on = () => setHydrated(true);
+    window.addEventListener('align360:synced', on);
+    const t = setTimeout(() => setHydrated(true), 4000); // fallback: never hang the gate
+    return () => { window.removeEventListener('align360:synced', on); clearTimeout(t); };
+  }, [hydrated]);
+
   // Gate: first-time users go through onboarding before reaching the app.
   useEffect(() => {
-    if (!isBare && !isOrgRoute && !isOnboarded()) router.replace('/onboarding');
-  }, [isBare, isOrgRoute, router]);
+    if (!isBare && !isOrgRoute && hydrated && !isOnboarded()) router.replace('/onboarding');
+  }, [isBare, isOrgRoute, hydrated, router]);
 
   // Billing gate: when enforcement is on (BILLING_ENABLED), users without access
   // (not an internal admin, no active subscription) are sent to /subscribe. Off

@@ -6,6 +6,7 @@ import { getAssessment } from '@/lib/assessments';
 import { computeScores, type AnswerSet } from '@/lib/scoring';
 import { PROFILE_SCHEMA_A, PROFILE_SCHEMA_B, fallbackProfile, type Profile } from '@/lib/profile';
 import { computeCurrencies, CURRENCY_CTX } from '@/lib/currency';
+import { scoreAssessment } from '@/lib/report-scoring';
 import { stripDashes } from '@/lib/markdown';
 
 const normName = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -172,10 +173,19 @@ export async function POST(req: NextRequest) {
     // I = Wiring, II = Orientation, III = Rejection Gift.
     // (The currency constellation is NOT pinned here — it has no deterministic source
     // among the three primary assessments yet; pending Samuel's scoring decision.)
+    // Pin name + pct to the EXACT numbers each individual assessment report shows
+    // (lib/report-scoring — the same function the /insights per-test pages use), so
+    // the user model never disagrees with the per-test results. Fixes Drew (2026-07-14):
+    // wiring matched, but orientation showed 88% here vs 46% on the test and rejection
+    // 88% vs 58% — because the combined profile used a strength scale while the reports
+    // use a share scale. scoreAssessment is now the single source for both surfaces.
+    const wRep = answers.wiring ? scoreAssessment('wiring', answers.wiring) : null;
+    const oRep = answers.orientation ? scoreAssessment('orientation', answers.orientation) : null;
+    const rRep = answers['rejection-gift'] ? scoreAssessment('rejection-gift', answers['rejection-gift']) : null;
     const pinned = [
-      { name: scores.wiring.primary, pct: scores.wiring.ranked[0]?.pct },
-      { name: scores.orientation.primary, pct: scores.orientation.ranked[0]?.pct },
-      { name: scores.rejectionGift.primary, pct: scores.rejectionGift.ranked[0]?.pct },
+      { name: wRep?.primary ?? scores.wiring.primary, pct: wRep?.primaryPct ?? scores.wiring.ranked[0]?.pct },
+      { name: oRep?.primary ?? scores.orientation.primary, pct: oRep?.primaryPct ?? scores.orientation.ranked[0]?.pct },
+      { name: rRep?.primary ?? scores.rejectionGift.primary, pct: rRep?.primaryPct ?? scores.rejectionGift.ranked[0]?.pct },
     ];
     if (Array.isArray(profile.signals?.items)) {
       profile.signals.items = profile.signals.items.map((it, i) =>
@@ -183,7 +193,7 @@ export async function POST(req: NextRequest) {
       );
     }
     if (Array.isArray(profile.hero?.pills) && profile.hero.pills.length >= 3) {
-      const vals = [scores.wiring.primary, scores.orientation.primary, scores.rejectionGift.primary];
+      const vals = [pinned[0].name, pinned[1].name, pinned[2].name];
       profile.hero.pills = profile.hero.pills.map((pill, i) => (vals[i] ? { ...pill, value: vals[i]! } : pill));
     }
 

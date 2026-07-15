@@ -24,6 +24,17 @@ export default function AccountSync() {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let cancelled = false;
 
+    // Signal that cloud→local hydration is settled (data restored, or no session /
+    // nothing to restore). Shell's onboarding gate waits for this before deciding, so
+    // a returning user isn't bounced into onboarding just because this device's
+    // localStorage was cleared on the previous logout (Drew, 2026-07-14).
+    const markHydrated = () => {
+      try {
+        (window as unknown as { __a360synced?: boolean }).__a360synced = true;
+        window.dispatchEvent(new Event('align360:synced'));
+      } catch { /* noop */ }
+    };
+
     const onChange = () => {
       if (!ready.current || !userId.current) return;
       if (timer) clearTimeout(timer);
@@ -36,7 +47,7 @@ export default function AccountSync() {
         const { data } = await supabase.auth.getUser();
         if (cancelled) return;
         const uid = data.user?.id;
-        if (!uid) return;
+        if (!uid) { markHydrated(); return; }
         let lastUid: string | null = null;
         try { lastUid = localStorage.getItem(UID_KEY); } catch {}
         if (lastUid && lastUid !== uid) {
@@ -48,7 +59,8 @@ export default function AccountSync() {
         if (cancelled) return;
         if (!hadCloud) await pushToCloud(supabase, uid); // first-time migration of this device's data
         ready.current = true;
-      } catch { /* best-effort */ }
+        markHydrated();
+      } catch { markHydrated(); /* best-effort: never leave the gate waiting */ }
     })();
 
     return () => { cancelled = true; if (timer) clearTimeout(timer); window.removeEventListener(STORE_EVENT, onChange); };
