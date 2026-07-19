@@ -1,15 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { OB_STEPS, synthesize, type Answers } from '@/lib/onboarding';
-import { setOnboarding, setName } from '@/lib/storage';
+import { setOnboarding, setName, isOnboarded } from '@/lib/storage';
 import AlignMark from '@/app/_components/AlignMark';
 
 export default function Onboarding() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
+
+  // Safety net: someone who has already onboarded should never be asked to redo
+  // it, however they got here (a stale gate decision, a bookmark, a stray link).
+  useEffect(() => { if (isOnboarded()) router.replace('/chat'); }, [router]);
 
   const s = OB_STEPS[step];
   const total = OB_STEPS.length;

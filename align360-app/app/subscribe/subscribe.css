@@ -1,4 +1,10 @@
-.sub-page { min-height:100vh; min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:2.5rem 1.25rem; background:var(--bg-body); font-family:var(--font-sans); }
+/* The app shell sets body{overflow:hidden}, so these bare pages own their own
+   scroll (same as .pr on /pricing). Without it the tall org form on /signup/team
+   is clipped with no way to reach the bottom (Drew, 2026-07-15: couldn't scroll
+   the team page off /pricing). `safe center` keeps the card centered when it fits
+   but falls back to top-aligned when it overflows, so a tall form's top edge
+   stays reachable instead of overflowing above the scroll origin. */
+.sub-page { height:100vh; height:100dvh; overflow-y:auto; overflow-x:hidden; display:flex; align-items:center; align-items:safe center; justify-content:center; padding:2.5rem 1.25rem; background:var(--bg-body); font-family:var(--font-sans); }
 .sub-card { width:100%; max-width:440px; background:var(--bg-surface); border:1px solid var(--border); border-radius:16px; padding:2.5rem 2.25rem; box-shadow:0 18px 50px rgba(42,18,46,.08); text-align:center; }
 .sub-eyebrow { font-family:var(--font-brand,'Jost',sans-serif); letter-spacing:.34em; text-transform:uppercase; font-size:12px; color:var(--accent); margin-bottom:1rem; }
 .sub-title { font-family:var(--font-display); font-weight:500; font-size:30px; color:var(--text-primary); margin-bottom:.5rem; }
