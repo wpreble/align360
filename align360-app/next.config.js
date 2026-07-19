@@ -13,6 +13,21 @@ const nextConfig = {
       '/discover/[slug]': ['./content/landing/**/*'],
     },
   },
+  // Retire the stale betaapp.io app: forward every path to the canonical
+  // align360.io. Lead-gen CTAs are relative (/signup), so a page served from the
+  // old domain kept users on betaapp.io (Samuel, 2026-07-11). Dormant on
+  // align360.io; activates once betaapp.io is added as a domain on this Vercel
+  // project (align360-app) — which also decommissions the old deployment.
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'align360.betaapp.io' }],
+        destination: 'https://align360.io/:path*',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
