@@ -6,7 +6,7 @@ export const LANDING_PAGES = [
   { slug: 'coach-intelligence', title: 'Coach Intelligence' },
   { slug: 'csuite', title: 'C-Suite' },
   { slug: 'workforce-intelligence', title: 'Workforce Intelligence' },
-  { slug: 'b3-daily', title: 'B3 Daily' },
+  { slug: 'b3-daily', title: 'Pulse360 Daily' },
   // Score-based lead-gen pages (mapped back from Samuel's Drive set to align360.io).
   { slug: 'conviction-score', title: 'Conviction Score' },
   { slug: 'wiring-score', title: 'Wiring Score' },
