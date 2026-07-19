@@ -12,7 +12,7 @@
 import { getAssessment } from '../lib/assessments';
 import { computeClarityScores } from '../lib/clarity-scoring';
 import { claritySchema } from '../lib/clarity';
-import { makeClient, genParams } from '../lib/ai';
+import { makeClient, genParams, parseJsonLoose, type Provider } from '../lib/ai';
 import { buildSystemPrompt } from '../lib/system-prompt';
 
 function demoAnswers(slug: string): Record<string, string> {
@@ -27,25 +27,30 @@ const scores = computeClarityScores('impact-readiness', demoAnswers('impact-read
 const sys = buildSystemPrompt();
 const userMsg = `You are writing the analysis for an Align360 Clarity Layer result (${scores.title}). The scores are already computed; write ONLY the interpretive narrative.\n\n${scores.scoreName}: ${scores.overall}/100 (${scores.level.label}).\n\n${claritySchema(scores)}`;
 
-async function run(label: string, model: string, useOpenRouter: boolean) {
-  const apiKey = useOpenRouter ? process.env.OPENROUTER_API_KEY : process.env.OPENAI_API_KEY;
+async function run(label: string, model: string, provider: Provider) {
+  const apiKey = provider === 'openrouter' ? process.env.OPENROUTER_API_KEY
+    : provider === 'charis' ? process.env.CHARIS_API_KEY
+    : process.env.OPENAI_API_KEY;
   if (!apiKey) { console.log(`\n=== ${label} — no key, skipped ===`); return; }
-  const client = makeClient(useOpenRouter, apiKey);
+  const client = makeClient(provider, apiKey);
   const t0 = Date.now();
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const c: any = await client.chat.completions.create({
       model,
-      ...genParams(useOpenRouter, { maxTokens: 9000, json: true, reasoning: 'low' }),
+      ...genParams(provider, { maxTokens: 9000, json: true, reasoning: 'off' }),
       messages: [{ role: 'system', content: sys }, { role: 'user', content: userMsg }],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
     const dt = ((Date.now() - t0) / 1000).toFixed(1);
     const text = c.choices[0]?.message?.content || '{}';
-    let parsed: any = null, ok = false;
-    try { parsed = JSON.parse(text); ok = true; } catch { /* invalid */ }
+    let strict = false;
+    try { JSON.parse(text); strict = true; } catch { /* invalid */ }
+    const parsed: any = parseJsonLoose(text);
+    const ok = parsed != null;
     console.log(`\n=== ${label} (${c.model || model}) — ${dt}s ===`);
-    console.log('valid JSON:', ok, ok ? `| keys: ${Object.keys(parsed).join(', ')}` : `| raw head: ${text.slice(0, 120)}`);
+    console.log('valid JSON (loose):', ok, '| strict:', strict, ok ? `| keys: ${Object.keys(parsed).join(', ')}` : `| raw head: ${text.slice(0, 120)}`);
+    console.log('raw tail:', JSON.stringify(text.slice(-80)));
     if (ok) {
       console.log('headline:', parsed.headline);
       console.log('summary :', (parsed.summary || '').slice(0, 200));
@@ -53,13 +58,18 @@ async function run(label: string, model: string, useOpenRouter: boolean) {
       console.log('sample domain blurb:', (parsed.domains?.[0]?.body || '').slice(0, 160));
     }
     console.log('usage:', c.usage);
-  } catch (e) {
-    console.log(`\n=== ${label} FAILED: ${e instanceof Error ? e.message : e} ===`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    console.log(`\n=== ${label} FAILED: ${e?.message ?? e} ===`);
+    console.log('status:', e?.status);
+    console.log('error body:', JSON.stringify(e?.error ?? e?.response?.data ?? null));
+    console.log('request id:', e?.requestID ?? e?.headers?.['x-request-id']);
   }
 }
 
 (async () => {
   console.log(`Eval: ${scores.title} report — ${scores.scoreName} ${scores.overall}/100\n`);
-  await run('gpt-5.5 (OpenAI)', process.env.OPENAI_MODEL || 'gpt-5.5', false);
-  await run('GLM 5.2 (OpenRouter)', 'z-ai/glm-5.2', true);
+  await run('gpt-5.5 (OpenAI)', process.env.OPENAI_MODEL || 'gpt-5.5', 'openai');
+  await run('GLM 5.2 (OpenRouter)', 'z-ai/glm-5.2', 'openrouter');
+  await run('GLM 5.2 (Charis)', process.env.CHARIS_MODEL || 'glm-5.2:public', 'charis');
 })();

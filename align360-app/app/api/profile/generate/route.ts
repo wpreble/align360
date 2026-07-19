@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
 
   // Report model: set REPORT_MODEL=z-ai/glm-5.2 to route through OpenRouter; default
   // OPENAI_MODEL/gpt-5.5 on OpenAI. No key → deterministic fallback so the page renders.
-  const { model, useOpenRouter, apiKey } = resolveModel('REPORT_MODEL', process.env.OPENAI_MODEL || 'gpt-5.5');
+  const { model, provider, apiKey } = resolveModel('REPORT_MODEL', process.env.OPENAI_MODEL || 'gpt-5.5');
   if (!apiKey) {
     return NextResponse.json({ scores, profile: deepStripDashes(fallbackProfile(scores, name)), generated: false });
   }
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
     .filter(Boolean)
     .join('\n\n');
 
-  const client = makeClient(useOpenRouter, apiKey);
+  const client = makeClient(provider, apiKey);
   const sys = buildSystemPrompt();
 
   // Generate the profile as two PARALLEL halves (identity + market/AI-era) so
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
   const genOnce = async (schema: string) => {
     const c = await client.chat.completions.create({
       model,
-      ...genParams(useOpenRouter, { maxTokens: 9000, json: true, reasoning: 'off', temperature: 0 }),
+      ...genParams(provider, { maxTokens: 9000, json: true, reasoning: 'off', temperature: 0 }),
       messages: [
         { role: 'system', content: sys },
         { role: 'user', content: `You are generating part of a combined Align360 identity profile ("Combined in an AI-Era" format). Return ONLY a single valid JSON object, no markdown fences or prose. Participant assessment data:\n\n${summary}\n\n${schema}` },

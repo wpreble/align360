@@ -29,14 +29,14 @@ export async function POST(req: NextRequest) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const hasAttachment = messages.some((m) => Array.isArray(m.content) && (m.content as any[]).some((p) => p?.type === 'image_url' || p?.type === 'file'));
   const openai = resolveModel('OPENAI_MODEL', 'gpt-5.5');
-  const { model, useOpenRouter, apiKey } = hasAttachment && openai.apiKey ? openai : resolveModel('CHAT_MODEL', 'gpt-5-mini');
+  const { model, provider, apiKey } = hasAttachment && openai.apiKey ? openai : resolveModel('CHAT_MODEL', 'gpt-5-mini');
   if (!apiKey) {
     return NextResponse.json(
-      { error: `${useOpenRouter ? 'OPENROUTER_API_KEY' : 'OPENAI_API_KEY'} is not set on the server.` },
+      { error: `${provider === 'openai' ? 'OPENAI_API_KEY' : provider === 'charis' ? 'CHARIS_API_KEY' : 'OPENROUTER_API_KEY'} is not set on the server.` },
       { status: 500 },
     );
   }
-  const client = makeClient(useOpenRouter, apiKey);
+  const client = makeClient(provider, apiKey);
 
   // GLM (OpenRouter) cannot consume image_url / file parts. If an attachment
   // message is heading there (no OpenAI key), flatten it to its text plus a note
@@ -51,7 +51,9 @@ export async function POST(req: NextRequest) {
     const merged = [text, notes.join(' ')].filter(Boolean).join('\n\n');
     return { ...m, content: merged || '(attachment)' };
   });
-  const prepared = useOpenRouter ? flattenForText(messages) : messages;
+  // Only GLM (OpenRouter / Charis) needs the flatten; OpenAI can consume the
+  // structured image_url / file parts, so keep them intact on that path.
+  const prepared = provider === 'openai' ? messages : flattenForText(messages);
 
   const pre = await creditPrecheck();
   if (!pre.ok) {
@@ -75,7 +77,7 @@ export async function POST(req: NextRequest) {
   // Chat: no reasoning tokens (cheap/fast); lower temperature for precision and a
   // tighter token ceiling as a brevity backstop (the voice layer does the real work).
   // Reports use reasoning:'low'.
-  const baseParams = { model, ...genParams(useOpenRouter, { maxTokens: 1500, reasoning: 'off', temperature: 0.5 }) };
+  const baseParams = { model, ...genParams(provider, { maxTokens: 1500, reasoning: 'off', temperature: 0.5 }) };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const run = (msgs: any) =>
     client.chat.completions.create({ ...baseParams, messages: msgs } as any);

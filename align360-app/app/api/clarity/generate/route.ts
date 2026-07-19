@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
 
   // Report model: REPORT_MODEL=z-ai/glm-5.2 → OpenRouter; default OPENAI_MODEL/gpt-5.5.
   // No key → deterministic fallback so the report still renders.
-  const { model, useOpenRouter, apiKey } = resolveModel('REPORT_MODEL', process.env.OPENAI_MODEL || 'gpt-5.5');
+  const { model, provider, apiKey } = resolveModel('REPORT_MODEL', process.env.OPENAI_MODEL || 'gpt-5.5');
   if (!apiKey) {
     return NextResponse.json({ scores, narrative: deepStripDashes(fallbackClarityNarrative(scores, name)), generated: false });
   }
@@ -155,13 +155,13 @@ export async function POST(req: NextRequest) {
     .filter(Boolean)
     .join('\n');
 
-  const client = makeClient(useOpenRouter, apiKey);
+  const client = makeClient(provider, apiKey);
   const sys = buildSystemPrompt();
 
   const genOnce = async () => {
     const c = await client.chat.completions.create({
       model,
-      ...genParams(useOpenRouter, { maxTokens: 9000, json: true, reasoning: 'off' }),
+      ...genParams(provider, { maxTokens: 9000, json: true, reasoning: 'off' }),
       messages: [
         { role: 'system', content: sys },
         {
