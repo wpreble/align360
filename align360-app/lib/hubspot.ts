@@ -74,6 +74,50 @@ export async function hubspotUpsertContact(email: string | null | undefined, pro
   }
 }
 
+/**
+ * Attach a NOTE to a contact (by email), so in-app feedback shows on the person's
+ * timeline in the CRM. No-op without a token; never throws. Resolves the contact id
+ * (creating a bare contact if needed so the note always has something to attach to),
+ * then posts a note associated to it. Bounded timeouts, same fail-open contract as
+ * the upsert above — a HubSpot hiccup must never fail the feedback save.
+ */
+export async function hubspotAddNote(email: string | null | undefined, body: string): Promise<void> {
+  const t = token();
+  if (!t) return;
+  const addr = (email || '').trim().toLowerCase();
+  const text = (body || '').trim();
+  if (!addr || !addr.includes('@') || !text) return;
+  const headers = { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' };
+
+  const contactId = async (): Promise<string | null> => {
+    try {
+      const r = await fetch(`${API}/crm/v3/objects/contacts/${encodeURIComponent(addr)}?idProperty=email&properties=email`, { headers, signal: AbortSignal.timeout(3000) });
+      if (r.ok) return (await r.json())?.id ?? null;
+    } catch { /* fall through */ }
+    return null;
+  };
+
+  try {
+    let id = await contactId();
+    if (!id) { await hubspotUpsertContact(addr); id = await contactId(); }
+    if (!id) return; // couldn't resolve a contact — feedback still lives in Supabase
+
+    const res = await fetch(`${API}/crm/v3/objects/notes`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        properties: { hs_note_body: text.slice(0, 65000), hs_timestamp: new Date().toISOString() },
+        // 202 = HubSpot-defined note→contact association.
+        associations: [{ to: { id }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 202 }] }],
+      }),
+      signal: AbortSignal.timeout(3000),
+    });
+    if (!res.ok) console.error('hubspot note failed:', res.status, (await res.text()).slice(0, 300));
+  } catch (e) {
+    console.error('hubspot note error:', e instanceof Error ? e.message : e);
+  }
+}
+
 /** Split a display name into HubSpot's firstname / lastname fields. */
 export function splitName(full?: string | null): { firstname?: string; lastname?: string } {
   const n = (full || '').trim();

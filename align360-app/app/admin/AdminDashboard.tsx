@@ -14,11 +14,13 @@ type Metrics = {
   stripeMode: string;
 };
 type Payouts = { range: { start: number; end: number }; currency: string; mode: string; count: number; capped: boolean; grossCents: number; feeCents: number; refundCents: number; netCents: number };
+type FeedbackItem = { id: number; email: string | null; message: string; path: string | null; created_at: string };
 
 export default function AdminDashboard({ email }: { email: string }) {
   const router = useRouter();
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [mErr, setMErr] = useState('');
+  const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
 
   const today = useMemo(() => new Date(), []);
   const thirtyAgo = useMemo(() => new Date(Date.now() - 30 * 86400_000), []);
@@ -35,6 +37,10 @@ export default function AdminDashboard({ email }: { email: string }) {
       .then((r) => r.json())
       .then((d) => (d.error ? setMErr(d.error) : setMetrics(d)))
       .catch((e) => setMErr(String(e)));
+    fetch('/api/admin/feedback')
+      .then((r) => r.json())
+      .then((d) => setFeedback(Array.isArray(d.items) ? d.items : []))
+      .catch(() => {});
   }, []);
 
   const loadPayouts = useCallback(async () => {
@@ -186,6 +192,25 @@ export default function AdminDashboard({ email }: { email: string }) {
             </tbody>
           </table>
         ) : <p className="adm-note">No signups yet.</p>}
+      </section>
+
+      <section className="adm-panel">
+        <h2 className="adm-h2">Feedback</h2>
+        {feedback.length ? (
+          <table className="adm-table">
+            <thead><tr><th>When</th><th>From</th><th>Message</th><th>Page</th></tr></thead>
+            <tbody>
+              {feedback.map((f) => (
+                <tr key={f.id}>
+                  <td style={{ whiteSpace: 'nowrap' }}>{new Date(f.created_at).toLocaleString()}</td>
+                  <td>{f.email || '—'}</td>
+                  <td style={{ whiteSpace: 'pre-wrap', maxWidth: 440 }}>{f.message}</td>
+                  <td>{f.path || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : <p className="adm-note">No feedback yet.</p>}
       </section>
     </div>
   );

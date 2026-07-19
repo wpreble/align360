@@ -43,6 +43,11 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const [credits, setCredits] = useState<{ remaining: number; granted: number; topup: number; unlimited?: boolean } | null>(null);
   const [buyOpen, setBuyOpen] = useState(false);
   const [buyBusy, setBuyBusy] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [fbText, setFbText] = useState('');
+  const [fbBusy, setFbBusy] = useState(false);
+  const [fbSent, setFbSent] = useState(false);
+  const [fbErr, setFbErr] = useState('');
   const year = new Date().getFullYear();
 
   const refreshCredits = useCallback(() => {
@@ -88,7 +93,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
   // Escape closes the mobile drawer.
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setDrawerOpen(false); setAccountOpen(false); } };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setDrawerOpen(false); setAccountOpen(false); setFeedbackOpen(false); } };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
@@ -114,15 +119,23 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   // decides. On login the previous logout cleared localStorage, so isOnboarded()
   // reads false until the cloud pull lands — without this, a returning, already-
   // onboarded user gets bounced to /onboarding on every login (Drew, 2026-07-14).
+  //
+  // The wait only starts once we're on a gated route, because that is where
+  // AccountSync mounts and begins the pull. Shell lives in the root layout and
+  // stays mounted across client navigation, so an ungated timer would burn down
+  // while the user sits on /login typing; the gate then fired the instant they
+  // landed on /insights, still ahead of the pull, and bounced them every time
+  // (Drew, 2026-07-15).
+  const gated = supabaseConfigured && !isBare && !isOrgRoute;
   const [hydrated, setHydrated] = useState(!supabaseConfigured);
   useEffect(() => {
-    if (!supabaseConfigured || hydrated) return;
+    if (!gated || hydrated) return;
     if ((window as unknown as { __a360synced?: boolean }).__a360synced) { setHydrated(true); return; }
     const on = () => setHydrated(true);
     window.addEventListener('align360:synced', on);
-    const t = setTimeout(() => setHydrated(true), 4000); // fallback: never hang the gate
+    const t = setTimeout(() => setHydrated(true), 8000); // fallback: never hang the gate
     return () => { window.removeEventListener('align360:synced', on); clearTimeout(t); };
-  }, [hydrated]);
+  }, [gated, hydrated]);
 
   // Gate: first-time users go through onboarding before reaching the app.
   useEffect(() => {
@@ -175,6 +188,24 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     try { if (supabaseConfigured) await createClient().auth.signOut(); } catch {}
     try { Object.keys(localStorage).filter((k) => k.startsWith('align360:')).forEach((k) => localStorage.removeItem(k)); } catch {}
     window.location.href = '/login';
+  };
+
+  const openFeedback = () => { setFbErr(''); setFbSent(false); setFeedbackOpen(true); };
+  const closeFeedback = () => { setFeedbackOpen(false); setFbErr(''); };
+  const submitFeedback = async () => {
+    const message = fbText.trim();
+    if (!message || fbBusy) return;
+    setFbBusy(true); setFbErr('');
+    try {
+      const r = await fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message, path: pathname }) });
+      if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.error || 'Could not send feedback.'); }
+      setFbSent(true); setFbText('');
+      setTimeout(() => { setFeedbackOpen(false); setFbSent(false); }, 1700);
+    } catch (e) {
+      setFbErr(e instanceof Error ? e.message : 'Could not send feedback.');
+    } finally {
+      setFbBusy(false);
+    }
   };
 
   // Inline rename of a chat-history item.
@@ -267,6 +298,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
         {/* Account + copyright pinned to the bottom. */}
         <div className="sidebar-foot">
+          <button className="feedback-btn" onClick={openFeedback} title="Send feedback to the Align360 team">
+            <span className="fb-ico"><Icon d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" /></span>
+            <span>Feedback</span>
+          </button>
           <div className="foot-controls">
             <button className="account-btn" onClick={() => setAccountOpen(true)} aria-label="Account and settings" title="Account & settings">
               <span className="account-avatar">{(name || '?').trim().charAt(0).toUpperCase()}</span>
@@ -374,6 +409,43 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               )}
               <button className="acct-done" onClick={() => setAccountOpen(false)}>Done</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Feedback popup */}
+      {feedbackOpen && (
+        <div className="acct-scrim" onClick={closeFeedback}>
+          <div className="acct-modal fb-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Send feedback">
+            {fbSent ? (
+              <div className="fb-thanks">
+                <div className="fb-thanks-ico">✓</div>
+                <div className="fb-thanks-t">Thank you</div>
+                <div className="fb-thanks-s">Your feedback went straight to the Align360 team.</div>
+              </div>
+            ) : (
+              <>
+                <div className="fb-head">
+                  <h3 className="fb-title">Share feedback</h3>
+                  <button className="acct-x" onClick={closeFeedback} aria-label="Close">✕</button>
+                </div>
+                <p className="fb-sub">A bug, an idea, anything at all. It goes straight to the Align360 team.</p>
+                <textarea
+                  className="fb-text"
+                  value={fbText}
+                  autoFocus
+                  maxLength={4000}
+                  placeholder="What's working, what's not, what you'd love to see…"
+                  onChange={(e) => setFbText(e.target.value)}
+                  onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); submitFeedback(); } }}
+                />
+                {fbErr ? <div className="fb-err">{fbErr}</div> : null}
+                <div className="fb-actions">
+                  <button className="fb-cancel" onClick={closeFeedback}>Cancel</button>
+                  <button className="fb-send" onClick={submitFeedback} disabled={fbBusy || !fbText.trim()}>{fbBusy ? 'Sending…' : 'Send feedback'}</button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
