@@ -40,5 +40,7 @@
 
 @media (max-width:820px) {
   .pr-grid { grid-template-columns:1fr; max-width:420px; margin:0 auto; }
-  .pr-card.feat { order:-1; }
+  /* Individual stays first on mobile (Drew, 2026-07-20) — the featured Group
+     card is still visually distinguished by its border/shadow, just not reordered
+     ahead of Individual, which was landing as the first card someone saw. */
 }

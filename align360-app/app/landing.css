@@ -61,6 +61,7 @@
 .lp-rule{width:64px;height:1px;background:linear-gradient(90deg,transparent,var(--sec-accent),transparent);margin:0 auto 1.5rem}
 .lp-h2{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(30px,5vw,52px);line-height:1.08;color:var(--sec-heading);margin-bottom:1rem}
 .lp-h2 em{font-style:italic;color:var(--sec-accent2)}
+.lp-strong-em{font-weight:700;font-style:italic}
 .lp-lead{font-size:18px;font-weight:300;color:var(--sec-muted);line-height:1.7}
 
 /* ── Hero (light) ── */

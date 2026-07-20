@@ -5,9 +5,9 @@ import FounderAvatar from '@/app/_components/FounderAvatar';
 import LandingMotion from '@/app/_components/LandingMotion';
 
 export const metadata = {
-  title: 'Align360 · Put out the fires. Then become one.',
+  title: 'ALIGN · Put out the fires. Then become one.',
   description:
-    'Align360 is an AI system that knows how you are wired. It solves what is urgent, then builds the clarity to align your career, decisions, and life for the AI era.',
+    'ALIGN is an AI system that knows how you are wired. It solves what is urgent, then builds the clarity to align your career, decisions, and life for the AI era.',
 };
 
 // Login is intentionally skipped for the alpha. Every CTA enters the app at
@@ -27,6 +27,7 @@ export default function Landing() {
           </Link>
           <div className="lp-nav-login" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <Link href="/pricing" className="lp-btn ghost small">Pricing</Link>
+            <Link href="/faq" className="lp-btn ghost small">FAQ</Link>
             <Link href={ENTER} className="lp-btn primary small">Log In</Link>
           </div>
         </div>
@@ -38,9 +39,8 @@ export default function Landing() {
         <div className="lp-hero-grain" aria-hidden="true" />
         <div className="wrap">
           <div className="lp-hero-mark"><AlignMark /></div>
-          <div className="lp-index" aria-hidden="true"><span className="lp-idot" />ignition</div>
           <h1 className="lp-h1"><span className="lp-l1">Put out the fires.</span><br /><em className="lp-l2">Then become one.<span className="lp-ember" aria-hidden="true" /></em></h1>
-          <p className="lp-sub">Align360 solves what&apos;s urgent, then builds the clarity to ignite everything else. One system that actually knows how you&apos;re wired.</p>
+          <p className="lp-sub">ALIGN solves what&apos;s urgent, then builds the clarity to ignite everything else.<br />A personal operating system that helps you live in alignment with who you are and what matters most.</p>
           <div className="lp-hero-cta">
             <Link href={ENTER} className="lp-btn primary lp-magnetic">Discover Your Wiring <span className="lp-arrow" aria-hidden="true">→</span><span className="lp-spk s1" aria-hidden="true" /><span className="lp-spk s2" aria-hidden="true" /></Link>
             <Link href="/pricing" className="lp-btn ghost">For Teams</Link>
@@ -53,8 +53,8 @@ export default function Landing() {
         <div className="wrap">
           <div className="lp-sec-head lp-reveal">
             <div className="lp-rule" />
-            <h2 className="lp-h2">You&apos;re navigating life without a system that <em>knows you</em>.</h2>
-            <p className="lp-lead">Education, career, money, relationships, and an AI shift rewriting all of it, while the only tools you have are generic. So you guess. Compare. Chase things that don&apos;t fit.</p>
+            <h2 className="lp-h2"><em>You</em>&apos;re navigating life without a system that knows you.</h2>
+            <p className="lp-lead">Life doesn&apos;t come with a roadmap. You&apos;re expected to make decisions about your career, finances, relationships, and future with generic advice that was never built for you.</p>
           </div>
           <div className="lp-domains lp-reveal">
             <span className="lp-domain">Education</span>
@@ -70,19 +70,19 @@ export default function Landing() {
       <section className="lp-section">
         <div className="wrap">
           <div className="lp-sec-head lp-reveal">
-            <h2 className="lp-h2">Two questions everything else is built on</h2>
-            <p className="lp-lead">Optimize these first. Then your finances, relationships, health, and legacy have something true to organize around.</p>
+            <h2 className="lp-h2">Two questions everything else is built on:</h2>
+            <p className="lp-lead">Optimize these first. Then your finances, relationships, health, and legacy have a clear direction.</p>
           </div>
           <div className="lp-pillars lp-reveal">
             <div className="lp-pillar">
               <div className="lp-pillar-n">01</div>
-              <h3>Who you are</h3>
-              <p>Your wiring, your gifts, the way you read situations and recover from setbacks. Not a label, but a working model that sharpens over time.</p>
+              <h3>Who are you?</h3>
+              <p>With ALIGN discover your wiring, your gifts, the way you read situations and recover from setbacks. Not a label, but a clear picture of who you are that becomes more refined over time.</p>
             </div>
             <div className="lp-pillar">
               <div className="lp-pillar-n">02</div>
-              <h3>What you do</h3>
-              <p>How that identity converts into direction, decisions, and momentum: career moves, opportunities, and the work that compounds.</p>
+              <h3>Where do you thrive?</h3>
+              <p>Find the places where your strengths, passions, and purpose intersect—and where your best work happens.</p>
             </div>
           </div>
         </div>
@@ -92,26 +92,23 @@ export default function Landing() {
       <section id="how" className="lp-section dark">
         <div className="wrap">
           <div className="lp-sec-head lp-reveal">
-            <h2 className="lp-h2">Urgent first. Then aligned for what&apos;s next.</h2>
+            <h2 className="lp-h2">Urgent matters <span className="lp-strong-em">first</span>. Then aligned for what&apos;s <span className="lp-strong-em">next</span>.</h2>
           </div>
           <div className="lp-steps lp-reveal">
             <div className="lp-step">
-              <div className="lp-step-time">Minutes</div>
-              <div className="lp-step-n">I</div>
+              <div className="lp-step-time">In Minutes</div>
               <h3>Solve what&apos;s urgent</h3>
-              <p>Bring the fire you&apos;re fighting right now. Get a clear, grounded next step before anything else.</p>
+              <p>Bring the fire you&apos;re fighting right now. Get a clear, grounded next step.</p>
             </div>
             <div className="lp-step">
-              <div className="lp-step-time">30 Days</div>
-              <div className="lp-step-n">II</div>
+              <div className="lp-step-time">In 30 Days</div>
               <h3>Discover your wiring</h3>
-              <p>Assessments reveal how you create value, decide, and bounce back, and your AI starts knowing you from message one.</p>
+              <p>Uncover your strengths, motivations, and patterns that help you thrive.</p>
             </div>
             <div className="lp-step">
-              <div className="lp-step-time">90 Days</div>
-              <div className="lp-step-n">III</div>
+              <div className="lp-step-time">In 90 Days</div>
               <h3>Align for what&apos;s next</h3>
-              <p>Turn that clarity into direction across career, money, and relationships, calibrated for where the world is actually going.</p>
+              <p>Build a life shaped by your purpose, ready for what&apos;s ahead.</p>
             </div>
           </div>
         </div>
@@ -121,86 +118,33 @@ export default function Landing() {
       <section id="included" className="lp-section">
         <div className="wrap">
           <div className="lp-sec-head lp-reveal">
-            <h2 className="lp-h2">Frameworks that compound</h2>
-            <p className="lp-lead">Every assessment you complete is remembered and fed into your AI, so the more you do, the sharper it gets.</p>
+            <h2 className="lp-h2">One model that grows with you</h2>
+            <p className="lp-lead">Your assessments lay the foundation, creating a working model of how you are wired to thrive. Everything after — every chat, every framework — draws on that model and helps it grow.</p>
           </div>
           <div className="lp-frames lp-reveal">
             <div className="lp-frame fw-design">
               <span className="lp-frame-tag">DesignSuite · Live</span>
               <h3>Understand how you&apos;re wired</h3>
-              <p>Identity, judgment, resilience, and decision clarity, before you build on guesses.</p>
+              <p>Gain clarity on your identity, judgment, and resilience — so your decisions are built on giftings, not guesswork.</p>
               <ul>
                 <li>Wiring for Impact</li>
                 <li>Orientation for Impact</li>
                 <li>Rejection Gift Finder</li>
-                <li>Decision Simulation Lab <span className="soon">soon</span></li>
-                <li>Impact Pathways &amp; Skill Builder <span className="soon">soon</span></li>
+                <li>Impact Readiness</li>
+                <li>Value Spectrum</li>
               </ul>
             </div>
             <div className="lp-frame fw-career">
               <span className="lp-frame-tag">Career Navigator</span>
               <h3>Move forward without losing yourself</h3>
-              <p>Career clarity, acceleration, and confidence, without the burnout.</p>
+              <p>Turn clarity into action through better decisions, meaningful work, and a future aligned with who you are.</p>
               <ul>
                 <li>Career Alignment Assessment</li>
-                <li>Resume Analyzer + Builder</li>
+                <li>Resume Builder and Analyzer</li>
                 <li>Job Opportunity Finder</li>
                 <li>Interview Preparation</li>
                 <li>Salary Negotiation &amp; LinkedIn <span className="soon">+ more</span></li>
               </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* OUTCOMES */}
-      <section className="lp-section dark">
-        <div className="wrap">
-          <div className="lp-sec-head lp-reveal">
-            <h2 className="lp-h2">Clarity you can feel, on a real timeline</h2>
-          </div>
-          <div className="lp-outcomes lp-reveal">
-            <div className="lp-outcome">
-              <div className="lp-outcome-lbl">In 45 Minutes</div>
-              <div className="lp-outcome-big">1</div>
-              <p>Articulate exactly how you create value, in language you&apos;d actually use.</p>
-            </div>
-            <div className="lp-outcome">
-              <div className="lp-outcome-lbl">In 30 Days</div>
-              <div className="lp-outcome-big">50-70%</div>
-              <p>Less major life and career indecision. Fewer loops, faster moves.</p>
-            </div>
-            <div className="lp-outcome">
-              <div className="lp-outcome-lbl">In 90 Days</div>
-              <div className="lp-outcome-big">∞</div>
-              <p>A thriving life of peace and simplicity. Aligned, not just busy.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* DIFFERENTIATION */}
-      <section className="lp-section">
-        <div className="wrap">
-          <div className="lp-sec-head lp-reveal">
-            <h2 className="lp-h2">Not another personality test</h2>
-          </div>
-          <div className="lp-compare lp-reveal">
-            <div className="lp-compare-row">
-              <div className="lp-compare-cell them lp-compare-head them">Generic tests</div>
-              <div className="lp-compare-cell us lp-compare-head us">Align360</div>
-            </div>
-            <div className="lp-compare-row">
-              <div className="lp-compare-cell them">A static PDF you forget in a week</div>
-              <div className="lp-compare-cell us">A system that evolves with you</div>
-            </div>
-            <div className="lp-compare-row">
-              <div className="lp-compare-cell them">A four-letter label</div>
-              <div className="lp-compare-cell us">An AI that remembers and adapts to you</div>
-            </div>
-            <div className="lp-compare-row">
-              <div className="lp-compare-cell them">Built for a 2022 job market</div>
-              <div className="lp-compare-cell us">Calibrated for the AI era</div>
             </div>
           </div>
         </div>
@@ -213,12 +157,12 @@ export default function Landing() {
             <div className="lp-founder-badge"><FounderAvatar /></div>
             <div>
               <div className="lp-founder-name">Samuel Ngu</div>
-              <div className="lp-founder-role">Founder · Align360</div>
-              <p>&ldquo;Smart, capable people were stalling, not because they lacked talent, but because their identity, decisions, and execution weren&apos;t aligned. Align360 is the system I wish they&apos;d had.&rdquo;</p>
+              <div className="lp-founder-role">Founder · ALIGN</div>
+              <p>&ldquo;Smart, capable people were stalling, not because they lacked talent, but because their identity, decisions, and execution weren&apos;t aligned. ALIGN is the system I wish they&apos;d had.&rdquo;</p>
               <div className="lp-stats">
                 <div className="lp-stat"><b>$200M+</b><span>Deals Executed</span></div>
                 <div className="lp-stat"><b>Fortune 500</b><span>Operating Experience</span></div>
-                <div className="lp-stat"><b>AI-Era</b><span>Built For What&apos;s Next</span></div>
+                <div className="lp-stat"><b>AI-Era Informed</b><span>Built For What&apos;s Next</span></div>
               </div>
             </div>
           </div>
@@ -230,8 +174,8 @@ export default function Landing() {
         <div className="lp-final-bg" />
         <div className="wrap">
           <div className="lp-rule" />
-          <h2 className="lp-h2">Start with the fire.<br /><em>Leave with the clarity.</em></h2>
-          <p className="lp-sub">Your first read takes minutes, and your AI remembers everything after.</p>
+          <h2 className="lp-h2">Become who you&apos;re wired to be.</h2>
+          <p className="lp-sub">What begins with putting out today&apos;s fires becomes a life marked by confidence, purpose, and meaningful impact.</p>
           <Link href={ENTER} className="lp-btn primary">Discover Your Wiring →</Link>
         </div>
       </section>
@@ -240,8 +184,8 @@ export default function Landing() {
       <footer className="lp-foot">
         <div className="wrap">
           <AlignMark white />
-          <span className="lp-foot-word">Align360</span>
-          <span className="lp-foot-copy">© 2026 Align360. All rights reserved.</span>
+          <span className="lp-foot-word">ALIGN</span>
+          <span className="lp-foot-copy">© 2026 ALIGN. All rights reserved.</span>
         </div>
       </footer>
     </div>
