@@ -27,7 +27,14 @@ export function makeClient(provider: Provider, apiKey: string): OpenAI {
     return new OpenAI({
       apiKey,
       baseURL: process.env.CHARIS_BASE_URL || 'https://gateway.charis.im/v1',
-      defaultHeaders: { 'X-Chain': process.env.CHARIS_CHAIN || 'base' },
+      defaultHeaders: {
+        'X-Chain': process.env.CHARIS_CHAIN || 'base',
+        // Pin routing to Charis's OpenRouter supplier: same reliability + latency
+        // as OpenRouter, but proxied through Charis (mainnet USDC settlement). The
+        // cheaper community sources are still flaky (503s / high latency / no live
+        // supply), so we deliberately avoid them. Override via CHARIS_PREFER_SOURCE.
+        'X-Prefer-Source': process.env.CHARIS_PREFER_SOURCE || 'openrouter',
+      },
     });
   }
   if (provider === 'openrouter') {
