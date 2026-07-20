@@ -14,6 +14,7 @@ import { RepChrome, CompletionBlock, useReveal } from './_components/report-bits
 import type { ReportScores, WiringScores, OrientationScores, RejectionScores } from '@/lib/report-scoring';
 import type { ReportNarrative, WiringNarrative, OrientationNarrative, RejectionNarrative } from '@/lib/report';
 import { getAnswers, getAssessmentReport, setAssessmentReport, ASSESSMENT_SLUGS } from '@/lib/storage';
+import { useAccess } from '@/lib/access-context';
 
 const isReportSlug = (s: string) => (ASSESSMENT_SLUGS as readonly string[]).includes(s);
 
@@ -29,6 +30,7 @@ function ReportInner() {
   const params = useParams();
   const sp = useSearchParams();
   const router = useRouter();
+  const { openPaywall } = useAccess();
   const slug = String(params.slug || '');
   const demo = sp.get('demo') === '1';
   const [state, setState] = useState<State>({ phase: 'loading' });
@@ -61,7 +63,14 @@ function ReportInner() {
         });
         const data = await res.json();
         if (!aliveRef.current) return; // navigated away mid-generation
-        if (!res.ok) throw new Error(data.error || data.message || 'Generation failed');
+        if (!res.ok) {
+          if (res.status === 402 && data.error === 'paywall') {
+            openPaywall(data.message);
+            setState({ phase: 'error', message: data.message || 'Subscribe to unlock this.' });
+            return;
+          }
+          throw new Error(data.error || data.message || 'Generation failed');
+        }
         if (!opts.demo) setAssessmentReport(slug, { scores: data.scores, narrative: data.narrative, name, generatedAt: new Date().toISOString() });
         setState({ phase: 'ready', scores: data.scores, narrative: data.narrative, generated: data.generated });
       } catch (err) {
@@ -70,7 +79,7 @@ function ReportInner() {
         inFlightRef.current = false;
       }
     },
-    [slug],
+    [slug, openPaywall],
   );
 
   useEffect(() => {

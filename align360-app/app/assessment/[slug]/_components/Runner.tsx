@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { clearProfile, clearClarityReport, clearAssessmentReport, CLARITY_SLUGS } from '@/lib/storage';
+import { useAccess } from '@/lib/access-context';
 
 type Option = { letter: string; text: string; giftTag?: string };
 type Q = { id: string; number: number; label: string; prompt: string; options: Option[]; section: string };
 
 export default function Runner({ title, slug, questions }: { title: string; slug: string; questions: Q[] }) {
   const router = useRouter();
+  const { requireAccess } = useAccess();
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [dir, setDir] = useState<'fwd' | 'back'>('fwd');
@@ -21,6 +23,13 @@ export default function Runner({ title, slug, questions }: { title: string; slug
   useEffect(() => {
     setAnimKey((k) => k + 1);
   }, [idx]);
+
+  // Onboarding is the free teaser; taking assessments needs a subscription.
+  // requireAccess gets a fresh identity whenever Shell's real access state
+  // arrives, so this re-evaluates once fetched rather than only at first mount.
+  useEffect(() => {
+    if (!requireAccess('Subscribe to take your assessments')) router.replace('/insights');
+  }, [requireAccess, router]);
 
   function choose(letter: string) {
     const next = { ...answers, [q.id]: letter };

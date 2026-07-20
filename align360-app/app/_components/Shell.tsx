@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getChats, deleteChat, renameChat, getName, setName, isOnboarded, resetAll, STORE_EVENT, type ChatSession } from '@/lib/storage';
+import { getChats, deleteChat, renameChat, getName, setName, isOnboarded, resetAll, STORE_EVENT, paywallDismissed, type ChatSession } from '@/lib/storage';
 import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import { wipeCloud } from '@/lib/sync';
 import { CREDIT_PACKS, topupPriceCents } from '@/lib/credits';
+import { AccessContext } from '@/lib/access-context';
 import AlignMark from './AlignMark';
 import AccountSync from './AccountSync';
 
@@ -48,6 +49,9 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const [fbBusy, setFbBusy] = useState(false);
   const [fbSent, setFbSent] = useState(false);
   const [fbErr, setFbErr] = useState('');
+  const [access, setAccess] = useState({ enforce: false, access: true, plan: 'none' });
+  const [paywallOpen, setPaywallOpen] = useState(false);
+  const [paywallReason, setPaywallReason] = useState('');
   const year = new Date().getFullYear();
 
   const refreshCredits = useCallback(() => {
@@ -93,7 +97,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
   // Escape closes the mobile drawer.
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setDrawerOpen(false); setAccountOpen(false); setFeedbackOpen(false); } };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setDrawerOpen(false); setAccountOpen(false); setFeedbackOpen(false); setPaywallOpen(false); } };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
@@ -145,22 +149,51 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   // Billing gate: when enforcement is on (BILLING_ENABLED), users without access
   // (not an internal admin, no active subscription) are sent to /subscribe. Off
   // by default, so this is a no-op until billing is switched on.
+  //
+  // Onboarding is the free teaser (Will/Drew/Samuel, 2026-07-20): a first-time
+  // user should reach /onboarding before ever seeing a paywall. This effect has
+  // no dependency on the onboarding gate above, so without the checks below it
+  // raced it — its fetch could resolve and redirect to /subscribe before the
+  // onboarding gate's hydration wait finished, paywalling a brand-new signup
+  // that had not seen /onboarding yet. Waiting for the same `hydrated` signal
+  // and skipping until isOnboarded() is true lets the onboarding gate go first;
+  // this effect re-evaluates on the pathname change that follows onboarding.
+  //
+  // "No thanks, just look around" (paywallDismissed): once set, this gate stops
+  // force-redirecting away from pages, so an unpaid user can browse. It still
+  // records access/enforce in state (below) for the per-action gates elsewhere
+  // (chat send, assessments, reports, the sidebar "Join Now" button) — they
+  // still can't DO anything, they just aren't yanked to /subscribe on every load.
   useEffect(() => {
-    if (isBare || isOrgRoute || !supabaseConfigured) return;
+    if (isBare || isOrgRoute || !supabaseConfigured || !hydrated || !isOnboarded()) return;
     let cancelled = false;
     (async () => {
       try {
         const d = await fetch('/api/access/status').then((r) => r.json());
-        if (cancelled || !d?.enforce || d.access) return;
+        if (cancelled) return;
+        if (!d?.enforce || d.access) { setAccess({ enforce: !!d?.enforce, access: true, plan: d?.plan || 'none' }); return; }
         // Self-heal before paywalling: reconcile subscription state straight from
         // Stripe (covers a just-completed checkout whose webhook has not landed).
         const s = await fetch('/api/stripe/sync', { method: 'POST' }).then((r) => r.json()).catch(() => null);
-        if (cancelled || s?.access) return;
-        router.replace('/subscribe');
+        if (cancelled) return;
+        if (s?.access) { setAccess({ enforce: true, access: true, plan: s.plan || 'individual' }); return; }
+        setAccess({ enforce: true, access: false, plan: 'none' });
+        if (!paywallDismissed()) router.replace('/subscribe');
       } catch { /* fail open */ }
     })();
     return () => { cancelled = true; };
-  }, [isBare, pathname, router]);
+  }, [isBare, isOrgRoute, hydrated, pathname, router]);
+
+  const openPaywall = useCallback((reason?: string) => { setPaywallReason(reason || ''); setPaywallOpen(true); }, []);
+  const closePaywall = useCallback(() => setPaywallOpen(false), []);
+  const requireAccess = useCallback(
+    (reason?: string) => {
+      if (!access.enforce || access.access) return true;
+      openPaywall(reason);
+      return false;
+    },
+    [access, openPaywall],
+  );
 
   // Who's signed in (for the account panel + sign out).
   useEffect(() => {
@@ -230,6 +263,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   };
 
   return (
+    <AccessContext.Provider value={{ loading: false, enforce: access.enforce, access: access.access, plan: access.plan, paywallOpen, paywallReason, openPaywall, closePaywall, requireAccess }}>
     <div className={`app-layout${leftCollapsed ? ' left-collapsed' : ''}${drawerOpen ? ' drawer-open' : ''}`}>
       <AccountSync />
       <div className="drawer-scrim" onClick={() => setDrawerOpen(false)} />
@@ -298,6 +332,12 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
         {/* Account + copyright pinned to the bottom. */}
         <div className="sidebar-foot">
+          {access.enforce && !access.access && (
+            <Link href="/subscribe" className="joinnow-btn" title="Subscribe to unlock the full app">
+              <span className="fb-ico"><Icon d="M12 2v20M2 12h20" /></span>
+              <span>Join now</span>
+            </Link>
+          )}
           <button className="feedback-btn" onClick={openFeedback} title="Send feedback to the Align360 team">
             <span className="fb-ico"><Icon d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" /></span>
             <span>Feedback</span>
@@ -450,6 +490,24 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
+      {/* Paywall popup: shown when an unpaid, "looking around" user tries to chat,
+          take an assessment, or view a report. See lib/access-context.tsx. */}
+      {paywallOpen && (
+        <div className="acct-scrim" onClick={closePaywall}>
+          <div className="acct-modal pw-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Subscribe to Align360">
+            <div className="fb-head">
+              <h3 className="fb-title">{paywallReason || 'Unlock the full experience'}</h3>
+              <button className="acct-x" onClick={closePaywall} aria-label="Close">✕</button>
+            </div>
+            <p className="fb-sub">Subscribe to unlock your full profile, every assessment, the Clarity Layer, and your AI guide.</p>
+            <div className="pw-actions">
+              <Link href="/subscribe" className="pw-cta primary" onClick={closePaywall}>Subscribe →</Link>
+              <Link href="/signup/team" className="pw-cta ghost" onClick={closePaywall}>Sign up your team →</Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       <main className="center-col">
         <div className="mobile-bar">
           <button className="icon-btn" onClick={() => setDrawerOpen(true)} aria-label="Open menu">
@@ -466,5 +524,6 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
     </div>
+    </AccessContext.Provider>
   );
 }

@@ -10,6 +10,7 @@ import GenLoader from '@/app/_components/GenLoader';
 import type { ClarityScores } from '@/lib/clarity-scoring';
 import type { ClarityNarrative } from '@/lib/clarity';
 import { getClarityAnswers, getClarityReport, setClarityReport, hashAnswers, CLARITY_SLUGS } from '@/lib/storage';
+import { useAccess } from '@/lib/access-context';
 
 type State =
   | { phase: 'loading' }
@@ -23,6 +24,7 @@ function ClarityInner() {
   const params = useParams();
   const sp = useSearchParams();
   const router = useRouter();
+  const { openPaywall } = useAccess();
   const slug = String(params.slug || '');
   const demo = sp.get('demo') === '1';
   const [state, setState] = useState<State>({ phase: 'loading' });
@@ -63,7 +65,14 @@ function ClarityInner() {
         });
         const data = await res.json();
         if (!aliveRef.current) return; // user navigated away mid-generation
-        if (!res.ok) throw new Error(data.error || 'Generation failed');
+        if (!res.ok) {
+          if (res.status === 402 && data.error === 'paywall') {
+            openPaywall(data.message);
+            setState({ phase: 'error', message: data.message || 'Subscribe to unlock this.' });
+            return;
+          }
+          throw new Error(data.error || 'Generation failed');
+        }
         if (!opts.demo) setClarityReport(slug, { scores: data.scores, narrative: data.narrative, name, answersHash, generatedAt: new Date().toISOString() });
         setState({ phase: 'ready', scores: data.scores, narrative: data.narrative, generated: data.generated });
       } catch (err) {
@@ -72,7 +81,7 @@ function ClarityInner() {
         inFlightRef.current = false;
       }
     },
-    [slug],
+    [slug, openPaywall],
   );
 
   useEffect(() => {

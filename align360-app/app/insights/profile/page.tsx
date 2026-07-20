@@ -11,6 +11,7 @@ import ClarityLayerSummary from '../_components/ClarityLayerSummary';
 import type { Profile } from '@/lib/profile';
 import type { Scores } from '@/lib/scoring';
 import { getAnswers, getProfile, setProfile, hashAnswers } from '@/lib/storage';
+import { useAccess } from '@/lib/access-context';
 
 type State =
   | { phase: 'loading' }
@@ -22,6 +23,7 @@ type State =
 function ProfileInner() {
   const sp = useSearchParams();
   const router = useRouter();
+  const { openPaywall } = useAccess();
   const demo = sp.get('demo') === '1';
   const [state, setState] = useState<State>({ phase: 'loading' });
   const aliveRef = useRef(true);
@@ -50,7 +52,14 @@ function ProfileInner() {
       });
       const data = await res.json();
       if (!aliveRef.current) return; // user navigated away mid-generation
-      if (!res.ok) throw new Error(data.error || 'Generation failed');
+      if (!res.ok) {
+        if (res.status === 402 && data.error === 'paywall') {
+          openPaywall(data.message);
+          setState({ phase: 'error', message: data.message || 'Subscribe to unlock this.' });
+          return;
+        }
+        throw new Error(data.error || 'Generation failed');
+      }
       if (!opts.demo) setProfile({ profile: data.profile, scores: data.scores, answersHash, generatedAt: new Date().toISOString() });
       setState({ phase: 'ready', profile: data.profile, scores: data.scores, generated: data.generated });
     } catch (err) {
@@ -58,7 +67,7 @@ function ProfileInner() {
     } finally {
       inFlightRef.current = false;
     }
-  }, []);
+  }, [openPaywall]);
 
   useEffect(() => {
     aliveRef.current = true;

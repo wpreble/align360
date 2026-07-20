@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { buildSystemPrompt } from '@/lib/system-prompt';
 import { parseJsonLoose, createReportCompletion, hasReportProvider, reportModelLabel } from '@/lib/ai';
 import { creditPrecheck, meterUsage } from '@/lib/credit-metering';
+import { getAccessStatus } from '@/lib/billing-access';
 import { getAssessment } from '@/lib/assessments';
 import { computeScores, type AnswerSet } from '@/lib/scoring';
 import { PROFILE_SCHEMA_A, PROFILE_SCHEMA_B, fallbackProfile, type Profile } from '@/lib/profile';
@@ -97,6 +98,16 @@ export async function POST(req: NextRequest) {
 
   if (!scores.completed.wiring && !scores.completed.orientation && !scores.completed.rejectionGift) {
     return NextResponse.json({ error: 'No assessment answers provided.' }, { status: 400 });
+  }
+
+  // Paywall: onboarding is the free teaser; the combined profile requires a
+  // subscription once billing is enforced. `demo` is the internal preview path
+  // (not linked from any UI), exempt so testing keeps working.
+  if (!body.demo) {
+    const acc = await getAccessStatus();
+    if (acc.enforce && !acc.access) {
+      return NextResponse.json({ error: 'paywall', message: 'Subscribe to unlock your full profile.' }, { status: 402 });
+    }
   }
 
   // Report model: set REPORT_MODEL=z-ai/glm-5.2 to route through OpenRouter; default

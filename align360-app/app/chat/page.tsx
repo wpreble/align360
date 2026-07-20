@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { renderMarkdown } from '@/lib/markdown';
 import { buildProfileContext, buildClarityContext, getProfile, getChat, getName, getOnboarding, saveChat, newChatId, type ChatMsg } from '@/lib/storage';
 import { buildOnboardingContext, synthesize } from '@/lib/onboarding';
+import { useAccess } from '@/lib/access-context';
 import AlignMark from '@/app/_components/AlignMark';
 
 type Attachment = {
@@ -29,6 +30,7 @@ const isTextName = (n: string) => /\.(txt|md|markdown|csv|json|log)$/i.test(n);
 
 function ChatInner() {
   const router = useRouter();
+  const { requireAccess } = useAccess();
   const sp = useSearchParams();
   const chatParam = sp.get('chat');
   const newParam = sp.get('new');
@@ -153,6 +155,9 @@ function ChatInner() {
     const trimmed = text.trim();
     const ready = attachments.filter((a) => a.status === 'ready');
     if ((!trimmed && ready.length === 0) || sending || uploading) return;
+    // Onboarding is the free teaser; chatting with the AI guide needs a
+    // subscription. Server /api/chat is the authoritative block if bypassed.
+    if (!requireAccess('Subscribe to chat with your AI guide')) return;
     if (/start.*wiring/i.test(trimmed)) { router.push('/assessment/wiring'); return; }
 
     const base = opts.fresh ? [] : messages;

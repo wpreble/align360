@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import { createOrg } from '@/lib/orgs';
+import { setPaywallDismissed } from '@/lib/storage';
 
 const ORG_SEAT_USD = 19;
 const MIN_SEATS = 5;
@@ -44,6 +45,15 @@ export default function SubscribePage() {
     })();
     return () => { cancelled = true; };
   }, [router]);
+
+  // "No thanks, just look around" (Will/Drew/Samuel, 2026-07-20): lets an unpaid
+  // user browse the app instead of being force-redirected back here on every
+  // page load. They still can't chat, take assessments, or view reports — those
+  // are gated individually and show this same paywall as a popup.
+  function lookAround() {
+    setPaywallDismissed();
+    router.push('/insights');
+  }
 
   async function subscribeIndividual() {
     setErr(''); setBusy(true);
@@ -160,6 +170,7 @@ export default function SubscribePage() {
 
         <button className="sub-link" onClick={async () => { try { if (supabaseConfigured) await createClient().auth.signOut(); } catch {} window.location.href = '/login'; }}>Use a different account</button>
         <p className="sub-note">Secure checkout via Stripe. Cancel anytime.{plan === 'org' ? ' After payment, invite your team from the org dashboard.' : ''}</p>
+        <button className="sub-skip" onClick={lookAround}>No thanks, just look around</button>
       </div>
     </div>
   );

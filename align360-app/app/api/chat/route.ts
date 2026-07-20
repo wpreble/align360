@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { buildSystemPrompt, chatDeliveryStyle } from '@/lib/system-prompt';
 import { resolveModel, makeClient, genParams, charisChatOpts } from '@/lib/ai';
 import { creditPrecheck, meterUsage } from '@/lib/credit-metering';
+import { getAccessStatus } from '@/lib/billing-access';
 
 export const runtime = 'nodejs';
 
@@ -19,6 +20,14 @@ export async function POST(req: NextRequest) {
   const messages = Array.isArray(body.messages) ? body.messages : [];
   if (messages.length === 0) {
     return NextResponse.json({ error: 'messages array is required.' }, { status: 400 });
+  }
+
+  // Paywall: onboarding is the free teaser; chat itself requires a subscription
+  // once billing is enforced. Authoritative server-side check (the client also
+  // pre-checks for instant UX, but this is what actually blocks the request).
+  const acc = await getAccessStatus();
+  if (acc.enforce && !acc.access) {
+    return NextResponse.json({ error: 'paywall', message: 'Subscribe to chat with your AI guide.' }, { status: 402 });
   }
 
   // Attachment-aware routing. Images (image_url) and PDFs (OpenAI Files `file_id`)

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getAnswers, getClarityAnswers, getProfile, getOnboarding, STORE_EVENT } from '@/lib/storage';
 import { synthesize } from '@/lib/onboarding';
+import { useAccess } from '@/lib/access-context';
 
 const ASSESSMENTS = [
   { slug: 'wiring', name: 'Wiring for Impact', core: true, blurb: 'How you naturally create value, under pressure and at your best. The foundational read.' },
@@ -18,6 +19,11 @@ const CLARITY = [
 ];
 
 export default function InsightsHub() {
+  const { requireAccess } = useAccess();
+  // Onboarding is the free teaser; taking assessments and viewing reports needs
+  // a subscription. Intercept the click (instant popup, no wasted navigation) —
+  // the server routes are the authoritative block if this is ever bypassed.
+  const gate = (e: React.MouseEvent, reason: string) => { if (!requireAccess(reason)) e.preventDefault(); };
   const [done, setDone] = useState<Record<string, boolean>>({});
   const [clarityDone, setClarityDone] = useState<Record<string, boolean>>({});
   const [hasProfile, setHasProfile] = useState(false);
@@ -80,9 +86,9 @@ export default function InsightsHub() {
         </div>
         <div className="ins-hero-action">
           {anyDone ? (
-            <Link href="/insights/profile" className="ins-btn primary">{hasProfile ? 'View full profile →' : 'Generate profile →'}</Link>
+            <Link href="/insights/profile" className="ins-btn primary" onClick={(e) => gate(e, 'Subscribe to view your full profile')}>{hasProfile ? 'View full profile →' : 'Generate profile →'}</Link>
           ) : (
-            <Link href="/assessment/wiring" className="ins-btn primary">Take Wiring for Impact →</Link>
+            <Link href="/assessment/wiring" className="ins-btn primary" onClick={(e) => gate(e, 'Subscribe to take your assessments')}>Take Wiring for Impact →</Link>
           )}
         </div>
       </div>
@@ -100,6 +106,7 @@ export default function InsightsHub() {
                 href={isDone ? `/insights/assessment/${a.slug}` : `/assessment/${a.slug}`}
                 className="ins-card-cover"
                 aria-label={`${a.name}: ${isDone ? 'view your result' : 'take the assessment'}`}
+                onClick={(e) => gate(e, isDone ? 'Subscribe to view your full report' : 'Subscribe to take your assessments')}
               />
               <span className={`ins-dot${isDone ? ' on' : ''}`} />
               <div className="ins-card-body">
@@ -113,7 +120,7 @@ export default function InsightsHub() {
               {isDone ? (
                 <div className="ins-card-actions">
                   <span className="ins-link go">View result →</span>
-                  <Link href={`/assessment/${a.slug}`} className="ins-link muted ins-retake">Retake</Link>
+                  <Link href={`/assessment/${a.slug}`} className="ins-link muted ins-retake" onClick={(e) => gate(e, 'Subscribe to retake your assessments')}>Retake</Link>
                 </div>
               ) : (
                 <span className="ins-link go">Take it →</span>
@@ -135,6 +142,7 @@ export default function InsightsHub() {
                 href={isDone ? `/insights/clarity/${a.slug}` : `/assessment/${a.slug}`}
                 className="ins-card-cover"
                 aria-label={`${a.name}: ${isDone ? 'view your result' : 'take the assessment'}`}
+                onClick={(e) => gate(e, isDone ? 'Subscribe to view your full report' : 'Subscribe to take your assessments')}
               />
               <span className={`ins-dot${isDone ? ' on' : ''}`} />
               <div className="ins-card-body">
@@ -147,7 +155,7 @@ export default function InsightsHub() {
               {isDone ? (
                 <div className="ins-card-actions">
                   <span className="ins-link go">View result →</span>
-                  <Link href={`/assessment/${a.slug}`} className="ins-link muted ins-retake">Retake</Link>
+                  <Link href={`/assessment/${a.slug}`} className="ins-link muted ins-retake" onClick={(e) => gate(e, 'Subscribe to retake your assessments')}>Retake</Link>
                 </div>
               ) : (
                 <span className="ins-link go">Take it →</span>

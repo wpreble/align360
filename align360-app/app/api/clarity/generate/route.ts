@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { buildSystemPrompt } from '@/lib/system-prompt';
 import { parseJsonLoose, createReportCompletion, hasReportProvider, reportModelLabel } from '@/lib/ai';
 import { creditPrecheck, meterUsage } from '@/lib/credit-metering';
+import { getAccessStatus } from '@/lib/billing-access';
 import { getAssessment } from '@/lib/assessments';
 import { computeClarityScores, isClaritySlug, type ClarityScores } from '@/lib/clarity-scoring';
 import { claritySchema, fallbackClarityNarrative, type ClarityNarrative, type ClarityNote } from '@/lib/clarity';
@@ -130,6 +131,16 @@ export async function POST(req: NextRequest) {
   }
   if (scores.answered === 0) {
     return NextResponse.json({ error: 'No answers provided for this assessment.' }, { status: 400 });
+  }
+
+  // Paywall: onboarding is the free teaser; Clarity Layer reports require a
+  // subscription once billing is enforced. `demo` is the internal preview path
+  // (not linked from any UI), exempt so testing keeps working.
+  if (!body.demo) {
+    const acc = await getAccessStatus();
+    if (acc.enforce && !acc.access) {
+      return NextResponse.json({ error: 'paywall', message: 'Subscribe to unlock your full report.' }, { status: 402 });
+    }
   }
 
   // Report model: REPORT_MODEL=z-ai/glm-5.2 → OpenRouter; default OPENAI_MODEL/gpt-5.5.

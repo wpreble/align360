@@ -108,6 +108,19 @@ export function isOnboarded(): boolean {
   return getOnboarding() !== null;
 }
 
+/* ── Paywall ── */
+const PAYWALL_DISMISSED_KEY = 'align360:paywallDismissed';
+// Set when a user picks "No thanks, just look around" on /subscribe. Once set,
+// Shell's billing gate stops force-redirecting to /subscribe on every route, so
+// the user can browse the app; individual actions (chat, assessments, reports)
+// still check access and paywall themselves (see lib/access-context.tsx).
+export function paywallDismissed(): boolean {
+  return read<boolean>(PAYWALL_DISMISSED_KEY, false) === true;
+}
+export function setPaywallDismissed() {
+  write(PAYWALL_DISMISSED_KEY, true);
+}
+
 /* ── Answers ── */
 function readAnswerSet(slugs: readonly string[]): Record<string, Record<string, string>> {
   const out: Record<string, Record<string, string>> = {};

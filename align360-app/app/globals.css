@@ -117,6 +117,22 @@ a { color:inherit; text-decoration:none; }
 .fb-thanks-ico { width:44px; height:44px; margin:0 auto 12px; border-radius:50%; display:grid; place-items:center; background:var(--fig-wash); color:var(--accent); font-size:22px; font-weight:700; }
 .fb-thanks-t { font-family:var(--font-display); font-size:20px; font-weight:600; color:var(--text-primary); margin-bottom:6px; }
 .fb-thanks-s { font-size:13px; color:var(--text-secondary); line-height:1.5; }
+
+/* Paywall: sidebar "Join now" (shown only for unpaid, enforced accounts) + the
+   popup shown when an unpaid user tries to chat, take an assessment, or view a
+   report. Reuses the acct-scrim/acct-modal + fb-* modal shell for consistency. */
+.joinnow-btn { width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 10px; margin-bottom:8px; border-radius:var(--radius-md); border:1px solid var(--accent); background:var(--fig-wash); color:var(--accent); font-size:13px; font-weight:700; cursor:pointer; text-decoration:none; transition:background .15s, transform .15s; }
+.joinnow-btn:hover { background:var(--fig); color:#fff; transform:translateY(-1px); }
+.joinnow-btn .fb-ico { display:inline-flex; width:15px; height:15px; }
+.joinnow-btn .fb-ico svg { width:15px; height:15px; }
+.pw-modal { max-width:420px; }
+.pw-actions { display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+.pw-cta { display:block; text-align:center; border-radius:8px; padding:11px 18px; font-size:14px; font-weight:700; text-decoration:none; transition:background .15s, transform .15s, border-color .15s; }
+.pw-cta.primary { background:var(--fig); color:#fff; border:none; }
+.pw-cta.primary:hover { background:var(--fig-strong,#4E0230); transform:translateY(-1px); }
+.pw-cta.ghost { background:none; border:1px solid var(--border); color:var(--text-secondary); }
+.pw-cta.ghost:hover { border-color:var(--accent); color:var(--text-primary); }
+
 .acct-head { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
 .account-avatar.lg { width:44px; height:44px; font-size:19px; }
 .acct-name-display { font-family:var(--font-display); font-weight:600; font-size:20px; line-height:1.1; }
