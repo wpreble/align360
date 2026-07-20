@@ -39,7 +39,7 @@ export default function Pricing() {
             <div className="pr-for">For your personal journey.</div>
             <div className="pr-alpha">Alpha price</div>
             <div className="pr-price"><b>$25</b><span>/month</span></div>
-            <div className="pr-pricenote">Free to start &middot; no card needed &middot; 588 credits included monthly</div>
+            <div className="pr-pricenote">Free to start &middot; no card needed</div>
             <ul className="pr-feats">
               <li>Your complete profile, built from every assessment.</li>
               <li>An AI guide that understands how you&apos;re uniquely wired.</li>
