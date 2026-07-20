@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildSystemPrompt } from '@/lib/system-prompt';
-import { resolveModel, makeClient, genParams, parseJsonLoose } from '@/lib/ai';
+import { parseJsonLoose, createReportCompletion, hasReportProvider, reportModelLabel } from '@/lib/ai';
 import { creditPrecheck, meterUsage } from '@/lib/credit-metering';
 import { getAssessment } from '@/lib/assessments';
 import { computeScores, type AnswerSet } from '@/lib/scoring';
@@ -101,8 +101,8 @@ export async function POST(req: NextRequest) {
 
   // Report model: set REPORT_MODEL=z-ai/glm-5.2 to route through OpenRouter; default
   // OPENAI_MODEL/gpt-5.5 on OpenAI. No key → deterministic fallback so the page renders.
-  const { model, provider, apiKey } = resolveModel('REPORT_MODEL', process.env.OPENAI_MODEL || 'gpt-5.5');
-  if (!apiKey) {
+  const model = reportModelLabel();
+  if (!hasReportProvider()) {
     return NextResponse.json({ scores, profile: deepStripDashes(fallbackProfile(scores, name)), generated: false });
   }
 
@@ -122,22 +122,19 @@ export async function POST(req: NextRequest) {
     .filter(Boolean)
     .join('\n\n');
 
-  const client = makeClient(provider, apiKey);
   const sys = buildSystemPrompt();
 
   // Generate the profile as two PARALLEL halves (identity + market/AI-era) so
   // wall-clock is the slower half, not the sum. Each half parses defensively,
   // so one malformed half still leaves the rest (over the deterministic fallback).
   const genOnce = async (schema: string) => {
-    const c = await client.chat.completions.create({
-      model,
-      ...genParams(provider, { maxTokens: 9000, json: true, reasoning: 'off', temperature: 0 }),
-      messages: [
+    const c = await createReportCompletion(
+      [
         { role: 'system', content: sys },
         { role: 'user', content: `You are generating part of a combined Align360 identity profile ("Combined in an AI-Era" format). Return ONLY a single valid JSON object, no markdown fences or prose. Participant assessment data:\n\n${summary}\n\n${schema}` },
       ],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
+      { maxTokens: 9000, json: true, reasoning: 'off', temperature: 0 },
+    );
     const text = c.choices[0]?.message?.content || '';
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const cu = (c as any).usage; mInTok += cu?.prompt_tokens ?? 0; mOutTok += cu?.completion_tokens ?? 0;

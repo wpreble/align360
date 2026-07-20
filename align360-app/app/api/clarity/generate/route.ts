@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildSystemPrompt } from '@/lib/system-prompt';
-import { resolveModel, makeClient, genParams, parseJsonLoose } from '@/lib/ai';
+import { parseJsonLoose, createReportCompletion, hasReportProvider, reportModelLabel } from '@/lib/ai';
 import { creditPrecheck, meterUsage } from '@/lib/credit-metering';
 import { getAssessment } from '@/lib/assessments';
 import { computeClarityScores, isClaritySlug, type ClarityScores } from '@/lib/clarity-scoring';
@@ -134,8 +134,8 @@ export async function POST(req: NextRequest) {
 
   // Report model: REPORT_MODEL=z-ai/glm-5.2 → OpenRouter; default OPENAI_MODEL/gpt-5.5.
   // No key → deterministic fallback so the report still renders.
-  const { model, provider, apiKey } = resolveModel('REPORT_MODEL', process.env.OPENAI_MODEL || 'gpt-5.5');
-  if (!apiKey) {
+  const model = reportModelLabel();
+  if (!hasReportProvider()) {
     return NextResponse.json({ scores, narrative: deepStripDashes(fallbackClarityNarrative(scores, name)), generated: false });
   }
 
@@ -155,22 +155,19 @@ export async function POST(req: NextRequest) {
     .filter(Boolean)
     .join('\n');
 
-  const client = makeClient(provider, apiKey);
   const sys = buildSystemPrompt();
 
   const genOnce = async () => {
-    const c = await client.chat.completions.create({
-      model,
-      ...genParams(provider, { maxTokens: 9000, json: true, reasoning: 'off' }),
-      messages: [
+    const c = await createReportCompletion(
+      [
         { role: 'system', content: sys },
         {
           role: 'user',
           content: `You are writing the analysis for an Align360 Clarity Layer result (${scores.title}). The scores are already computed; write ONLY the interpretive narrative as a single valid JSON object, no markdown fences or prose.\n\n${summary}\n\n${claritySchema(scores)}`,
         },
       ],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
+      { maxTokens: 9000, json: true, reasoning: 'off' },
+    );
     const text = c.choices[0]?.message?.content || '';
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const cu = (c as any).usage; mInTok += cu?.prompt_tokens ?? 0; mOutTok += cu?.completion_tokens ?? 0;

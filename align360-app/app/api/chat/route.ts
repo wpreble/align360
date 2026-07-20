@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildSystemPrompt, chatDeliveryStyle } from '@/lib/system-prompt';
-import { resolveModel, makeClient, genParams } from '@/lib/ai';
+import { resolveModel, makeClient, genParams, charisChatOpts } from '@/lib/ai';
 import { creditPrecheck, meterUsage } from '@/lib/credit-metering';
 
 export const runtime = 'nodejs';
@@ -79,8 +79,10 @@ export async function POST(req: NextRequest) {
   // Reports use reasoning:'low'.
   const baseParams = { model, ...genParams(provider, { maxTokens: 1500, reasoning: 'off', temperature: 0.5 }) };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Chat is latency-sensitive: pin a Charis chat to its fast OpenRouter supplier
+  // (no-op for OpenAI/OpenRouter providers). Reports don't do this (cheapest peer).
   const run = (msgs: any) =>
-    client.chat.completions.create({ ...baseParams, messages: msgs } as any);
+    client.chat.completions.create({ ...baseParams, messages: msgs } as any, charisChatOpts(provider));
 
   // Drop {type:'file'} parts when a referenced file is gone (expired/deleted),
   // so an old session with a stale file_id stays usable instead of 400ing forever.

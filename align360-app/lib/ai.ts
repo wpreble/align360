@@ -27,14 +27,7 @@ export function makeClient(provider: Provider, apiKey: string): OpenAI {
     return new OpenAI({
       apiKey,
       baseURL: process.env.CHARIS_BASE_URL || 'https://gateway.charis.im/v1',
-      defaultHeaders: {
-        'X-Chain': process.env.CHARIS_CHAIN || 'base',
-        // Pin routing to Charis's OpenRouter supplier: same reliability + latency
-        // as OpenRouter, but proxied through Charis (mainnet USDC settlement). The
-        // cheaper community sources are still flaky (503s / high latency / no live
-        // supply), so we deliberately avoid them. Override via CHARIS_PREFER_SOURCE.
-        'X-Prefer-Source': process.env.CHARIS_PREFER_SOURCE || 'openrouter',
-      },
+      defaultHeaders: { 'X-Chain': process.env.CHARIS_CHAIN || 'base' },
     });
   }
   if (provider === 'openrouter') {
@@ -94,4 +87,76 @@ export function genParams(
     if (typeof opts.temperature === 'number') p.temperature = opts.temperature;
   }
   return p;
+}
+
+/**
+ * Per-request options that pin a Charis CHAT call to a fast supplier (default
+ * OpenRouter) so interactive chat keeps low latency. No-op for other providers.
+ * Reports do NOT use this — they chase the cheapest peer (see createReportCompletion).
+ */
+export function charisChatOpts(provider: Provider): { headers?: Record<string, string> } {
+  if (provider !== 'charis') return {};
+  return { headers: { 'X-Prefer-Source': process.env.CHARIS_PREFER_SOURCE || 'openrouter' } };
+}
+
+export type ReportAttempt = { model: string; provider: Provider; apiKey: string };
+
+/**
+ * Ordered provider attempts for the REPORT path:
+ *   1. REPORT_MODEL's provider (Charis when a :-suffixed grade + CHARIS_API_KEY is set)
+ *   2. if #1 is Charis: direct OpenRouter GLM (REPORT_FALLBACK_MODEL, default z-ai/glm-5.2)
+ *   3. if #1 is Charis: OpenAI (OPENAI_MODEL) — last resort
+ * Only tiers with a configured key are included. When REPORT_MODEL is already
+ * OpenRouter/OpenAI this is a single attempt, i.e. identical to the old behavior.
+ */
+export function reportAttempts(): ReportAttempt[] {
+  const out: ReportAttempt[] = [];
+  const primary = resolveModel('REPORT_MODEL', process.env.OPENAI_MODEL || 'gpt-5.5');
+  if (primary.apiKey) out.push(primary);
+  if (primary.provider === 'charis') {
+    if (process.env.OPENROUTER_API_KEY) out.push({ model: process.env.REPORT_FALLBACK_MODEL || 'z-ai/glm-5.2', provider: 'openrouter', apiKey: process.env.OPENROUTER_API_KEY });
+    if (process.env.OPENAI_API_KEY) out.push({ model: process.env.OPENAI_MODEL || 'gpt-5.5', provider: 'openai', apiKey: process.env.OPENAI_API_KEY });
+  }
+  return out;
+}
+
+/** The model id used to label report usage/metering (the primary/first attempt). */
+export function reportModelLabel(): string {
+  return resolveModel('REPORT_MODEL', process.env.OPENAI_MODEL || 'gpt-5.5').model;
+}
+
+/** True when at least one report provider is configured (else render the deterministic fallback). */
+export function hasReportProvider(): boolean {
+  return reportAttempts().length > 0;
+}
+
+/**
+ * Report-path chat completion with a provider fallback chain (see reportAttempts).
+ * Reports tolerate latency, so the Charis attempt chases the cheapest available
+ * peer (no source pin) with a ~60s latency hint + a hard client timeout, and fails
+ * FAST (maxRetries 0) so a Charis 5xx/timeout drops straight to direct OpenRouter
+ * rather than stalling. Returns the first successful completion; throws if all fail.
+ */
+export async function createReportCompletion(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  messages: any[],
+  opts: { maxTokens: number; json?: boolean; reasoning?: 'off' | 'low'; temperature?: number },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Promise<any> {
+  const attempts = reportAttempts();
+  let lastErr: unknown;
+  for (const a of attempts) {
+    try {
+      const client = makeClient(a.provider, a.apiKey);
+      const reqOpts = a.provider === 'charis'
+        ? { headers: { 'X-Max-Latency-S': process.env.CHARIS_MAX_LATENCY_S || '60' }, timeout: Number(process.env.CHARIS_TIMEOUT_MS || 70000), maxRetries: 0 }
+        : { timeout: Number(process.env.REPORT_TIMEOUT_MS || 120000) };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return await client.chat.completions.create({ model: a.model, ...genParams(a.provider, opts), messages } as any, reqOpts);
+    } catch (e) {
+      lastErr = e;
+      console.error(`report attempt via ${a.provider} (${a.model}) failed, trying next:`, e instanceof Error ? e.message : e);
+    }
+  }
+  throw lastErr ?? new Error('no report provider configured');
 }
