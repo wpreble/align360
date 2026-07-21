@@ -11,6 +11,7 @@ const nextConfig = {
       '/api/assessment/generate': ['./content/**/*'],
       '/assessment/[slug]': ['./content/**/*'],
       '/discover/[slug]': ['./content/landing/**/*'],
+      '/for/[slug]': ['./content/for/**/*'],
     },
   },
   // Retire the stale betaapp.io app: forward every path to the canonical
