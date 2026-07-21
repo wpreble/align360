@@ -106,7 +106,7 @@ export default function Landing() {
               <p>Uncover your strengths, motivations, and patterns that help you thrive.</p>
             </div>
             <div className="lp-step">
-              <div className="lp-step-time">In 90 Days</div>
+              <div className="lp-step-time">In 30 Days</div>
               <h3>Align for what&apos;s next</h3>
               <p>Build a life shaped by your purpose, ready for what&apos;s ahead.</p>
             </div>
