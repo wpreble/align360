@@ -36,6 +36,18 @@ export default function OrgDashboard() {
   }, [id]);
   useEffect(() => { refresh(); }, [refresh]);
 
+  // One-time note after joining via invite: if an existing individual
+  // subscription was just canceled (see /invite/[token] + /api/stripe/
+  // cancel-individual), say so, so it's never a silent charge-stops surprise.
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem('align360:individualCanceledOnJoin') === '1') {
+        sessionStorage.removeItem('align360:individualCanceledOnJoin');
+        setMsg('Your individual subscription was canceled — this organization now covers your access, so you will not be charged separately.');
+      }
+    } catch {}
+  }, []);
+
   const isAdmin = role === 'owner' || role === 'admin';
   const assigned = members.filter((m) => m.seat_assigned).length;
 
