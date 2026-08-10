@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { verifyCredentials, createSessionToken, ADMIN_COOKIE, adminConfigured } from '@/lib/admin/auth';
+import { verifyCredentials, createSessionToken, roleFor, ADMIN_COOKIE, adminConfigured } from '@/lib/admin/auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,12 +14,14 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }
-  const ok = verifyCredentials(body.email || '', body.password || '');
+  const email = (body.email || '').trim().toLowerCase();
+  const ok = verifyCredentials(email, body.password || '');
   // Generic error — never reveal whether the email exists.
   if (!ok) return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
+  const role = roleFor(email) || 'admin'; // verifyCredentials already confirmed this email exists
 
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(ADMIN_COOKIE, createSessionToken((body.email || '').trim().toLowerCase()), {
+  res.cookies.set(ADMIN_COOKIE, createSessionToken(email, role), {
     httpOnly: true,
     secure: true,
     sameSite: 'lax',

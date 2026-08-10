@@ -12,8 +12,8 @@ import AlignMark from './AlignMark';
 import AccountSync from './AccountSync';
 
 const NAV = [
-  { key: 'chat', label: 'Chat', href: '/chat', icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
   { key: 'insights', label: 'Insights', href: '/insights', icon: 'M3 3v18h18M7 14l4-4 3 3 5-6' },
+  { key: 'chat', label: 'Chat', href: '/chat', icon: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
   { key: 'frameworks', label: 'Frameworks', href: '/frameworks', icon: 'M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' },
   { key: 'resources', label: 'Resources', href: '/resources', icon: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' },
   { key: 'team', label: 'Team', href: '/org', icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' },
@@ -107,7 +107,15 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   // this, an un-onboarded visitor on /login or /signup gets bounced to
   // /onboarding → middleware sends them back to /login → infinite loop, and the
   // auth pages wrongly render the full app sidebar.
-  const BARE_PREFIXES = ['/login', '/signup', '/auth', '/invite', '/subscribe', '/pricing', '/contact', '/faq'];
+  //
+  // /admin belongs here too. It has its own auth (lib/admin/auth) and is already
+  // exempt from the Supabase gate in lib/supabase/middleware, but the CLIENT
+  // gate below is separate: without this entry, the onboarding check fires on
+  // /admin and redirects any admin who has not personally completed onboarding
+  // to /onboarding — which is every admin who is not also a regular user. The
+  // paywall gate would then do the same to /subscribe. Server-side gating being
+  // correct is not enough; both gates have to agree.
+  const BARE_PREFIXES = ['/login', '/signup', '/auth', '/invite', '/subscribe', '/pricing', '/contact', '/faq', '/admin'];
   const isBare =
     pathname === '/' ||
     pathname === '/onboarding' ||

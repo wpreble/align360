@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getAdminEmail, adminConfigured } from '@/lib/admin/auth';
+import { getAdminSession, adminConfigured } from '@/lib/admin/auth';
 import AdminDashboard from './AdminDashboard';
 import './admin.css';
 
@@ -16,7 +16,7 @@ export default function AdminPage() {
       </div>
     );
   }
-  const email = getAdminEmail();
-  if (!email) redirect('/admin/login');
-  return <AdminDashboard email={email} />;
+  const session = getAdminSession();
+  if (!session) redirect('/admin/login');
+  return <AdminDashboard email={session.email} role={session.role} />;
 }

@@ -1,82 +1,126 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/admin/guard';
-import { getStripe, stripeConfigured } from '@/lib/stripe/client';
+import { loadSnapshot, wantsFresh } from '@/lib/admin/data';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Normalize any Stripe recurring price to a monthly-cents figure for MRR.
-function toMonthlyCents(unitAmount: number, interval: string, count: number, qty: number): number {
-  const perPeriod = unitAmount * qty;
-  const c = count || 1;
-  switch (interval) {
-    case 'day': return Math.round((perPeriod / c) * 30);
-    case 'week': return Math.round((perPeriod / c) * (52 / 12));
-    case 'year': return Math.round((perPeriod / c) / 12);
-    case 'month':
-    default: return Math.round(perPeriod / c);
-  }
-}
+const DAY_MS = 86_400_000;
 
-async function signups() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return { total: null as number | null, recent: [] as { email: string; created_at: string; provider?: string }[] };
-  const res = await fetch(`${url}/auth/v1/admin/users?per_page=10&page=1`, {
-    headers: { apikey: key, Authorization: `Bearer ${key}` },
-    cache: 'no-store',
-  });
-  const total = Number(res.headers.get('x-total-count')) || null;
-  const data = await res.json().catch(() => ({}));
-  const users = Array.isArray(data?.users) ? data.users : [];
-  const recent = users
-    .sort((a: { created_at: string }, b: { created_at: string }) => (a.created_at < b.created_at ? 1 : -1))
-    .slice(0, 10)
-    .map((u: { email?: string; created_at: string; app_metadata?: { provider?: string } }) => ({
-      email: u.email || '(no email)',
-      created_at: u.created_at,
-      provider: u.app_metadata?.provider,
-    }));
-  return { total, recent };
-}
-
-async function subscriptions() {
-  if (!stripeConfigured) return { activeCount: 0, mrrCents: 0, live: null as boolean | null, list: [] };
-  const stripe = getStripe();
-  const subs = await stripe.subscriptions.list({ status: 'active', limit: 100, expand: ['data.customer'] });
-  let mrrCents = 0;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const list = subs.data.map((s: any) => {
-    const item = s.items?.data?.[0];
-    const price = item?.price;
-    const monthly = price?.unit_amount
-      ? toMonthlyCents(price.unit_amount, price.recurring?.interval || 'month', price.recurring?.interval_count || 1, item?.quantity || 1)
-      : 0;
-    mrrCents += monthly;
-    const cust = s.customer && typeof s.customer === 'object' ? s.customer : null;
-    return {
-      email: cust?.email || null,
-      status: s.status,
-      monthlyCents: monthly,
-      quantity: item?.quantity || 1,
-      interval: price?.recurring?.interval || null,
-      created: s.created,
-    };
-  });
-  const live = subs.data.length ? !!subs.data[0].livemode : null;
-  return { activeCount: subs.data.length, mrrCents, live, list };
-}
-
-export async function GET() {
+/**
+ * Aggregate business metrics. requireAdmin (not superadmin): knowing how many
+ * customers there are and what they pay is the core reason the portal exists.
+ * Only the Ascendance revenue SPLIT stays superadmin-only (see /api/admin/payouts).
+ *
+ * Every figure here derives from the full, paginated snapshot in lib/admin/data,
+ * so MRR no longer truncates at 100 subscriptions and trials / failed payments /
+ * cancellations are represented instead of filtered away.
+ */
+export async function GET(req: Request) {
   const gate = requireAdmin();
   if (gate instanceof NextResponse) return gate;
+
   try {
-    const [su, sub] = await Promise.all([signups(), subscriptions()]);
+    const snap = await loadSnapshot(wantsFresh(req));
+    const now = Date.now();
+    const nowSec = Math.floor(now / 1000);
+
+    // ── Revenue ─────────────────────────────────────────────────────────────
+    // MRR counts only `active`. past_due/unpaid revenue is real but at risk, so
+    // it is reported separately rather than inflating the headline number.
+    let mrrCents = 0, atRiskCents = 0;
+    let activeSubs = 0, trialingSubs = 0, pastDueSubs = 0, canceledSubs = 0;
+    let canceled30 = 0, pendingCancel = 0;
+    let trialsResolved = 0, trialsConverted = 0;
+
+    for (const s of snap.subs) {
+      switch (s.status) {
+        case 'active':
+          activeSubs += 1; mrrCents += s.monthlyCents;
+          if (s.cancelAtPeriodEnd) pendingCancel += 1;
+          break;
+        case 'trialing':
+          trialingSubs += 1;
+          break;
+        case 'past_due':
+        case 'unpaid':
+          pastDueSubs += 1; atRiskCents += s.monthlyCents;
+          break;
+        case 'canceled':
+        case 'incomplete_expired':
+          canceledSubs += 1;
+          if (s.canceledAt && now - s.canceledAt * 1000 <= 30 * DAY_MS) canceled30 += 1;
+          break;
+        default:
+          break; // incomplete / paused: not access-granting, not churn
+      }
+
+      // Trial-to-paid: only subs whose trial has actually ended can be scored.
+      if (s.trialEnd && s.trialEnd < nowSec) {
+        trialsResolved += 1;
+        if (s.status === 'active' || s.status === 'past_due' || s.status === 'unpaid') trialsConverted += 1;
+      }
+    }
+
+    // ── People ──────────────────────────────────────────────────────────────
+    const byState = { active: 0, trialing: 0, past_due: 0, canceled: 0, org_seat: 0, free: 0 };
+    let signups30 = 0, signups7 = 0, activeLast30 = 0;
+    for (const u of snap.users) {
+      byState[u.state] += 1;
+      const created = new Date(u.created_at).getTime();
+      if (now - created <= 30 * DAY_MS) signups30 += 1;
+      if (now - created <= 7 * DAY_MS) signups7 += 1;
+      if (u.last_sign_in_at && now - new Date(u.last_sign_in_at).getTime() <= 30 * DAY_MS) activeLast30 += 1;
+    }
+    const payingUsers = byState.active + byState.past_due + byState.org_seat;
+    const totalUsers = snap.users.length;
+
+    // Subscriber churn over the trailing 30 days: cancellations divided by the
+    // population that could have cancelled (those still active plus those who left).
+    const churnDenom = activeSubs + canceled30;
+    const churn30Pct = churnDenom > 0 ? (canceled30 / churnDenom) * 100 : null;
+    const trialConversionPct = trialsResolved > 0 ? (trialsConverted / trialsResolved) * 100 : null;
+
     return NextResponse.json({
-      signups: su,
-      subscriptions: sub,
-      stripeMode: sub.live == null ? 'unknown' : sub.live ? 'live' : 'test',
-      generatedAt: Date.now(),
+      users: {
+        total: totalUsers,
+        paying: payingUsers,
+        free: byState.free,
+        byState,
+        signups30,
+        signups7,
+        activeLast30,
+      },
+      revenue: {
+        mrrCents,
+        arrCents: mrrCents * 12,
+        atRiskCents,
+        arpuCents: payingUsers > 0 ? Math.round(mrrCents / payingUsers) : 0,
+      },
+      subscriptions: {
+        active: activeSubs,
+        trialing: trialingSubs,
+        pastDue: pastDueSubs,
+        canceled: canceledSubs,
+        pendingCancel,
+        canceled30,
+      },
+      rates: {
+        churn30Pct,
+        trialConversionPct,
+        trialsResolved,
+        paidSharePct: totalUsers > 0 ? (payingUsers / totalUsers) * 100 : null,
+      },
+      orgs: {
+        total: snap.orgs.length,
+        paying: snap.orgs.filter((o) => o.state === 'active' || o.state === 'trialing').length,
+        seatsPurchased: snap.orgs.reduce((n, o) => n + o.seatsPurchased, 0),
+        seatsAssigned: snap.orgs.reduce((n, o) => n + o.seatsAssigned, 0),
+      },
+      stripeMode: snap.stripeMode,
+      truncated: snap.truncated,
+      available: snap.available,
+      generatedAt: snap.generatedAt,
     });
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : 'metrics failed' }, { status: 502 });

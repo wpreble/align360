@@ -10,15 +10,23 @@ import { cookies } from 'next/headers';
 export const ADMIN_COOKIE = 'a360_admin';
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12h
 
-type AdminUser = { email: string; salt: string; hash: string };
+export type AdminRole = 'superadmin' | 'admin';
+type AdminUser = { email: string; salt: string; hash: string; role?: AdminRole };
 
-/** Parse ADMIN_USERS (JSON array of {email,salt,hash}); never throws. */
+/** Parse ADMIN_USERS (JSON array of {email,salt,hash,role?}); never throws.
+ *  Entries with no `role` default to 'admin' (least privilege) — an operator
+ *  must explicitly opt an account INTO 'superadmin', never fall into it by
+ *  omission. See scripts/provision-admin.ts to generate entries. */
 function adminUsers(): AdminUser[] {
   try {
     const raw = process.env.ADMIN_USERS;
     if (!raw) return [];
     const arr = JSON.parse(raw);
-    return Array.isArray(arr) ? arr.filter((u) => u?.email && u?.salt && u?.hash) : [];
+    return Array.isArray(arr)
+      ? arr
+          .filter((u) => u?.email && u?.salt && u?.hash)
+          .map((u) => ({ ...u, role: u.role === 'superadmin' ? 'superadmin' : 'admin' }) as AdminUser)
+      : [];
   } catch {
     return [];
   }
@@ -47,18 +55,30 @@ export function verifyCredentials(email: string, password: string): boolean {
   return !!user && ok;
 }
 
-/** Compact HMAC-signed session token: base64url(payload).base64url(sig). */
-export function createSessionToken(email: string): string {
+/** The provisioned role for an email, or null if unknown. Call ONLY after
+ *  verifyCredentials succeeds — this alone is not an auth check. */
+export function roleFor(email: string): AdminRole | null {
+  const addr = (email || '').trim().toLowerCase();
+  const user = adminUsers().find((u) => u.email.trim().toLowerCase() === addr);
+  return user ? (user.role as AdminRole) : null;
+}
+
+/** Compact HMAC-signed session token: base64url(payload).base64url(sig). The
+ *  role is embedded at issuance (login), not re-looked-up per request — same
+ *  12h staleness window as the rest of the session, no extra design needed. */
+export function createSessionToken(email: string, role: AdminRole): string {
   const secret = sessionSecret();
   const payload = Buffer.from(
-    JSON.stringify({ e: email.trim().toLowerCase(), x: Date.now() + SESSION_TTL_MS }),
+    JSON.stringify({ e: email.trim().toLowerCase(), r: role, x: Date.now() + SESSION_TTL_MS }),
   ).toString('base64url');
   const sig = createHmac('sha256', secret).update(payload).digest('base64url');
   return `${payload}.${sig}`;
 }
 
-/** Return the admin email if the token is valid and unexpired, else null. */
-export function verifySessionToken(token: string | undefined | null): string | null {
+export type AdminSession = { email: string; role: AdminRole };
+
+/** Return the admin session if the token is valid and unexpired, else null. */
+export function verifySessionToken(token: string | undefined | null): AdminSession | null {
   const secret = sessionSecret();
   if (!token || !secret) return null;
   const [payload, sig] = token.split('.');
@@ -68,17 +88,26 @@ export function verifySessionToken(token: string | undefined | null): string | n
   const b = Buffer.from(expected);
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
   try {
-    const { e, x } = JSON.parse(Buffer.from(payload, 'base64url').toString());
+    const { e, r, x } = JSON.parse(Buffer.from(payload, 'base64url').toString());
     if (typeof x !== 'number' || Date.now() > x) return null;
-    return typeof e === 'string' ? e : null;
+    if (typeof e !== 'string') return null;
+    // Tokens issued before roles existed have no `r` — treat as least-privilege
+    // 'admin' rather than reject, so an in-flight session isn't force-logged-out
+    // by this deploy; it naturally rotates to a role-carrying token on next login.
+    return { email: e, role: r === 'superadmin' ? 'superadmin' : 'admin' };
   } catch {
     return null;
   }
 }
 
 /** Read + verify the admin session from request cookies (RSC / route handlers). */
-export function getAdminEmail(): string | null {
+export function getAdminSession(): AdminSession | null {
   return verifySessionToken(cookies().get(ADMIN_COOKIE)?.value);
+}
+
+/** Convenience accessor for callers that only need the email. */
+export function getAdminEmail(): string | null {
+  return getAdminSession()?.email ?? null;
 }
 
 /** True once admin auth is provisioned (both env vars present). */

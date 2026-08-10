@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/admin/guard';
+import { requireSuperAdmin } from '@/lib/admin/guard';
 import { getStripe, stripeConfigured } from '@/lib/stripe/client';
 
 export const runtime = 'nodejs';
@@ -18,7 +18,7 @@ function toUnix(s: string | null, fallback: number, endOfDay = false): number {
 }
 
 export async function GET(req: Request) {
-  const gate = requireAdmin();
+  const gate = requireSuperAdmin(); // revenue split — superadmin only
   if (gate instanceof NextResponse) return gate;
   if (!stripeConfigured) return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
 
