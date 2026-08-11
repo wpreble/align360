@@ -122,8 +122,10 @@ export function BarChart({
 
       {hasLine && <polyline points={linePts} fill="none" stroke={lineColor} strokeWidth={2} />}
 
+      {/* Label every Nth bar, plus the final one — but only when the final bar is
+          far enough from the previous tick to not collide with it. */}
       {data.map((d, i) =>
-        i % labelEvery === 0 || i === data.length - 1 ? (
+        i % labelEvery === 0 || (i === data.length - 1 && (data.length - 1) % labelEvery >= 2) ? (
           <text key={`l-${d.label}`} x={PAD_L + bw * i + bw / 2} y={H - 6} textAnchor="middle" className="adm-chart-tick">
             {d.label}
           </text>
