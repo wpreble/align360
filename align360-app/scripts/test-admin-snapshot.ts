@@ -48,6 +48,7 @@ const authUsers: AuthUsersResult = {
 
 const subs: SubsResult = {
   available: true, truncated: false, livemode: true, connectScoped: true,
+  excluded: { activeSubs: 0, monthlyCents: 0, products: [] }, brandFilterApplied: true,
   subs: [
     sub({ id: 'sub_1', customerId: 'cus_1', status: 'active' }),
     sub({ id: 'sub_3', customerId: 'cus_3', status: 'canceled', canceledAt: NOW - 3600, monthlyCents: 2500 }),

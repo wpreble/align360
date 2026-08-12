@@ -27,6 +27,7 @@ export type UserRow = {
 
 export type Truncation = { users: boolean; subs: boolean };
 export type Availability = { supabase: boolean; stripe: boolean };
+export type Excluded = { activeSubs: number; monthlyCents: number; products: string[] };
 
 export type Metrics = {
   users: {
@@ -44,6 +45,8 @@ export type Metrics = {
   orgs: { total: number; paying: number; seatsPurchased: number; seatsAssigned: number };
   stripeMode: 'live' | 'test' | 'unknown';
   connectScoped: boolean;
+  excluded: Excluded;
+  brandFilterApplied: boolean;
   truncated: Truncation;
   available: Availability;
   generatedAt: number;
@@ -60,6 +63,8 @@ export type UsersPage = {
   available: Availability;
   stripeMode: string;
   connectScoped: boolean;
+  excluded: Excluded;
+  brandFilterApplied: boolean;
   generatedAt: number;
 };
 

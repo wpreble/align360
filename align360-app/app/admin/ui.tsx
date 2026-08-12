@@ -167,10 +167,14 @@ export function DataWarnings({
   truncated,
   available,
   connectScoped,
+  excluded,
+  brandFilterApplied,
 }: {
   truncated?: { users: boolean; subs: boolean };
   available?: { supabase: boolean; stripe: boolean };
   connectScoped?: boolean;
+  excluded?: { activeSubs: number; monthlyCents: number; products: string[] };
+  brandFilterApplied?: boolean;
 }) {
   const msgs: string[] = [];
   // The failure this guards against is silent and severe: Align360 bills on a
@@ -178,10 +182,20 @@ export function DataWarnings({
   // and reports another business's revenue as ours.
   if (connectScoped === false)
     msgs.push(
-      'STRIPE_CONNECTED_ACCOUNT_ID is not set, so billing figures are being read from the Stripe PLATFORM account, not Align360. Every revenue number below belongs to a different business. Do not trust them.',
+      'STRIPE_CONNECTED_ACCOUNT_ID is not set, so Stripe Connect is inactive and Align360 shares one Stripe account with other product lines. Figures below are filtered to Align360 products by brand metadata.',
+    );
+  if (brandFilterApplied === false)
+    msgs.push(
+      'No Align360-branded Stripe product could be identified, so NOTHING was filtered out. Revenue figures below may include other product lines. Re-run scripts/stripe-setup-products.ts to restore the brand metadata.',
     );
   if (available && !available.supabase) msgs.push('Supabase is not configured in this environment, so signup data is missing.');
   if (available && !available.stripe) msgs.push('Stripe is not configured in this environment, so billing data is missing.');
+  if (excluded && excluded.activeSubs > 0)
+    msgs.push(
+      `Excluded ${excluded.activeSubs} active subscription${excluded.activeSubs === 1 ? '' : 's'} ` +
+        `(${fmtMoney(excluded.monthlyCents)}/mo) on this Stripe account that are not Align360: ` +
+        `${excluded.products.join(', ')}.`,
+    );
   if (truncated?.users) msgs.push('User list hit the 20,000-row safety cap. Counts below are incomplete.');
   if (truncated?.subs) msgs.push('Subscription list hit the 10,000-row safety cap. Revenue figures below are incomplete.');
   if (!msgs.length) return null;

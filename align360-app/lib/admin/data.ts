@@ -147,14 +147,35 @@ export type SubRow = {
 };
 
 export type SubsResult = {
+  /** Align360 subscriptions ONLY. See the brand filter below for why. */
   subs: SubRow[];
   truncated: boolean;
   available: boolean;
   livemode: boolean | null;
-  /** False when STRIPE_CONNECTED_ACCOUNT_ID is unset, i.e. these rows came from
-   *  the PLATFORM account and are not Align360's revenue. */
+  /** False when STRIPE_CONNECTED_ACCOUNT_ID is unset. */
   connectScoped: boolean;
+  /** What the brand filter removed: other product lines on the same Stripe
+   *  account. Reported rather than silently dropped — silent exclusion is the
+   *  same class of mistake as the silent inclusion this fixes. */
+  excluded: { activeSubs: number; monthlyCents: number; products: string[] };
+  /** False when no Align360-branded product could be identified at all, in
+   *  which case NOTHING was filtered and the figures may include other lines. */
+  brandFilterApplied: boolean;
 };
+
+/**
+ * Is this Stripe product Align360's?
+ *
+ * scripts/stripe-setup-products.ts stamps every product it creates with
+ * metadata { brand: 'Align360', tier }. That metadata is the authoritative
+ * marker. Product name is a fallback for anything created before the metadata
+ * existed or by hand in the dashboard.
+ */
+function isAlign360Product(p: Stripe.Product): boolean {
+  const brand = (p.metadata?.brand || '').trim().toLowerCase();
+  if (brand === 'align360') return true;
+  return /^align\s*360/i.test((p.name || '').trim());
+}
 
 /** Normalize any Stripe recurring price to monthly cents. */
 export function toMonthlyCents(unitAmount: number, interval: string, count: number, qty: number): number {
@@ -175,11 +196,29 @@ export const PAYING_STATUSES: SubStatus[] = ['active', 'past_due', 'unpaid'];
 /** Every subscription in every status, auto-paginated. */
 export async function listSubscriptions(fresh = false): Promise<SubsResult> {
   return cached('subs', fresh, async () => {
-    if (!stripeConfigured) return { subs: [], truncated: false, available: false, livemode: null, connectScoped };
+    const empty = { activeSubs: 0, monthlyCents: 0, products: [] as string[] };
+    if (!stripeConfigured) {
+      return { subs: [], truncated: false, available: false, livemode: null, connectScoped, excluded: empty, brandFilterApplied: false };
+    }
     const stripe = getStripe();
-    // Align360 bills via Direct Charges on the connected account. Without this
-    // scoping every read below silently returns the PLATFORM account's data.
+    // Scope to the connected account when Connect is configured. NOTE: this alone
+    // is not sufficient — with STRIPE_CONNECTED_ACCOUNT_ID unset, Align360 shares
+    // one Stripe account with other product lines, so the brand filter below is
+    // what actually keeps someone else's revenue out of Align360's MRR.
     const opts = connectedOptions();
+
+    // Products first: their metadata is what identifies a subscription as ours.
+    const productNames = new Map<string, string>();
+    const align360Products = new Set<string>();
+    try {
+      for await (const p of stripe.products.list({ limit: 100 }, opts)) {
+        productNames.set(p.id, p.name);
+        if (isAlign360Product(p)) align360Products.add(p.id);
+      }
+    } catch {
+      /* leaves the filter un-appliable; flagged below rather than guessed at */
+    }
+
     const subs: SubRow[] = [];
     let truncated = false;
 
@@ -237,23 +276,37 @@ export async function listSubscriptions(fresh = false): Promise<SubsResult> {
       if (subs.length >= MAX_SUBS) { truncated = true; break; }
     }
 
-    // Resolve product ids to names in one pass. A catalogue is a handful of
-    // products, so this is one cheap call regardless of subscriber count, and
-    // a failure here only costs the friendlier label.
-    if (subs.some((s) => s.productId)) {
-      try {
-        const names = new Map<string, string>();
-        for await (const p of stripe.products.list({ limit: 100 }, opts)) names.set(p.id, p.name);
-        for (const s of subs) {
-          const name = s.productId ? names.get(s.productId) : undefined;
-          if (name) s.planName = name;
-        }
-      } catch {
-        /* keep the price nickname */
-      }
+    // Upgrade the label from price nickname to real product name.
+    for (const s of subs) {
+      const name = s.productId ? productNames.get(s.productId) : undefined;
+      if (name) s.planName = name;
     }
 
-    return { subs, truncated, available: true, livemode: subs.length ? subs[0].livemode : null, connectScoped };
+    // Split Align360's subscriptions from everything else billing through this
+    // Stripe account. If no branded product was identified we do NOT filter —
+    // reporting zero would be as wrong as reporting someone else's revenue.
+    const brandFilterApplied = align360Products.size > 0;
+    const mine = brandFilterApplied ? subs.filter((s) => s.productId && align360Products.has(s.productId)) : subs;
+    const foreign = brandFilterApplied ? subs.filter((s) => !(s.productId && align360Products.has(s.productId))) : [];
+
+    const foreignActive = foreign.filter((s) => s.status === 'active');
+    const excluded = {
+      activeSubs: foreignActive.length,
+      monthlyCents: foreignActive.reduce((n, s) => n + s.monthlyCents, 0),
+      products: Array.from(
+        new Set(foreignActive.map((s) => (s.productId ? productNames.get(s.productId) ?? s.productId : '(unknown)'))),
+      ).sort(),
+    };
+
+    return {
+      subs: mine,
+      truncated,
+      available: true,
+      livemode: subs.length ? subs[0].livemode : null,
+      connectScoped,
+      excluded,
+      brandFilterApplied,
+    };
   });
 }
 
@@ -345,9 +398,11 @@ export type Snapshot = {
   truncated: { users: boolean; subs: boolean };
   available: { supabase: boolean; stripe: boolean };
   stripeMode: 'live' | 'test' | 'unknown';
-  /** False = Stripe reads hit the PLATFORM account, so every revenue figure
-   *  belongs to someone else. Surfaced loudly in the UI. */
+  /** False = Stripe reads hit the PLATFORM account. */
   connectScoped: boolean;
+  /** Other product lines on the same Stripe account, kept out of Align360's numbers. */
+  excluded: { activeSubs: number; monthlyCents: number; products: string[] };
+  brandFilterApplied: boolean;
   generatedAt: number;
 };
 
@@ -502,6 +557,8 @@ export function buildSnapshot({ authUsers: authRes, subs: subsRes, owners, orgDa
     available: { supabase: authRes.available, stripe: subsRes.available },
     stripeMode: subsRes.livemode == null ? 'unknown' : subsRes.livemode ? 'live' : 'test',
     connectScoped: subsRes.connectScoped,
+    excluded: subsRes.excluded,
+    brandFilterApplied: subsRes.brandFilterApplied,
     generatedAt: Date.now(),
   };
 }

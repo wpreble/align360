@@ -119,6 +119,8 @@ export async function GET(req: Request) {
       },
       stripeMode: snap.stripeMode,
       connectScoped: snap.connectScoped,
+      excluded: snap.excluded,
+      brandFilterApplied: snap.brandFilterApplied,
       truncated: snap.truncated,
       available: snap.available,
       generatedAt: snap.generatedAt,
