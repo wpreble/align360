@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { requireSuperAdmin } from '@/lib/admin/guard';
 import { getStripe, stripeConfigured, connectedOptions, connectScoped, connect } from '@/lib/stripe/client';
+import { align360CustomerIds, wantsFresh } from '@/lib/admin/data';
+import type Stripe from 'stripe';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -33,8 +35,12 @@ export async function GET(req: Request) {
   // this scope returns the platform's own revenue, which is a different business.
   const opts = connectedOptions();
   let grossCents = 0, feeCents = 0, netCents = 0, refundCents = 0, appFeeCents = 0, count = 0, capped = false;
+  // Money on this Stripe account that could NOT be attributed to Align360 —
+  // other product lines. Reported, never silently folded in or dropped.
+  let otherGrossCents = 0, otherCount = 0;
   let currency = 'usd';
   let live: boolean | null = null;
+  const mine = await align360CustomerIds(wantsFresh(req)).catch(() => new Set<string>());
   try {
     // BalanceTransaction has no `livemode` field, so probe mode from a charge (which
     // does). This reflects the key's mode, i.e. whether these figures are real money.
@@ -44,9 +50,25 @@ export async function GET(req: Request) {
     const CAP = 5000;
     // Auto-paginate balance transactions in the window. `net` already nets out fees
     // and refunds, so summing net over income + refund types = true net revenue.
-    for await (const txn of stripe.balanceTransactions.list({ created: { gte, lte }, limit: 100 }, opts)) {
+    for await (const txn of stripe.balanceTransactions.list(
+      { created: { gte, lte }, limit: 100, expand: ['data.source'] },
+      opts,
+    )) {
       if (txn.currency) currency = txn.currency;
       const t = txn.type;
+
+      // Attribute this movement to Align360 via the source charge's customer.
+      // A balance transaction carries no product information, so this is the
+      // only cheap join available while one Stripe account serves several lines.
+      const src = txn.source && typeof txn.source === 'object' ? (txn.source as { customer?: string | { id: string } }) : null;
+      const custId = typeof src?.customer === 'string' ? src.customer : src?.customer?.id ?? null;
+      const isMine = !!custId && mine.has(custId);
+
+      if (!isMine) {
+        if (t === 'charge' || t === 'payment') { otherGrossCents += txn.amount; otherCount += 1; }
+        continue;
+      }
+
       if (t === 'charge' || t === 'payment') {
         grossCents += txn.amount;
         feeCents += txn.fee;
@@ -81,6 +103,9 @@ export async function GET(req: Request) {
     refundCents,
     appFeeCents,
     netCents,
+    // Revenue on this Stripe account belonging to other product lines. Shown so
+    // the panel can never again present someone else's gross as Align360's.
+    other: { grossCents: otherGrossCents, count: otherCount },
     // Context the UI needs so the split is not applied twice.
     connectScoped,
     applicationFeePercent: connect.applicationFeePercent,

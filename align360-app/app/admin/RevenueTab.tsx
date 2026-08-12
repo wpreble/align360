@@ -74,6 +74,9 @@ export default function RevenueTab() {
             {payouts.refundCents !== 0 && <div><span>Refunds</span><strong>{fmtMoney(payouts.refundCents, ccy)}</strong></div>}
             <div className="adm-rev-net"><span>Net</span><strong>{fmtMoney(payouts.netCents, ccy)}</strong></div>
             <div><span>Charges</span><strong>{payouts.count}{payouts.capped ? '+ (capped)' : ''}</strong></div>
+            {payouts.appFeeCents !== 0 && (
+              <div><span>Application fee</span><strong>{fmtMoney(payouts.appFeeCents, ccy)}</strong></div>
+            )}
           </div>
 
           <div className="adm-split-controls">
@@ -99,6 +102,21 @@ export default function RevenueTab() {
               <div className="adm-card-value">{fmtMoney(teamCents, ccy)}</div>
             </div>
           </div>
+          {payouts.other.count > 0 && (
+            <div className="adm-warn">
+              Align360 only. A further {fmtMoney(payouts.other.grossCents, ccy)} gross across{' '}
+              {payouts.other.count} charge{payouts.other.count === 1 ? '' : 's'} on this Stripe account belongs to
+              other product lines and is excluded from the split.
+            </div>
+          )}
+          {payouts.applicationFeePercent > 0 && payouts.appFeeCents === 0 && (
+            <div className="adm-warn">
+              STRIPE_APPLICATION_FEE_PERCENT is {payouts.applicationFeePercent}% but no application fee was
+              actually charged in this period, because Stripe Connect is not active
+              (STRIPE_CONNECTED_ACCOUNT_ID is unset). The split below is therefore a manual calculation, not
+              something Stripe is already doing.
+            </div>
+          )}
           <p className="adm-note">
             Split applied to <strong>{basis === 'net' ? 'net' : 'gross'}</strong> of {fmtMoney(baseCents, ccy)} over {start} → {end}.
             Mode: <span className={`adm-pill ${payouts.mode}`}>{payouts.mode}</span>

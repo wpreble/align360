@@ -124,6 +124,12 @@ export default function OverviewTab({ onOpenUsers }: { onOpenUsers: (state: stri
                   valueFormat={(v) => fmtMoney(v, ts.currency)}
                   labelEvery={2}
                 />
+                {ts.otherGrossCents > 0 && (
+                  <p className="adm-note">
+                    Align360 only. A further {fmtMoney(ts.otherGrossCents, ts.currency)} on this Stripe
+                    account belongs to other product lines and is excluded.
+                  </p>
+                )}
                 {ts.revenueTruncated && <p className="adm-note">Hit the 10,000-transaction cap; earlier months may be understated.</p>}
               </>
             )}

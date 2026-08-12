@@ -47,6 +47,21 @@ async function cached<T>(key: string, fresh: boolean, load: () => Promise<T>): P
   return value;
 }
 
+/**
+ * Stripe customer ids that belong to Align360, derived from the brand-filtered
+ * subscription list (all statuses, so past customers still attribute correctly).
+ *
+ * Money movement cannot be filtered by product the way subscriptions can: a
+ * balance transaction points at a charge, not a price. Attributing by customer
+ * is the cheap, reliable proxy while Align360 shares a Stripe account with other
+ * product lines. Callers MUST report what they could not attribute rather than
+ * dropping it, so a mis-attribution shows up instead of quietly shrinking revenue.
+ */
+export async function align360CustomerIds(fresh = false): Promise<Set<string>> {
+  const { subs } = await listSubscriptions(fresh);
+  return new Set(subs.map((s) => s.customerId).filter(Boolean));
+}
+
 /** True when the caller passed ?refresh=1 (or ?refresh=true). */
 export function wantsFresh(req: Request): boolean {
   const v = new URL(req.url).searchParams.get('refresh');

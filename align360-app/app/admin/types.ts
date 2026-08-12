@@ -100,6 +100,7 @@ export type TimeSeries = {
   currency: string;
   revenueAvailable: boolean;
   revenueTruncated: boolean;
+  otherGrossCents: number;
   revenueError: string | null;
   months: number;
   generatedAt: number;
@@ -155,6 +156,7 @@ export type Payouts = {
   refundCents: number;
   appFeeCents: number;
   netCents: number;
+  other: { grossCents: number; count: number };
   connectScoped: boolean;
   applicationFeePercent: number;
 };

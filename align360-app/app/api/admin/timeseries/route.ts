@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/admin/guard';
-import { loadSnapshot, wantsFresh } from '@/lib/admin/data';
+import { align360CustomerIds, loadSnapshot, wantsFresh } from '@/lib/admin/data';
 import { getStripe, stripeConfigured, connectedOptions, connectScoped } from '@/lib/stripe/client';
 
 export const runtime = 'nodejs';
@@ -77,15 +77,30 @@ export async function GET(req: Request) {
     let revenueTruncated = false;
     let currency = 'usd';
     let revenueError: string | null = null;
+    let otherGrossCents = 0;
 
     if (stripeConfigured) {
       try {
+        // Attribute money movement to Align360 by the source charge's customer.
+        // Without this the chart shows every product line billing through this
+        // Stripe account, which is how a $100/mo business rendered as $5k/mo.
+        const mine = await align360CustomerIds(wantsFresh(req)).catch(() => new Set<string>());
         const CAP = 10_000;
         let seen = 0;
-        for await (const txn of getStripe().balanceTransactions.list({ created: { gte }, limit: 100 }, connectedOptions())) {
+        for await (const txn of getStripe().balanceTransactions.list(
+          { created: { gte }, limit: 100, expand: ['data.source'] },
+          connectedOptions(),
+        )) {
           const t = txn.type;
           if (t !== 'charge' && t !== 'payment' && t !== 'refund' && t !== 'payment_refund') continue;
           if (txn.currency) currency = txn.currency;
+
+          const src = txn.source && typeof txn.source === 'object' ? (txn.source as { customer?: string | { id: string } }) : null;
+          const custId = typeof src?.customer === 'string' ? src.customer : src?.customer?.id ?? null;
+          if (!custId || !mine.has(custId)) {
+            if (t === 'charge' || t === 'payment') otherGrossCents += txn.amount;
+            continue;
+          }
           const key = new Date(txn.created * 1000).toISOString().slice(0, 7);
           const bucket = revenueByMonth.get(key);
           if (bucket) {
@@ -107,6 +122,7 @@ export async function GET(req: Request) {
       currency,
       revenueAvailable,
       revenueTruncated,
+      otherGrossCents,
       connectScoped,
       revenueError,
       months,
