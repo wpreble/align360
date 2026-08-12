@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { hubspotAddNote } from '@/lib/hubspot';
+import { syncFeedbackToHubspot } from '@/lib/hubspot-feedback';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -28,16 +28,32 @@ export async function POST(req: NextRequest) {
   const email = user.email ?? null;
   const userAgent = (req.headers.get('user-agent') || '').slice(0, 300) || null;
 
-  const { error } = await supabase.from('feedback').insert({ user_id: user.id, email, message, path, user_agent: userAgent });
-  if (error) {
-    console.error('feedback insert failed:', error.message);
-    return NextResponse.json({ error: 'Could not save your feedback. Please try again.' }, { status: 500 });
+  // Insert with RETURNING so the mirror can key off the row id. RETURNING needs the
+  // 0012 select-own policy; until that migration is applied, fall back to the bare
+  // 0011 insert so a user's save NEVER depends on migration ordering — the skipped
+  // mirror is picked up later by scripts/backfill-feedback-to-hubspot.ts.
+  const values = { user_id: user.id, email, message, path, user_agent: userAgent };
+  let row: { id: number; created_at: string } | null = null;
+  const ins = await supabase.from('feedback').insert(values).select('id, created_at').single();
+  if (ins.error || !ins.data) {
+    const bare = await supabase.from('feedback').insert(values);
+    if (bare.error) {
+      console.error('feedback insert failed:', bare.error.message, '(returning path:', ins.error?.message, ')');
+      return NextResponse.json({ error: 'Could not save your feedback. Please try again.' }, { status: 500 });
+    }
+    console.warn('feedback saved without RETURNING (apply 0012 for inline hubspot sync):', ins.error?.message);
+  } else {
+    row = ins.data as { id: number; created_at: string };
   }
 
-  // Mirror to HubSpot as a note on the contact (best-effort; the save already succeeded).
-  try {
-    await hubspotAddNote(email, `Align360 in-app feedback${path ? ` (from ${path})` : ''}:\n\n${message}`);
-  } catch { /* best-effort */ }
+  // Mirror to HubSpot (note + custom-object table when configured). Best-effort:
+  // the Supabase save already succeeded and is the source of truth; on any HubSpot
+  // failure the row keeps hubspot_synced_at NULL and the backfill script retries it.
+  if (row) {
+    try {
+      await syncFeedbackToHubspot({ id: row.id, email, message, path, created_at: row.created_at });
+    } catch { /* best-effort — never fail the save */ }
+  }
 
   return NextResponse.json({ ok: true });
 }

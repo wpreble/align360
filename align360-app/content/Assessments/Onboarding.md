@@ -1,6 +1,6 @@
 # Onboarding Assessment
 
-*12 questions  ·  ~3 minutes  ·  Single choice  ·  Answer for your whole life, not just work*
+*22 questions  ·  ~5 minutes  ·  Single choice  ·  Answer for your whole life, not just work*
 
 Design note:  Onboarding is NOT scored for a result. Every answer maps directly to a system behavior: AI tone, session sequencing, faith integration level, opportunity weighting, and resource filtering. Users never see a score — they see a personalized experience shaped by these answers.
 
@@ -298,5 +298,57 @@ E. I feel overwhelmed by it. Major change tends to disorient me before I find my
 Internal Layer 3 — Non-negotiable rules
 
 The Current State Calibration Layer must never be used to reduce a user's confidence, limit their access to any tool, or suggest that their present state is a reflection of permanent capability. It exists to ensure the system meets the person where they are — not to define where they are permitted to go. Every calibration signal is temporary and contextual by definition.
+
+
+## Section J — Career Context
+
+Added 2026-08-04 per Drew's ask: onboarding assumed a blank slate even for mid/late-career users. Question text and options are from Samuel's Career Context Intelligence Spec v1.0, Section 1.2. Scope note: only the 3-question intake and the deterministic mode tag below are implemented. The rest of that spec (CareerNav routing, Master Chief session scripts, Transferable Asset Map UI, dashboard badges, 627Figures routing) references product surfaces that do not exist in the app yet and is a separate, larger build — not part of this addition.
+
+
+### Q20
+
+*Section J · Career Context*
+
+> Where are you right now in your career or professional life?
+
+- **A.** I'm early — still studying, exploring, or just getting started.   →  Career stage: Early / exploring
+- **B.** I'm established in my field and want to keep building on what I have.   →  Career stage: Established, building on it
+- **C.** I'm doing work that doesn't fit who I am and want to pivot into something better.   →  Career stage: Misaligned, wants to pivot
+- **D.** I know what I'm doing and I want to move faster or go further.   →  Career stage: Aligned, wants acceleration
+- **E.** I'm building my own thing — a business, a practice, or something I own.   →  Career stage: Building own venture
+
+> **Dev note: Store as CAREER_STAGE. Feeds CAREER_CONTEXT_MODE below (spec Section 1.3).**
+
+
+### Q21
+
+*Section J · Career Context*
+
+> How much of what you've already built do you want to carry forward?
+
+- **A.** All of it — I want to build on my existing experience, reputation, and skills.   →  Carries forward: All of it
+- **B.** Most of it — some things carry, but I'm ready to shift direction meaningfully.   →  Carries forward: Most of it
+- **C.** Some of it — I want to keep the transferable pieces and leave the rest behind.   →  Carries forward: Some of it
+- **D.** As little as possible — I want a genuine fresh start in a new direction.   →  Carries forward: As little as possible
+- **E.** I'm not sure yet — that's part of what I need help figuring out.   →  Carries forward: Unsure
+
+> **Dev note: Store as CAREER_CARRYFORWARD. Feeds CAREER_CONTEXT_MODE below.**
+
+
+### Q22
+
+*Section J · Career Context*
+
+> What does success look like for you in the next 12 to 24 months?
+
+- **A.** Getting hired into a role that actually fits me.   →  Success target: Role fit
+- **B.** Growing faster or earning more in the direction I'm already heading.   →  Success target: Acceleration in current direction
+- **C.** Making a meaningful career change without starting from zero.   →  Success target: Pivot without reset
+- **D.** Building something of my own that generates real income.   →  Success target: Build own income
+- **E.** Finding clarity about what I should be doing before I make any big moves.   →  Success target: Clarity before action
+
+> **Dev note: Store as CAREER_SUCCESS_TARGET. Feeds CAREER_CONTEXT_MODE below.**
+
+> **Mode classification (deterministic, spec Section 1.3): BUILD_ON when Q20 in {A,B} and Q21 in {A,B} and Q22 = B. PIVOT when Q20 = C and Q21 in {B,C,D} and Q22 in {A,C}. ACCELERATE when Q20 in {B,D,E} and Q21 = A and Q22 in {B,D}. Anything else, including any conflicting combination, defaults to DISCOVER. Never used to gate access or reduce confidence — same non-negotiable rule as the rest of this file.**
 
 02

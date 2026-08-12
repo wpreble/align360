@@ -89,7 +89,7 @@ export default function UsersTab({ initialFilter }: { initialFilter?: string }) 
         <button className="adm-btn sm" onClick={() => load(true)} disabled={busy}>{busy ? 'Refreshing…' : 'Refresh'}</button>
       </div>
 
-      {data && <DataWarnings truncated={data.truncated} available={data.available} />}
+      {data && <DataWarnings truncated={data.truncated} available={data.available} connectScoped={data.connectScoped} />}
 
       <section className="adm-panel">
         <div className="adm-userbar">

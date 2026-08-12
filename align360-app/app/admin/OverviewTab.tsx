@@ -46,7 +46,7 @@ export default function OverviewTab({ onOpenUsers }: { onOpenUsers: (state: stri
       </div>
 
       {err && <div className="adm-err adm-block">{err}</div>}
-      {m && <DataWarnings truncated={m.truncated} available={m.available} />}
+      {m && <DataWarnings truncated={m.truncated} available={m.available} connectScoped={m.connectScoped} />}
 
       <section className="adm-cards">
         <div className="adm-card">

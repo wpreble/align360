@@ -78,6 +78,7 @@ export async function GET(req: Request) {
       truncated: snap.truncated,
       available: snap.available,
       stripeMode: snap.stripeMode,
+      connectScoped: snap.connectScoped,
       generatedAt: snap.generatedAt,
     });
   } catch (e) {

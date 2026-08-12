@@ -1,6 +1,6 @@
 // Onboarding flow — the canonical Align360 intake (content/Assessments/Onboarding.md).
-// 19 single-choice questions across Sections A–I. NOT scored for a result: every
-// answer maps to a system behavior (AI tone, routing, faith level, distress flag,
+// 22 single-choice questions across Sections A–I plus a Career Context intake. NOT
+// scored for a result: every answer maps to a system behavior (AI tone, routing, faith level, distress flag,
 // AI-era delivery). synthesize() gives a preliminary "first read"; buildOnboarding
 // context() feeds the chosen-answer signals into the live AI.
 
@@ -149,7 +149,55 @@ const QUESTIONS: QDef[] = [
     { t: 'I focus on what hasn’t changed. I look for what remains stable and build from there.', s: 'Disruption posture: stability-anchored; surface AI-era signals gradually, leading with what is durable' },
     { t: 'I feel overwhelmed by it. Major change tends to disorient me before I find my footing.', s: 'Disruption posture: high sensitivity; withhold AI-era signals until grounding; lead with identity stability' },
   ]},
+  // Career Context Intake (added 2026-08-04, Drew's request — mid/late-career users
+  // shouldn't get blank-slate framing). Source: Samuel's Career Context Intelligence
+  // Spec v1.0, Section 1.2 (question text/options verbatim). Scope note: this ships
+  // ONLY the 3-question intake + the deterministic mode tag Drew's ask needed to be
+  // useful — NOT the rest of that spec (CareerNav routing, Master Chief session
+  // scripts, Transferable Asset Map UI, dashboard badges, 627Figures routing). Those
+  // reference product surfaces (CareerNav, Master Chief) that don't exist in this
+  // app yet and are a separate, much larger build.
+  { key: 'q20_careerstage', eyebrow: 'Career context', question: 'Where are you right now in your career or professional life?', sub: 'Helps us calibrate to where you actually are, not a blank slate.', opts: [
+    { t: 'I’m early, still studying, exploring, or just getting started', s: 'Career stage: early / exploring' },
+    { t: 'I’m established in my field and want to keep building on what I have', s: 'Career stage: established, building on it' },
+    { t: 'I’m doing work that doesn’t fit who I am and want to pivot into something better', s: 'Career stage: misaligned, wants to pivot' },
+    { t: 'I know what I’m doing and I want to move faster or go further', s: 'Career stage: aligned, wants acceleration' },
+    { t: 'I’m building my own thing, a business, a practice, or something I own', s: 'Career stage: building own venture' },
+  ]},
+  { key: 'q21_carryforward', eyebrow: 'Career context', question: 'How much of what you’ve already built do you want to carry forward?', opts: [
+    { t: 'All of it, I want to build on my existing experience, reputation, and skills', s: 'Carries forward: all of it' },
+    { t: 'Most of it, some things carry, but I’m ready to shift direction meaningfully', s: 'Carries forward: most of it' },
+    { t: 'Some of it, I want to keep the transferable pieces and leave the rest behind', s: 'Carries forward: some of it' },
+    { t: 'As little as possible, I want a genuine fresh start in a new direction', s: 'Carries forward: as little as possible' },
+    { t: 'I’m not sure yet, that’s part of what I need help figuring out', s: 'Carries forward: unsure' },
+  ]},
+  { key: 'q22_careersuccess', eyebrow: 'Career context', question: 'What does success look like for you in the next 12 to 24 months?', opts: [
+    { t: 'Getting hired into a role that actually fits me', s: 'Success target: role fit' },
+    { t: 'Growing faster or earning more in the direction I’m already heading', s: 'Success target: acceleration in current direction' },
+    { t: 'Making a meaningful career change without starting from zero', s: 'Success target: pivot without reset' },
+    { t: 'Building something of my own that generates real income', s: 'Success target: build own income' },
+    { t: 'Finding clarity about what I should be doing before I make any big moves', s: 'Success target: clarity before action' },
+  ]},
 ];
+
+/**
+ * Deterministic career context mode (Samuel's spec Section 1.3, rule table
+ * reproduced exactly). Any combination outside the three named patterns falls
+ * through to DISCOVER, matching the spec's own ambiguous-signal default.
+ */
+export type CareerContextMode = 'BUILD_ON' | 'PIVOT' | 'ACCELERATE' | 'DISCOVER';
+
+export function classifyCareerContext(answers: Answers): CareerContextMode {
+  const i1 = answerIndex(answers, 'q20_careerstage'); // A B C D E -> 0..4
+  const i2 = answerIndex(answers, 'q21_carryforward');
+  const i3 = answerIndex(answers, 'q22_careersuccess');
+  if (i1 < 0 || i2 < 0 || i3 < 0) return 'DISCOVER';
+
+  if ([0, 1].includes(i1) && [0, 1].includes(i2) && i3 === 1) return 'BUILD_ON';
+  if (i1 === 2 && [1, 2, 3].includes(i2) && [0, 2].includes(i3)) return 'PIVOT';
+  if ([1, 3, 4].includes(i1) && i2 === 0 && [1, 3].includes(i3)) return 'ACCELERATE';
+  return 'DISCOVER';
+}
 
 const SIGNAL_MAP: Record<string, Record<string, string>> = Object.fromEntries(
   QUESTIONS.map((q) => [q.key, Object.fromEntries(q.opts.map((o) => [o.t, o.s]))]),
@@ -284,6 +332,10 @@ export function buildOnboardingContext(answers: Answers): string {
     sig('q17_effort', 'Worth the cost? (distress signal)'),
     sig('q18_shift', 'Desired shift'),
     sig('q19_disruption', 'Disruption posture (AI-era delivery)'),
+    sig('q20_careerstage', 'Career stage'),
+    sig('q21_carryforward', 'Wants to carry forward'),
+    sig('q22_careersuccess', '12-24mo success target'),
+    `Career context mode: ${classifyCareerContext(answers)} — never assume a blank slate for BUILD_ON/PIVOT/ACCELERATE users; they arrive with prior context. Only DISCOVER users are genuinely starting fresh.`,
     `Preliminary wiring hypothesis (NOT confirmed; the Wiring for Impact assessment confirms it): ${s.primaryGift}, with undertones of ${s.secondaryGift}. Treat as a working read, not a label.`,
     'Honor the calibration rules: never use current-state signals to reduce confidence or limit access; every calibration signal is temporary and contextual.',
   ].filter(Boolean);

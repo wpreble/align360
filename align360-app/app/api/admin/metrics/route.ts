@@ -118,6 +118,7 @@ export async function GET(req: Request) {
         seatsAssigned: snap.orgs.reduce((n, o) => n + o.seatsAssigned, 0),
       },
       stripeMode: snap.stripeMode,
+      connectScoped: snap.connectScoped,
       truncated: snap.truncated,
       available: snap.available,
       generatedAt: snap.generatedAt,

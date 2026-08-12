@@ -43,6 +43,7 @@ export type Metrics = {
   rates: { churn30Pct: number | null; trialConversionPct: number | null; trialsResolved: number; paidSharePct: number | null };
   orgs: { total: number; paying: number; seatsPurchased: number; seatsAssigned: number };
   stripeMode: 'live' | 'test' | 'unknown';
+  connectScoped: boolean;
   truncated: Truncation;
   available: Availability;
   generatedAt: number;
@@ -58,6 +59,7 @@ export type UsersPage = {
   truncated: Truncation;
   available: Availability;
   stripeMode: string;
+  connectScoped: boolean;
   generatedAt: number;
 };
 
@@ -146,7 +148,10 @@ export type Payouts = {
   grossCents: number;
   feeCents: number;
   refundCents: number;
+  appFeeCents: number;
   netCents: number;
+  connectScoped: boolean;
+  applicationFeePercent: number;
 };
 
 export type FeedbackItem = { id: number; email: string | null; message: string; path: string | null; created_at: string };

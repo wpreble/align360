@@ -166,11 +166,20 @@ export function StateBar({ counts, total }: { counts: Record<PaymentState, numbe
 export function DataWarnings({
   truncated,
   available,
+  connectScoped,
 }: {
   truncated?: { users: boolean; subs: boolean };
   available?: { supabase: boolean; stripe: boolean };
+  connectScoped?: boolean;
 }) {
   const msgs: string[] = [];
+  // The failure this guards against is silent and severe: Align360 bills on a
+  // Stripe CONNECTED account, so an unscoped read returns the PLATFORM's data
+  // and reports another business's revenue as ours.
+  if (connectScoped === false)
+    msgs.push(
+      'STRIPE_CONNECTED_ACCOUNT_ID is not set, so billing figures are being read from the Stripe PLATFORM account, not Align360. Every revenue number below belongs to a different business. Do not trust them.',
+    );
   if (available && !available.supabase) msgs.push('Supabase is not configured in this environment, so signup data is missing.');
   if (available && !available.stripe) msgs.push('Stripe is not configured in this environment, so billing data is missing.');
   if (truncated?.users) msgs.push('User list hit the 20,000-row safety cap. Counts below are incomplete.');

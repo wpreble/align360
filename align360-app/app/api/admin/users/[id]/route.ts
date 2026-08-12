@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/admin/guard';
 import { loadSnapshot, supabaseConfigured, wantsFresh } from '@/lib/admin/data';
 import { createServiceClient } from '@/lib/supabase/server';
-import { getStripe, stripeConfigured } from '@/lib/stripe/client';
+import { getStripe, stripeConfigured, connectedOptions } from '@/lib/stripe/client';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -71,7 +71,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     const customerId = snap.subs.find((s) => s.id === user.subId)?.customerId ?? null;
     if (customerId && stripeConfigured) {
       try {
-        const charges = await getStripe().charges.list({ customer: customerId, limit: 25 });
+        const charges = await getStripe().charges.list({ customer: customerId, limit: 25 }, connectedOptions());
         payments = charges.data.map((c) => ({
           id: c.id,
           amountCents: c.amount,

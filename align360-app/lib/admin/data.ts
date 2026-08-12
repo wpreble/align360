@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { getStripe, stripeConfigured } from '@/lib/stripe/client';
+import { getStripe, stripeConfigured, connectedOptions, connectScoped } from '@/lib/stripe/client';
 import { createServiceClient } from '@/lib/supabase/server';
 
 /**
@@ -146,7 +146,15 @@ export type SubRow = {
   livemode: boolean;
 };
 
-export type SubsResult = { subs: SubRow[]; truncated: boolean; available: boolean; livemode: boolean | null };
+export type SubsResult = {
+  subs: SubRow[];
+  truncated: boolean;
+  available: boolean;
+  livemode: boolean | null;
+  /** False when STRIPE_CONNECTED_ACCOUNT_ID is unset, i.e. these rows came from
+   *  the PLATFORM account and are not Align360's revenue. */
+  connectScoped: boolean;
+};
 
 /** Normalize any Stripe recurring price to monthly cents. */
 export function toMonthlyCents(unitAmount: number, interval: string, count: number, qty: number): number {
@@ -167,8 +175,11 @@ export const PAYING_STATUSES: SubStatus[] = ['active', 'past_due', 'unpaid'];
 /** Every subscription in every status, auto-paginated. */
 export async function listSubscriptions(fresh = false): Promise<SubsResult> {
   return cached('subs', fresh, async () => {
-    if (!stripeConfigured) return { subs: [], truncated: false, available: false, livemode: null };
+    if (!stripeConfigured) return { subs: [], truncated: false, available: false, livemode: null, connectScoped };
     const stripe = getStripe();
+    // Align360 bills via Direct Charges on the connected account. Without this
+    // scoping every read below silently returns the PLATFORM account's data.
+    const opts = connectedOptions();
     const subs: SubRow[] = [];
     let truncated = false;
 
@@ -183,7 +194,7 @@ export async function listSubscriptions(fresh = false): Promise<SubsResult> {
       status: 'all',
       limit: 100,
       expand: ['data.customer'],
-    })) {
+    }, opts)) {
       const item = s.items?.data?.[0];
       const price = item?.price;
       const qty = item?.quantity || 1;
@@ -232,7 +243,7 @@ export async function listSubscriptions(fresh = false): Promise<SubsResult> {
     if (subs.some((s) => s.productId)) {
       try {
         const names = new Map<string, string>();
-        for await (const p of stripe.products.list({ limit: 100 })) names.set(p.id, p.name);
+        for await (const p of stripe.products.list({ limit: 100 }, opts)) names.set(p.id, p.name);
         for (const s of subs) {
           const name = s.productId ? names.get(s.productId) : undefined;
           if (name) s.planName = name;
@@ -242,7 +253,7 @@ export async function listSubscriptions(fresh = false): Promise<SubsResult> {
       }
     }
 
-    return { subs, truncated, available: true, livemode: subs.length ? subs[0].livemode : null };
+    return { subs, truncated, available: true, livemode: subs.length ? subs[0].livemode : null, connectScoped };
   });
 }
 
@@ -334,6 +345,9 @@ export type Snapshot = {
   truncated: { users: boolean; subs: boolean };
   available: { supabase: boolean; stripe: boolean };
   stripeMode: 'live' | 'test' | 'unknown';
+  /** False = Stripe reads hit the PLATFORM account, so every revenue figure
+   *  belongs to someone else. Surfaced loudly in the UI. */
+  connectScoped: boolean;
   generatedAt: number;
 };
 
@@ -487,6 +501,7 @@ export function buildSnapshot({ authUsers: authRes, subs: subsRes, owners, orgDa
     truncated: { users: authRes.truncated, subs: subsRes.truncated },
     available: { supabase: authRes.available, stripe: subsRes.available },
     stripeMode: subsRes.livemode == null ? 'unknown' : subsRes.livemode ? 'live' : 'test',
+    connectScoped: subsRes.connectScoped,
     generatedAt: Date.now(),
   };
 }

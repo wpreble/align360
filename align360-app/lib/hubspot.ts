@@ -80,13 +80,16 @@ export async function hubspotUpsertContact(email: string | null | undefined, pro
  * (creating a bare contact if needed so the note always has something to attach to),
  * then posts a note associated to it. Bounded timeouts, same fail-open contract as
  * the upsert above — a HubSpot hiccup must never fail the feedback save.
+ *
+ * Returns the created note id, or null on any failure/no-op — callers that need a
+ * durable success signal (the feedback sync stamp) key off a non-null return.
  */
-export async function hubspotAddNote(email: string | null | undefined, body: string): Promise<void> {
+export async function hubspotAddNote(email: string | null | undefined, body: string): Promise<string | null> {
   const t = token();
-  if (!t) return;
+  if (!t) return null;
   const addr = (email || '').trim().toLowerCase();
   const text = (body || '').trim();
-  if (!addr || !addr.includes('@') || !text) return;
+  if (!addr || !addr.includes('@') || !text) return null;
   const headers = { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' };
 
   const contactId = async (): Promise<string | null> => {
@@ -100,7 +103,7 @@ export async function hubspotAddNote(email: string | null | undefined, body: str
   try {
     let id = await contactId();
     if (!id) { await hubspotUpsertContact(addr); id = await contactId(); }
-    if (!id) return; // couldn't resolve a contact — feedback still lives in Supabase
+    if (!id) return null; // couldn't resolve a contact — feedback still lives in Supabase
 
     const res = await fetch(`${API}/crm/v3/objects/notes`, {
       method: 'POST',
@@ -112,9 +115,14 @@ export async function hubspotAddNote(email: string | null | undefined, body: str
       }),
       signal: AbortSignal.timeout(3000),
     });
-    if (!res.ok) console.error('hubspot note failed:', res.status, (await res.text()).slice(0, 300));
+    if (!res.ok) {
+      console.error('hubspot note failed:', res.status, (await res.text()).slice(0, 300));
+      return null;
+    }
+    return (await res.json())?.id ?? null;
   } catch (e) {
     console.error('hubspot note error:', e instanceof Error ? e.message : e);
+    return null;
   }
 }
 

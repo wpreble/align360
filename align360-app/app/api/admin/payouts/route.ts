@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireSuperAdmin } from '@/lib/admin/guard';
-import { getStripe, stripeConfigured } from '@/lib/stripe/client';
+import { getStripe, stripeConfigured, connectedOptions, connectScoped, connect } from '@/lib/stripe/client';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -29,19 +29,22 @@ export async function GET(req: Request) {
   if (gte > lte) return NextResponse.json({ error: 'start must be before end' }, { status: 400 });
 
   const stripe = getStripe();
-  let grossCents = 0, feeCents = 0, netCents = 0, refundCents = 0, count = 0, capped = false;
+  // Align360 bills via Direct Charges on the CONNECTED account. Reading without
+  // this scope returns the platform's own revenue, which is a different business.
+  const opts = connectedOptions();
+  let grossCents = 0, feeCents = 0, netCents = 0, refundCents = 0, appFeeCents = 0, count = 0, capped = false;
   let currency = 'usd';
   let live: boolean | null = null;
   try {
     // BalanceTransaction has no `livemode` field, so probe mode from a charge (which
     // does). This reflects the key's mode, i.e. whether these figures are real money.
-    const probe = await stripe.charges.list({ limit: 1 });
+    const probe = await stripe.charges.list({ limit: 1 }, opts);
     live = probe.data[0] ? probe.data[0].livemode : null;
 
     const CAP = 5000;
     // Auto-paginate balance transactions in the window. `net` already nets out fees
     // and refunds, so summing net over income + refund types = true net revenue.
-    for await (const txn of stripe.balanceTransactions.list({ created: { gte, lte }, limit: 100 })) {
+    for await (const txn of stripe.balanceTransactions.list({ created: { gte, lte }, limit: 100 }, opts)) {
       if (txn.currency) currency = txn.currency;
       const t = txn.type;
       if (t === 'charge' || t === 'payment') {
@@ -52,6 +55,13 @@ export async function GET(req: Request) {
       } else if (t === 'refund' || t === 'payment_refund') {
         refundCents += txn.amount; // negative
         feeCents += txn.fee;
+        netCents += txn.net;
+      } else if (t === 'application_fee' || t === 'application_fee_refund') {
+        // On the connected account the platform's cut leaves as its own negative
+        // balance transaction. Excluding it (as this route used to) overstates
+        // what Align360 actually keeps, and then the split panel below applies a
+        // SECOND 50% on top of a cut Stripe already took.
+        appFeeCents += txn.amount;
         netCents += txn.net;
       }
       if (count >= CAP) { capped = true; break; }
@@ -69,7 +79,11 @@ export async function GET(req: Request) {
     grossCents,
     feeCents,
     refundCents,
+    appFeeCents,
     netCents,
+    // Context the UI needs so the split is not applied twice.
+    connectScoped,
+    applicationFeePercent: connect.applicationFeePercent,
     generatedAt: Date.now(),
   });
 }

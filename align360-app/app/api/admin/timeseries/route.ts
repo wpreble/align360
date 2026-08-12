@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/admin/guard';
 import { loadSnapshot, wantsFresh } from '@/lib/admin/data';
-import { getStripe, stripeConfigured } from '@/lib/stripe/client';
+import { getStripe, stripeConfigured, connectedOptions, connectScoped } from '@/lib/stripe/client';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -82,7 +82,7 @@ export async function GET(req: Request) {
       try {
         const CAP = 10_000;
         let seen = 0;
-        for await (const txn of getStripe().balanceTransactions.list({ created: { gte }, limit: 100 })) {
+        for await (const txn of getStripe().balanceTransactions.list({ created: { gte }, limit: 100 }, connectedOptions())) {
           const t = txn.type;
           if (t !== 'charge' && t !== 'payment' && t !== 'refund' && t !== 'payment_refund') continue;
           if (txn.currency) currency = txn.currency;
@@ -107,6 +107,7 @@ export async function GET(req: Request) {
       currency,
       revenueAvailable,
       revenueTruncated,
+      connectScoped,
       revenueError,
       months,
       generatedAt: snap.generatedAt,
