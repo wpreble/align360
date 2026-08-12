@@ -335,6 +335,26 @@ Payouts were contaminated the same way: the $14,531/30d and $55,146/2026 figures
 
 I verified the rewrite with Stripe unset locally, which is why both this and the expand-depth bug reached production. Empty-state verification proves rendering, not arithmetic. Any future change to revenue math must be checked against the live ledger and against a known-good external figure before it is reported as fact.
 
+## Follow-up: the money-flow views had the same bug one panel over
+
+Filtering subscriptions by product fixed MRR, but the Revenue split panel and the
+Net revenue chart still read whole-account balance transactions. The dashboard
+briefly showed **$100/mo MRR beside a chart reading ~$5,000/mo for the same
+business**. Caught by re-checking live rather than assuming the first fix covered it.
+
+A balance transaction carries no product information, so attribution now goes
+through the source charge's customer, matched against the customer ids on
+Align360's brand-filtered subscriptions. Unattributed money is totalled and named
+in the UI, never folded in and never silently dropped.
+
+Verified live, all three views agreeing:
+
+| View | Figure |
+|---|---|
+| MRR (metrics) | $100.00/mo, 4 paying, 4 active subs |
+| Revenue split (30d) | gross $100.00, net $95.88, 4 charges (excluded $14,431.09 / 7 charges) |
+| Revenue chart (12mo) | gross $125.00 (Jul $50, Aug $75) (excluded $80,545.54) |
+
 ## Still open
 
 `STRIPE_CONNECTED_ACCOUNT_ID` is unset in production. Decide whether Connect is meant to be active. If it is, Align360 billing should move to the connected account and the 50% application fee should flow automatically; if it is not, the Revenue split panel's manual 50% is the only split and the `STRIPE_APPLICATION_FEE_PERCENT=50` setting is misleading, since no application fee is actually being charged.
