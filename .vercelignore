@@ -1,0 +1,40 @@
+# Vercel's Root Directory for this project is `align360-app`, but the CLI uploads
+# the whole repo as build context. This repo also holds working material (brand
+# assets, research, handoffs, screen recordings) that must never be uploaded —
+# without this file the upload is ~220MB and fails the 100MB per-file limit on
+# a stray .MOV and on next-swc in node_modules.
+#
+# Do NOT add a blanket *.pdf rule: align360-app/public/resources/*.pdf are
+# served assets.
+
+# Dependencies and build output
+node_modules
+**/node_modules
+.next
+**/.next
+
+# Screen recordings and video
+*.MOV
+*.mov
+*.mp4
+
+# Root-level duplicates of the public resource PDFs
+/align360-career-navigator-overview.pdf
+/align360-designsuite-overview.pdf
+/align360-quick-orientation.pdf
+
+# Working material, not part of the app
+/Brand/
+/Demo/
+/R&D/
+/Project Log/
+/Drive Intake — A360 (2026-06-04)/
+/knowledge/
+/slack/
+/handoff/
+/.agent/
+align360-app/handoff/
+
+# Local scratch
+.DS_Store
+**/.DS_Store

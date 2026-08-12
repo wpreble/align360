@@ -137,6 +137,7 @@ export type SubRow = {
   /** Stripe product name when expandable, else the price nickname, else null. */
   planName: string | null;
   priceId: string | null;
+  productId: string | null;
   created: number;
   currentPeriodEnd: number | null;
   cancelAtPeriodEnd: boolean;
@@ -173,10 +174,15 @@ export async function listSubscriptions(fresh = false): Promise<SubsResult> {
 
     // status:'all' is the fix for trial / past_due / canceled invisibility.
     // The for-await form auto-paginates, which is the fix for the 100-sub cap.
+    //
+    // `data.items.data.price.product` is NOT expandable here: Stripe caps
+    // expansion at 4 levels and that path is 5, which fails the whole request
+    // with a 400. Product names are resolved from a separate products.list
+    // below instead.
     for await (const s of stripe.subscriptions.list({
       status: 'all',
       limit: 100,
-      expand: ['data.customer', 'data.items.data.price.product'],
+      expand: ['data.customer'],
     })) {
       const item = s.items?.data?.[0];
       const price = item?.price;
@@ -188,10 +194,9 @@ export async function listSubscriptions(fresh = false): Promise<SubsResult> {
       const cust = s.customer && typeof s.customer === 'object' && !('deleted' in s.customer && s.customer.deleted)
         ? (s.customer as Stripe.Customer)
         : null;
-      const product = price?.product;
-      const planName =
-        product && typeof product === 'object' && 'name' in product ? (product as Stripe.Product).name
-        : price?.nickname ?? null;
+      // Unexpanded, price.product is the product id string. Resolved to a name
+      // after the walk; nickname is the fallback when the product is gone.
+      const productId = typeof price?.product === 'string' ? price.product : price?.product?.id ?? null;
 
       subs.push({
         id: s.id,
@@ -201,8 +206,9 @@ export async function listSubscriptions(fresh = false): Promise<SubsResult> {
         monthlyCents: monthly,
         quantity: qty,
         interval: price?.recurring?.interval ?? null,
-        planName,
+        planName: price?.nickname ?? null, // upgraded to the product name below
         priceId: price?.id ?? null,
+        productId,
         created: s.created,
         // As of API 2025-xx (SDK v22) the billing period lives on the subscription
         // ITEM, not the subscription. Read it from the same item we price from,
@@ -218,6 +224,22 @@ export async function listSubscriptions(fresh = false): Promise<SubsResult> {
       });
 
       if (subs.length >= MAX_SUBS) { truncated = true; break; }
+    }
+
+    // Resolve product ids to names in one pass. A catalogue is a handful of
+    // products, so this is one cheap call regardless of subscriber count, and
+    // a failure here only costs the friendlier label.
+    if (subs.some((s) => s.productId)) {
+      try {
+        const names = new Map<string, string>();
+        for await (const p of stripe.products.list({ limit: 100 })) names.set(p.id, p.name);
+        for (const s of subs) {
+          const name = s.productId ? names.get(s.productId) : undefined;
+          if (name) s.planName = name;
+        }
+      } catch {
+        /* keep the price nickname */
+      }
     }
 
     return { subs, truncated, available: true, livemode: subs.length ? subs[0].livemode : null };

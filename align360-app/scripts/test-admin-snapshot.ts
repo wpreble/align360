@@ -26,7 +26,8 @@ function user(n: number, email: string, created = '2026-01-01T00:00:00Z') {
 function sub(over: Partial<SubRow> & Pick<SubRow, 'id' | 'customerId' | 'status'>): SubRow {
   return {
     customerEmail: null, monthlyCents: 2500, quantity: 1, interval: 'month', planName: 'Individual',
-    priceId: 'price_1', created: NOW - 86400, currentPeriodEnd: NOW + 86400, cancelAtPeriodEnd: false,
+    priceId: 'price_1', productId: 'prod_1',
+    created: NOW - 86400, currentPeriodEnd: NOW + 86400, cancelAtPeriodEnd: false,
     canceledAt: null, trialEnd: null, livemode: true, ...over,
   };
 }
