@@ -293,3 +293,48 @@ Verification deliberately ran with Supabase and Stripe **unset**, so no live use
 **Confirm `ADMIN_USERS` in Vercel contains Drew and Samuel**, then redeploy. Everything above is inert until that is true. `scripts/provision-admin.ts` generates the entries; `docs/admin-portal.md` has the runbook. Note the output replaces the entire array, so include everyone who should keep access.
 
 Not built, and flagged rather than silently skipped: cohort retention (needs event instrumentation that does not exist yet) and a password-reset flow for admins (today a lost password means regenerating the env var by hand).
+
+---
+
+# The revenue numbers were wrong (2026-08-12)
+
+Caught by Will, not by me. I reported **$8,033 MRR** and called it consistent with expectations. It was not Align360's revenue at all.
+
+**Actual Align360 MRR: $100.00/mo.** 4 active subscriptions at $25. ARR $1,200. ARPU $25.00.
+
+## What happened
+
+Align360 bills through the **same Stripe account as other product lines**. `STRIPE_CONNECTED_ACCOUNT_ID` is not set in production, so Stripe Connect is inert and everything shares one account. The admin dashboard counted every subscription on that account as Align360's:
+
+| Product | Active subs | Monthly |
+|---|---|---|
+| AI Agents as a Service | 2 | $5,900.00 |
+| AI Application Hosting & Maintence | 1 | $2,000.00 |
+| Website Hosting | 1 | $33.00 |
+| **Align360 · Individual** | **4** | **$100.00** |
+
+96% of the reported MRR belonged to other businesses. The Revenue split panel was therefore proposing to split another company's gross revenue with Ascendance.
+
+Payouts were contaminated the same way: the $14,531/30d and $55,146/2026 figures I reported are whole-account totals, not Align360's.
+
+## Root cause, in two layers
+
+1. **Wrong account.** Every billing path (`checkout`, `sync`, `sync-credits`, `topup`, `cancel-individual`, `stripe-setup-products`) passes `{ stripeAccount: connectedAccountId }`. Every admin read passed nothing. Stripe does not error on this; it returns different data with a 200. This predates the rewrite: the original `metrics` and `payouts` routes had the same omission. I carried it forward and presented its output as fact.
+2. **Wrong discriminator.** Account scoping alone could not have fixed it, because with Connect inert there is only one account. The real discriminator is product identity.
+
+## Fixes
+
+- `connectedOptions()` in `lib/stripe/client.ts`, applied to every admin Stripe read (subscriptions, products, charges, balance transactions) across `data.ts`, `metrics`, `payouts`, `timeseries`, `users/[id]`.
+- **Brand filter**: subscriptions match Align360 by product metadata `brand: 'Align360'`, which `stripe-setup-products.ts` stamps on creation, with a product-name fallback.
+- **Exclusions are reported, never silent.** The UI names the excluded products and their total. Silently dropping revenue is the same class of error as silently including it.
+- If no branded product can be identified, the filter is **not** applied and the UI says so, since reporting zero would be as wrong as reporting someone else's revenue.
+- `payouts` now counts `application_fee` balance transactions. Excluding them overstated Align360's take, and the split panel then applied a second 50% on top of a cut Stripe had already taken.
+- New superadmin `/api/admin/subscriptions`: per-subscription ledger with line items and product grouping, so any headline number can be decomposed to the rows behind it. This is what made the diagnosis take minutes.
+
+## Lesson for this file
+
+I verified the rewrite with Stripe unset locally, which is why both this and the expand-depth bug reached production. Empty-state verification proves rendering, not arithmetic. Any future change to revenue math must be checked against the live ledger and against a known-good external figure before it is reported as fact.
+
+## Still open
+
+`STRIPE_CONNECTED_ACCOUNT_ID` is unset in production. Decide whether Connect is meant to be active. If it is, Align360 billing should move to the connected account and the 50% application fee should flow automatically; if it is not, the Revenue split panel's manual 50% is the only split and the `STRIPE_APPLICATION_FEE_PERCENT=50` setting is misleading, since no application fee is actually being charged.
