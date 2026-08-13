@@ -22,6 +22,26 @@ export function resolveModel(envVar: string, fallback: string): { model: string;
   return { model, provider: 'openai', apiKey: process.env.OPENAI_API_KEY || '' };
 }
 
+/**
+ * Strict resolve for optional routing overrides. Returns null unless the env var
+ * is set AND the provider its model id implies actually has a key.
+ *
+ * resolveModel() deliberately falls through to OpenAI when a key is missing,
+ * which is right for the primary path but wrong for an override: a Charis id
+ * like "deepseek-v4-flash:public" with no CHARIS_API_KEY would otherwise be sent
+ * to OpenAI as a model name that does not exist there. Null means "override not
+ * usable, fall back" rather than "silently send it somewhere else".
+ */
+export function resolveModelStrict(envVar: string): { model: string; provider: Provider; apiKey: string } | null {
+  const model = process.env[envVar];
+  if (!model) return null;
+  const r = resolveModel(envVar, model);
+  if (!r.apiKey) return null;
+  if (model.includes(':') && r.provider !== 'charis') return null;
+  if (model.includes('/') && r.provider !== 'openrouter') return null;
+  return r;
+}
+
 export function makeClient(provider: Provider, apiKey: string): OpenAI {
   if (provider === 'charis') {
     return new OpenAI({

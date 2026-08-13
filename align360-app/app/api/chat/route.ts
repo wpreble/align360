@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildSystemPrompt, chatDeliveryStyle } from '@/lib/system-prompt';
-import { resolveModel, makeClient, genParams, charisChatOpts } from '@/lib/ai';
+import { resolveModel, resolveModelStrict, makeClient, genParams, charisChatOpts } from '@/lib/ai';
 import { creditPrecheck, meterUsage } from '@/lib/credit-metering';
 import { getAccessStatus } from '@/lib/billing-access';
 
@@ -30,15 +30,45 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'paywall', message: 'Subscribe to chat with your AI guide.' }, { status: 402 });
   }
 
-  // Attachment-aware routing. Images (image_url) and PDFs (OpenAI Files `file_id`)
-  // need a vision + Files-capable model; GLM via OpenRouter can read neither. So
-  // route attachment messages to OpenAI when its key is present; otherwise the
-  // GLM path flattens them to a note (below) instead of hard-erroring. Text-only
-  // chat stays on cheap GLM (CHAT_MODEL).
+  // Attachment-aware routing. GLM via OpenRouter can read neither images nor
+  // files, so attachments need a vision-capable target or they get flattened to
+  // a note (below) rather than 502ing. Text-only chat stays on cheap GLM.
+  //
+  // IMAGE_MODEL routes IMAGES to an open-weights vision model (e.g. a DeepSeek
+  // vision id on Charis) so image content stops going to a frontier lab, which
+  // is the claim we want to be able to make to enterprise buyers. It is opt-in:
+  // unset, or set without its provider key, falls back to OpenAI exactly as before.
+  //
+  // Setting IMAGE_MODEL is treated as a POLICY, not just a preference: once it is
+  // configured, no attachment path may reach a frontier lab, because that is the
+  // claim we make to enterprise buyers and it has to be true end to end.
+  //
+  // The consequence is PDFs. They are sent as OpenAI Files `file_id` parts, an
+  // OpenAI-specific reference no other provider can resolve, so with IMAGE_MODEL
+  // set they are NOT forwarded to OpenAI. They degrade to the flatten path below
+  // ("paste the relevant text") instead. Restoring PDF reading without OpenAI
+  // needs server-side text extraction at upload, which is a separate change.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const hasAttachment = messages.some((m) => Array.isArray(m.content) && (m.content as any[]).some((p) => p?.type === 'image_url' || p?.type === 'file'));
+  const partsOf = (m: any) => (Array.isArray(m.content) ? (m.content as any[]) : []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const hasImage = messages.some((m: any) => partsOf(m).some((p) => p?.type === 'image_url'));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const hasFile = messages.some((m: any) => partsOf(m).some((p) => p?.type === 'file'));
+
   const openai = resolveModel('OPENAI_MODEL', 'gpt-5.5');
-  const { model, provider, apiKey } = hasAttachment && openai.apiKey ? openai : resolveModel('CHAT_MODEL', 'gpt-5-mini');
+  const imageModel = resolveModelStrict('IMAGE_MODEL');
+
+  // visionCapable drives whether the structured parts survive; see `prepared`.
+  let target = resolveModel('CHAT_MODEL', 'gpt-5-mini');
+  let visionCapable = false;
+  if (imageModel) {
+    // Frontier-free mode. Images go to the open-weights vision model; PDFs fall
+    // through to flatten rather than being handed to OpenAI.
+    if (hasImage) { target = imageModel; visionCapable = true; }
+  } else if ((hasImage || hasFile) && openai.apiKey) {
+    target = openai; visionCapable = true;              // legacy path, unchanged
+  }
+  const { model, provider, apiKey } = target;
   if (!apiKey) {
     return NextResponse.json(
       { error: `${provider === 'openai' ? 'OPENAI_API_KEY' : provider === 'charis' ? 'CHARIS_API_KEY' : 'OPENROUTER_API_KEY'} is not set on the server.` },
@@ -60,9 +90,10 @@ export async function POST(req: NextRequest) {
     const merged = [text, notes.join(' ')].filter(Boolean).join('\n\n');
     return { ...m, content: merged || '(attachment)' };
   });
-  // Only GLM (OpenRouter / Charis) needs the flatten; OpenAI can consume the
-  // structured image_url / file parts, so keep them intact on that path.
-  const prepared = provider === 'openai' ? messages : flattenForText(messages);
+  // Keep the structured image_url / file parts only when we actually routed to a
+  // vision-capable target. Gating this on `provider === 'openai'` (as it used to)
+  // would silently strip the image the moment IMAGE_MODEL pointed anywhere else.
+  const prepared = visionCapable ? messages : flattenForText(messages);
 
   const pre = await creditPrecheck();
   if (!pre.ok) {
