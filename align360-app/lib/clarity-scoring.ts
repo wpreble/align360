@@ -154,7 +154,7 @@ export function computeClarityScores(slug: string, answers: Record<string, strin
     : null;
   const strengths = subs.filter((s) => s.points >= 10);
 
-  const level = bandFor(cfg.bands, overall);
+  const band = bandFor(cfg.bands, overall);
   let ladder: ClarityBand[];
   let ladderNow: number;
   if (cfg.progression) {
@@ -163,7 +163,7 @@ export function computeClarityScores(slug: string, answers: Record<string, strin
       // Impact Readiness: nodes align to the score bands; the last node is the goal
       // beyond the top band, and the current node tracks the band index.
       ladder = cfg.progression.map((label, i) => ({ key: `p${i}`, label, goal: i === n - 1 }));
-      ladderNow = level.index;
+      ladderNow = band.index;
     } else {
       // Value Spectrum: an N-stage narrative ladder (finer than the 5 score bands).
       // Highlight the "now" node by the SAME band the headline shows — mapped
@@ -174,13 +174,28 @@ export function computeClarityScores(slug: string, answers: Record<string, strin
       ladder = cfg.progression.map((label, i) => ({ key: `p${i}`, label }));
       const bandMax = cfg.bands.length - 1;
       ladderNow = bandMax > 0
-        ? Math.round((level.index / bandMax) * (n - 1))
+        ? Math.round((band.index / bandMax) * (n - 1))
         : Math.max(0, Math.min(n - 1, Math.floor((overall / 100) * n)));
     }
   } else {
     ladder = cfg.bands.map((b) => ({ key: b.key, label: b.label }));
-    ladderNow = level.index;
+    ladderNow = band.index;
   }
+
+  // The headline level takes its LABEL from the ladder node the marker sits on,
+  // keeping the band's key and index for scoring.
+  //
+  // The 2026-07-14 fix synced the ladder POSITION to the band but left the two
+  // label sets independent, so a report could place the marker on "Identity
+  // Aligned" while the headline read "Confident Value" (Drew, 2026-08-18: same
+  // defect on Impact Readiness, "Discovering" vs "Clarity"). Deriving the label
+  // from `ladder[ladderNow]` means the headline and the strip are now the same
+  // string by construction and cannot drift again.
+  //
+  // This also reaches the narrative: `level.label` is what lib/clarity.ts and
+  // the report generator hand to the model, so the written prose was describing
+  // the band name while the user was looking at the ladder name.
+  const level: ClarityLevel = { ...band, label: ladder[ladderNow]?.label ?? band.label };
 
   return {
     slug,
