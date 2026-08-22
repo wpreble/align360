@@ -34,6 +34,31 @@ export type Profile = {
   closing: { name: string; title: string; latin: string; note: string };
 };
 
+/**
+ * Anti-formula voice rules, appended to both profile schemas.
+ *
+ * Drew, 2026-08-18: the AI-Era section read as "language drift". The cause was
+ * the schema itself, not the model. `aiNote` asked for "what AI cannot do here"
+ * four times over, so all four cells came back in one rhythm:
+ *   "AI optimizes within a frame; it cannot decide the frame itself is wrong."
+ *   "AI extrapolates from existing data; it cannot envision what has no precedent."
+ *   "AI generates content; it cannot generate the human conviction..."
+ *   "AI accelerates execution for the resourceful; it cannot create the will..."
+ * The cards did the same with "AI can X, but you Y". Four aphorisms in a row stop
+ * reading as insight and start reading as a template, which is exactly what he saw.
+ *
+ * Asking for variety is not enough on its own; the field descriptions had to stop
+ * naming the construction they wanted. These rules cover the rest.
+ */
+const VOICE = `
+VOICE (applies to every field):
+- Write plainly and concretely. Prefer the specific detail from this person's data over a clever generalisation.
+- Do NOT write aphorisms, epigrams, or maxims. If a line would work as a caption under any other person's profile, it is too general: rewrite it with their actual signals.
+- Never use the construction "AI does X; it cannot do Y", or "AI can X, but you Y", or any variant. Do not open consecutive fields with the same word.
+- Vary sentence shape and length across sibling items. Four cards should not share one rhythm.
+- Do not use the words "amplify", "commodity", "irreplaceable" or "moat" unless the user's own data makes them literally accurate.
+- No em dashes. Plain sentences, ordinary punctuation.`;
+
 // Split schemas: the profile is generated as two PARALLEL calls so wall-clock
 // is the slower half, not the sum (the single 18K-token call took ~60s).
 export const PROFILE_SCHEMA_A = `Return ONLY a valid JSON object (no markdown fences) with EXACTLY these keys:
@@ -45,14 +70,16 @@ export const PROFILE_SCHEMA_A = `Return ONLY a valid JSON object (no markdown fe
   "positioning": [ {"n":"I","label":"Identity Layer · Wiring & Orientation","value":"1 sentence"}, {"n":"II","label":"Transformation Layer · Rejection Gift","value":"1 sentence"}, {"n":"III","label":"Value Layer · True Riches Currency","value":"1 sentence"}, {"n":"IV","label":"Advantage Layer · Combined Edge","value":"1 sentence"}, {"n":"V","label":"Opportunity Layer · AI-Era Calibration","value":"1 sentence"} ],
   "closing": { "name":"<first name>", "title":"<same archetype as hero, full>", "latin":"<same Latin motto>", "note":"3 sentences, grounded and dignified" }
 }
-For "currency" keep all eight names and their order exactly as shown; the system sets each currency's percentage from the assessment scores, so provide only the short "ctx" label (2-3 words) per row, not a number. Honor the governance: present options not directives, never rank human worth, never manufacture urgency. Use the user's assessment data below to make every field specific to them.`;
+For "currency" keep all eight names and their order exactly as shown; the system sets each currency's percentage from the assessment scores, so provide only the short "ctx" label (2-3 words) per row, not a number. Honor the governance: present options not directives, never rank human worth, never manufacture urgency. Use the user's assessment data below to make every field specific to them.
+${VOICE}`;
 
 export const PROFILE_SCHEMA_B = `Return ONLY a valid JSON object (no markdown fences) with EXACTLY these keys:
 {
-  "opportunity": { "intro":"2 sentences framing legacy vs AI-era", "legacy": {"note":"1 sentence; the 2022-market caveat","items":[ {"score":<70-95>,"title":"<role category>","tag":"<which gifts>","chips":["Role A","Role B","Role C"],"risk":"⚠ AI risk: <one line> OR ↑ AI opportunity: <one line>"} ]}, "ai": {"title":"The same profile. A different world.","note":"1-2 sentences","items":[ {"score":<85-97>,"title":"<AI-era role category>","chips":["Role A","Role B","Role C"],"why":"2 sentences on why AI amplifies this"} ]} },
-  "aiEra": { "reframeLabel":"The honest picture", "reframeTitle":"<one line; wrap a phrase in <em></em>>", "reframeBody":"3 sentences; you may wrap key phrases in <strong></strong>", "cards":[ {"status":"rising","statusLabel":"↑ Rising in AI world","title":"<short>","body":"2 sentences","chips":["A","B","C"]}, {"status":"holding","statusLabel":"→ Holding (if repositioned)","title":"<short>","body":"2 sentences","chips":["A","B","C"]}, {"status":"pivot","statusLabel":"⟳ Needs a pivot","title":"<short>","body":"2 sentences","chips":["A","B","C"]} ], "moves":[ {"num":"I","label":"Move to make now","title":"<short>","body":"2 sentences","chips":["A","B","C"]}, {"num":"II","label":"Work to prioritize next 12 months","title":"<short>","body":"2 sentences","chips":["A","B","C"]}, {"num":"III","label":"Identity to protect always","title":"<short>","body":"2 sentences","chips":["A","B","C"]} ], "irreplaceable": {"title":"Capabilities that become more valuable as AI advances","cells":[ {"lbl":"Capability I","cap":"<short italic phrase>","body":"2 sentences","chips":["A","B"],"aiNote":"<one line: what AI cannot do here>"} ]} }
+  "opportunity": { "intro":"2 sentences framing legacy vs AI-era", "legacy": {"note":"1 sentence; the 2022-market caveat","items":[ {"score":<70-95>,"title":"<role category>","tag":"<which gifts>","chips":["Role A","Role B","Role C"],"risk":"⚠ AI risk: <one line> OR ↑ AI opportunity: <one line>"} ]}, "ai": {"title":"The same profile. A different world.","note":"1-2 sentences","items":[ {"score":<85-97>,"title":"<AI-era role category>","chips":["Role A","Role B","Role C"],"why":"2 sentences, specific to this person's signals, on why this role gets more valuable rather than less. Do not use the word amplify."} ]} },
+  "aiEra": { "reframeLabel":"The honest picture", "reframeTitle":"<one line, stated plainly; wrap a phrase in <em></em>>", "reframeBody":"3 sentences grounded in this person's actual scores; you may wrap key phrases in <strong></strong>", "cards":[ {"status":"rising","statusLabel":"↑ Rising in AI world","title":"<short>","body":"2 sentences; describe what this person does, not what machines fail to do","chips":["A","B","C"]}, {"status":"holding","statusLabel":"→ Holding (if repositioned)","title":"<short>","body":"2 sentences","chips":["A","B","C"]}, {"status":"pivot","statusLabel":"⟳ Needs a pivot","title":"<short>","body":"2 sentences","chips":["A","B","C"]} ], "moves":[ {"num":"I","label":"Move to make now","title":"<short>","body":"2 sentences","chips":["A","B","C"]}, {"num":"II","label":"Work to prioritize next 12 months","title":"<short>","body":"2 sentences","chips":["A","B","C"]}, {"num":"III","label":"Identity to protect always","title":"<short>","body":"2 sentences","chips":["A","B","C"]} ], "irreplaceable": {"title":"Capabilities that become more valuable as AI advances","cells":[ {"lbl":"Capability I","cap":"<short italic phrase>","body":"2 sentences","chips":["A","B"],"aiNote":"<one line, plain and concrete: the specific thing this capability depends on that automation does not supply. Must NOT begin with the word AI. Each of the four cells must use a different sentence shape.>"} ]} }
 }
-Provide exactly 4 legacy items, 4 ai items, and 4 irreplaceable cells. Honor the governance: name AI-era calibration honestly (legacy signals are "incomplete, not wrong"), present options not directives, never manufacture urgency. Use the user's assessment data below to make every field specific to them.`;
+Provide exactly 4 legacy items, 4 ai items, and 4 irreplaceable cells. Honor the governance: name AI-era calibration honestly (legacy signals are "incomplete, not wrong"), present options not directives, never manufacture urgency. Use the user's assessment data below to make every field specific to them.
+${VOICE}`;
 
 /** Deterministic fallback so the result page always renders (no key / API error). */
 export function fallbackProfile(scores: Scores, name: string): Profile {

@@ -37,18 +37,19 @@ export function claritySchema(scores: ClarityScores): string {
   const strengthList = scores.strengths.map((s) => s.label).join(', ') || 'none at maximum';
   return `Return ONLY a valid JSON object (no markdown fences) with EXACTLY this shape:
 {
-  "headline": "<one evocative line about where this person stands on their ${scores.scoreName}; you may wrap one phrase in <em></em>>",
+  "headline": "<one plain, specific line about where this person stands on their ${scores.scoreName}. State their actual position, do not write a maxim. You may wrap one phrase in <em></em>>",
   "summary": "2-3 sentences interpreting an overall ${scores.scoreName} of ${scores.overall}/100 (level: ${scores.level.label}). Honest, dignified, specific.",
   "domains": [ ${scores.domains.map((d) => `{"name":${JSON.stringify(d.name)},"body":"2 sentences interpreting this domain at ${d.score}/100"}`).join(', ')} ],
   "subs": [ ${scores.subs.map((s) => `{"label":${JSON.stringify(s.label)},"body":"1-2 sentences interpreting this signal at ${s.points}/10"}`).join(', ')} ],
   "primaryGap": { "title":"<the behavioral pattern at the lowest signal (${gap}), phrased as a short first-person quote or crisp label>", "body":"3-4 sentences analyzing this gap IN CONTEXT of the strengths (${strengthList}). It is a precision gap, not a foundational flaw.", "tool":"<the one specific practice or Align360 tool that closes it>" },
   "strengths": [ {"title":"<short>","body":"2 sentences on a fully developed signal"} ],
-  "aiEra": ${scores.aiEra ? `{ "title":"<short>", "body":"2-3 sentences on AI-era readiness given a score of ${scores.aiEra.score}/100" }` : 'null'},
+  "aiEra": ${scores.aiEra ? `{ "title":"<short; describe this person\'s position, not a general claim about AI>", "body":"2-3 sentences on AI-era readiness given a score of ${scores.aiEra.score}/100. Ground it in their own signals. Do not use the construction \\"AI does X; it cannot do Y\\"." }` : 'null'},
   "diagnostic": { "severity": {"label":"<Mild / Moderate / Significant>","body":"2 sentences"}, "source": {"label":"<short: where this pattern comes from>","body":"2 sentences"}, "velocity": {"label":"<short: how fast it can shift>","body":"2 sentences"} },
   "closing": { "title":"<one line on what comes next>", "body":"2 sentences, grounded and forward-looking" }
 }
 Provide 2-3 strengths items. Domains to cover (use these EXACT names): ${domainList}. Signals to cover (use these EXACT labels): ${subList}.
-Honor the governance: present options not directives, name gaps as precise and addressable (never as worth), never rank human worth, never manufacture urgency. Every field must be specific to this person's answers below.`;
+Honor the governance: present options not directives, name gaps as precise and addressable (never as worth), never rank human worth, never manufacture urgency. Every field must be specific to this person's answers below.
+Write plainly. Do not produce aphorisms or epigrams: if a line would read the same under anyone else's results, rewrite it with this person's actual numbers. Vary sentence shape between sibling items. No em dashes.`;
 }
 
 /* ── Deterministic fallback ──────────────────────────────────────────────── */

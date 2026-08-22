@@ -27,6 +27,7 @@ export default function Landing() {
           </Link>
           <div className="lp-nav-login" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <Link href="/pricing" className="lp-btn ghost small">Pricing</Link>
+            <Link href="/contact" className="lp-btn ghost small">Enterprise</Link>
             <Link href="/faq" className="lp-btn ghost small">FAQ</Link>
             <Link href={ENTER} className="lp-btn primary small">Log In</Link>
           </div>
@@ -43,7 +44,7 @@ export default function Landing() {
           <p className="lp-sub">ALIGN solves what&apos;s urgent, then builds the clarity to ignite everything else.<br />A personal operating system that helps you live in alignment with who you are and what matters most.</p>
           <div className="lp-hero-cta">
             <Link href={ENTER} className="lp-btn primary lp-magnetic">Discover Your Wiring <span className="lp-arrow" aria-hidden="true">→</span><span className="lp-spk s1" aria-hidden="true" /><span className="lp-spk s2" aria-hidden="true" /></Link>
-            <Link href="/pricing" className="lp-btn ghost">For Teams</Link>
+            <Link href="/contact" className="lp-btn ghost">For Organizations</Link>
           </div>
         </div>
       </section>
@@ -169,14 +170,56 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* FINAL CTA */}
+      {/* PRIVACY & SECURITY
+          Added 2026-08-21 (Samuel: "HTML needs a few edits (privacy, security, add CTAs)").
+          Every claim here is deliberately one the codebase actually supports:
+          chat/profiles/reports run on open-weights models, attached images use an
+          open-weights vision model, and documents are extracted to text server-side
+          (app/api/upload) so no file is handed to a frontier lab. What is NOT claimed,
+          because it is not true today: certifications, data residency on the standard
+          tier, and named hosting. Those belong to the sovereign conversation. */}
+      <section id="privacy" className="lp-section">
+        <div className="wrap">
+          <div className="lp-sec-head lp-reveal">
+            <div className="lp-rule" />
+            <h2 className="lp-h2">Built so your <em>thinking</em> stays yours.</h2>
+            <p className="lp-lead">The more honest you are with ALIGN, the more useful it gets. That only works if you trust where your words go.</p>
+          </div>
+          <div className="lp-pillars lp-reveal">
+            <div className="lp-pillar">
+              <div className="lp-pillar-n">01</div>
+              <h3>Not sent to a frontier lab</h3>
+              <p>ALIGN runs on open weights models, not the frontier models from OpenAI or Anthropic. Documents you upload are read on our side and never handed to an outside model.</p>
+            </div>
+            <div className="lp-pillar">
+              <div className="lp-pillar-n">02</div>
+              <h3>Never sold, never training data</h3>
+              <p>Your answers are not sold and are not used to train our models or anyone else&apos;s. Encrypted in transit and at rest, and scoped so you reach your own data and nobody else&apos;s.</p>
+            </div>
+            <div className="lp-pillar">
+              <div className="lp-pillar-n">03</div>
+              <h3>Sovereign, for organizations</h3>
+              <p>Firms that need more can run ALIGN as a fully private, encrypted, US based deployment, so sensitive work never leaves their boundary. Priced above a standard implementation.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA
+          Two paths now. `/contact` already existed and posts to HubSpot with
+          align360_source=enterprise_contact, but nothing on this page linked to it,
+          so the only route in was the individual assessment funnel. That is Samuel's
+          "get CTA from info they give us to follow up with them". */}
       <section className="lp-final">
         <div className="lp-final-bg" />
         <div className="wrap">
           <div className="lp-rule" />
           <h2 className="lp-h2">Become who you&apos;re wired to be.</h2>
           <p className="lp-sub">What begins with putting out today&apos;s fires becomes a life marked by confidence, purpose, and meaningful impact.</p>
-          <Link href={ENTER} className="lp-btn primary">Discover Your Wiring →</Link>
+          <div className="lp-hero-cta">
+            <Link href={ENTER} className="lp-btn primary">Discover Your Wiring →</Link>
+            <Link href="/contact" className="lp-btn ghost">Talk to us about your organization</Link>
+          </div>
         </div>
       </section>
 
@@ -185,6 +228,8 @@ export default function Landing() {
         <div className="wrap">
           <AlignMark white />
           <span className="lp-foot-word">ALIGN</span>
+          <Link href="/#privacy" className="lp-foot-link">Privacy &amp; Security</Link>
+          <Link href="/contact" className="lp-foot-link">Enterprise</Link>
           <span className="lp-foot-copy">© 2026 ALIGN. All rights reserved.</span>
         </div>
       </footer>
