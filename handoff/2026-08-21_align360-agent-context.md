@@ -88,6 +88,24 @@ npm run build > /tmp/build.log 2>&1; echo "EXIT=$?"; tail -20 /tmp/build.log
 |---|---|
 | **git push is broken** | `osxkeychain` holds nothing for github.com, `gh` token is invalid, only SSH key is `Replit.pub` and `ssh -T git@github.com` gets `Permission denied`. Fix is `gh auth login -h github.com && gh auth setup-git`, which needs a browser. **Will has been asked to run it.** |
 | **Machine is heavily loaded** | `tsc --noEmit` takes 4+ minutes. `git log -3` times out at 90s. Run long checks with `run_in_background: true`. |
+| **Another session may be live in this repo** | On 2026-08-21 a second Claude session was running `git blame` against `scripts/deploy.sh` and `src/lib/production-deploy-harness.test.ts`, **neither of which exists in this repo**. Two sessions contending for one git index produced repeated hangs and stale `.git/index.lock` files. |
+
+### Stale `index.lock`
+`git commit` killed by a timeout leaves `.git/index.lock` behind, and every later git write then fails with "Another git process seems to be running". Before deleting it, **check for live git WRITE operations**:
+
+```bash
+ps aux | grep -E "bin/git (commit|merge|rebase|am)"
+```
+
+Match on `bin/git`, not bare `git`. A bare pattern also matches the *shell wrapper* whose command line contains the string "git commit", so it reports a live write on your own command and always looks unsafe. Verified: the bare form produced exactly that false positive here.
+
+`git log` / `git blame` / `git status` reads do not hold `index.lock`, so their presence is not a reason to keep it. But if another session is mid-commit, deleting the lock can corrupt its index. Check first, then `rm -f .git/index.lock`.
+
+Because git writes are slow and hang here, prefer:
+```bash
+git commit -F /tmp/msg.txt          # message from a file, not a heredoc
+```
+run with `run_in_background: true`, then confirm with `git log --oneline -1`. A timed-out commit often leaves the files **staged but uncommitted**, so always verify rather than assuming it failed cleanly.
 
 ---
 
