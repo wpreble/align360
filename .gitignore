@@ -43,3 +43,7 @@ build/
 
 # Heavy archives (logo packs etc.) — keep selected assets in repo, not the zip
 *.zip
+.vercel
+
+# Regenerated-report backups contain real user report data. Local only.
+handoff/backup-combined-report_*.json
