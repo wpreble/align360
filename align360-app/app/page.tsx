@@ -27,7 +27,7 @@ export default function Landing() {
           </Link>
           <div className="lp-nav-login" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <Link href="/pricing" className="lp-btn ghost small">Pricing</Link>
-            <Link href="/contact" className="lp-btn ghost small">Enterprise</Link>
+            <Link href="/enterprise" className="lp-btn ghost small">Enterprise</Link>
             <Link href="/faq" className="lp-btn ghost small">FAQ</Link>
             <Link href={ENTER} className="lp-btn primary small">Log In</Link>
           </div>
@@ -44,7 +44,7 @@ export default function Landing() {
           <p className="lp-sub">ALIGN solves what&apos;s urgent, then builds the clarity to ignite everything else.<br />A personal operating system that helps you live in alignment with who you are and what matters most.</p>
           <div className="lp-hero-cta">
             <Link href={ENTER} className="lp-btn primary lp-magnetic">Discover Your Wiring <span className="lp-arrow" aria-hidden="true">→</span><span className="lp-spk s1" aria-hidden="true" /><span className="lp-spk s2" aria-hidden="true" /></Link>
-            <Link href="/contact" className="lp-btn ghost">For Organizations</Link>
+            <Link href="/enterprise" className="lp-btn ghost">For Organizations</Link>
           </div>
         </div>
       </section>
@@ -229,7 +229,7 @@ export default function Landing() {
           <AlignMark white />
           <span className="lp-foot-word">ALIGN</span>
           <Link href="/#privacy" className="lp-foot-link">Privacy &amp; Security</Link>
-          <Link href="/contact" className="lp-foot-link">Enterprise</Link>
+          <Link href="/enterprise" className="lp-foot-link">Enterprise</Link>
           <span className="lp-foot-copy">© 2026 ALIGN. All rights reserved.</span>
         </div>
       </footer>

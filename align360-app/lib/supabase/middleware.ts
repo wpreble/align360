@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 // Routes reachable without a Supabase user session. Everything else requires login.
 // /admin has its OWN auth (lib/admin/auth) and self-gates, so it must be exempt from
 // the Supabase user gate here — otherwise it would bounce admins to the app login.
-const PUBLIC_PREFIXES = ['/login', '/signup', '/auth', '/api/stripe/webhook', '/discover', '/for', '/admin', '/api/admin', '/pricing', '/contact', '/api/contact', '/faq'];
+const PUBLIC_PREFIXES = ['/login', '/signup', '/auth', '/api/stripe/webhook', '/discover', '/for', '/admin', '/api/admin', '/pricing', '/contact', '/api/contact', '/faq', '/enterprise'];
 const PUBLIC_EXACT = ['/']; // the marketing landing page
 
 function isPublic(path: string): boolean {

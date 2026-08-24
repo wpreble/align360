@@ -221,6 +221,13 @@
 
 /* ═══ Mobile polish (audited 2026-06-25). Phones <=560px. ═══ */
 @media (max-width:560px){
+  /* The nav row was overflowing its container on phones (493px of buttons in a
+     375px viewport), clipping the rightmost action off screen. Shared by the
+     landing, pricing, contact, faq and enterprise pages, so it is fixed here
+     rather than per page: let the row wrap and tighten the small buttons. */
+  .lp-nav .wrap{height:auto;min-height:60px;flex-wrap:wrap;row-gap:8px;padding-top:10px;padding-bottom:10px}
+  .lp-nav-login{gap:8px !important}
+  .lp-btn.small{padding:8px 13px;font-size:12px}
   .lp .wrap{padding:0 18px}
   .lp-section{padding:4rem 0}
   .lp-hero{padding:4.5rem 0 3.5rem}
