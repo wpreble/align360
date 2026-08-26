@@ -68,7 +68,14 @@ export function checkVoice(value: unknown): VoiceViolation[] {
 
     // Collect first words of sibling items so we can flag four cards that all
     // open the same way ("Do not open consecutive fields with the same word").
-    if (isProse) {
+    //
+    // Headings, captions and short structured values are excluded. The VOICE rule
+    // is about sibling BODY copy sharing one rhythm; headings that open "You ..."
+    // are a normal, readable pattern, and flagging them blocked a clean
+    // regeneration on 2026-08-26 over prose that was not actually drifting.
+    const leaf = path.split('.').pop()?.replace(/\[\d+\]$/, '') ?? '';
+    const isLabelField = /^(heading|title|label|lbl|cap|value|name|statusLabel|eyebrow|subtitle|step)$/i.test(leaf);
+    if (isProse && !isLabelField) {
       const parent = path.replace(/\[\d+\][^[]*$/, '');
       const first = text.trim().split(/\s+/)[0].toLowerCase().replace(/[^a-z]/g, '');
       if (first) {

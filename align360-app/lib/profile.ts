@@ -142,9 +142,32 @@ export function fallbackProfile(scores: Scores, name: string): Profile {
       moves: [
         { num: 'I', label: 'Move to make now', title: 'Position at the edge', body: 'Lead with the capability AI makes more valuable.', chips: [] },
         { num: 'II', label: 'Work to prioritize', title: 'Seek disruption', body: 'Find organizations mid-transition.', chips: [] },
-        { num: 'III', label: 'Identity to protect', title: 'Protect your lived perspective', body: 'It is the moat AI cannot cross.', chips: [] },
+        { num: 'III', label: 'Identity to protect', title: 'Protect your lived perspective', body: 'It is the part of your work that stays yours as the tools improve.', chips: [] },
       ],
-      irreplaceable: { title: 'Capabilities that become more valuable as AI advances', cells: [{ lbl: 'Capability I', cap: 'Your lived judgment', body: 'Forged through experience AI has never had.', chips: [], aiNote: 'AI has read about it. It has never lived it.' }] },
+      // FOUR cells, not one. `.irr-grid` is a two-column grid, so a single cell
+      // rendered an empty panel beside it — which is what Drew reported on
+      // 2026-08-25 as "missing the second capability". The schema asks the model
+      // for four; the fallback has to match or the layout breaks for every user
+      // who lands here (no provider, API error, or a failed parse).
+      // Grounded in this person's actual wiring/orientation/gift so the fallback
+      // is still about them, and written to pass lib/voice-check.
+      irreplaceable: {
+        title: 'Capabilities that become more valuable as AI advances',
+        cells: [
+          { lbl: 'Capability I', cap: `Reading a situation the way a ${w} does`,
+            body: `The pattern you notice first is not the one most people notice. That is a function of how you are wired, not a technique you picked up.`,
+            chips: [], aiNote: 'Judgment built from being in the room, repeatedly, with something at stake.' },
+          { lbl: 'Capability II', cap: 'Deciding what matters before deciding what to do',
+            body: `Your ${o} orientation sets the frame. Choosing which problem deserves the effort sits upstream of solving it.`,
+            chips: [], aiNote: 'Someone has to own that choice and answer for it afterwards.' },
+          { lbl: 'Capability III', cap: 'Perspective earned the hard way',
+            body: `${g} came out of something you lived through. It carries weight when you bring it to someone facing the same thing.`,
+            chips: [], aiNote: 'Credibility of this kind accumulates. It cannot be retrieved on demand.' },
+          { lbl: 'Capability IV', cap: 'Staying with a problem past the first answer',
+            body: 'Fast answers are abundant now. The discipline to reject a quick wrong one is the scarce part.',
+            chips: [], aiNote: 'A habit of attention, built over time rather than installed.' },
+        ],
+      },
     },
     positioning: [
       { n: 'I', label: 'Identity Layer · Wiring & Orientation', value: `${w} · ${o}` },

@@ -7,6 +7,9 @@
  * not doing its job.
  */
 import { checkVoice, formatViolations } from '../lib/voice-check';
+import { fallbackProfile } from '../lib/profile';
+import { computeScores } from '../lib/scoring';
+import { getAssessment } from '../lib/assessments';
 
 const BAD_AI_ERA = {
   irreplaceable: { cells: [
@@ -41,6 +44,44 @@ const CASES: { name: string; value: unknown; expect: 'violations' | 'clean'; rul
 ];
 
 let failures = 0;
+
+/* ── The deterministic fallback is user-facing prose too ────────────────────
+ * It shipped with ONE irreplaceable cell while `.irr-grid` is a two-column
+ * grid and the schema asks the model for four, so anyone who hit the fallback
+ * saw an empty panel (Drew, 2026-08-25). It also carried the exact "moat" /
+ * "AI cannot" phrasing the VOICE block bans. Nothing checked it, because the
+ * fallback is the path nobody looks at until a user lands on it.
+ */
+function fallbackChecks() {
+  const answers: Record<string, Record<string, string>> = {};
+  for (const slug of ['wiring', 'orientation', 'rejection-gift']) {
+    const a = getAssessment(slug);
+    if (!a) continue;
+    const picked: Record<string, string> = {};
+    a.sections.flatMap((s) => s.questions).forEach((q, i) => {
+      picked[q.id] = q.options[i % q.options.length].letter;
+    });
+    answers[slug] = picked;
+  }
+  const scores = computeScores(answers as never);
+  const fb = fallbackProfile(scores, 'Test User');
+
+  const cells = fb.aiEra?.irreplaceable?.cells ?? [];
+  const cellsOk = cells.length === 4;
+  console.log(`${cellsOk ? 'PASS' : 'FAIL'}  fallback has 4 irreplaceable cells (got ${cells.length})`);
+  if (!cellsOk) failures++;
+
+  const incomplete = cells.filter((c) => !c.cap || !c.body || !c.aiNote || !c.lbl);
+  console.log(`${incomplete.length ? 'FAIL' : 'PASS'}  every fallback cell is fully populated`);
+  if (incomplete.length) failures++;
+
+  const v = checkVoice(fb);
+  console.log(`${v.length ? 'FAIL' : 'PASS'}  fallback prose passes the voice rules (${v.length} violation${v.length === 1 ? '' : 's'})`);
+  if (v.length) { console.log(formatViolations(v)); failures++; }
+}
+fallbackChecks();
+console.log('');
+
 for (const c of CASES) {
   const v = checkVoice(c.value);
   const got = v.length ? 'violations' : 'clean';

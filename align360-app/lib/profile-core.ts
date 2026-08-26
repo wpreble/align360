@@ -99,12 +99,18 @@ function makeGen(summary: string, usage: Usage) {
   // and the retry never fires: the AI-era-only regeneration hit exactly that on
   // 2026-08-23, returning a well-formed object with no `aiEra` and silently
   // keeping the stored (drifted) copy.
-  return async (schema: string, requireKey?: string) => {
+  return async (schema: string, requireKey?: string, deepOk?: (parsed: Partial<Profile>) => boolean) => {
     const structureOk = (r: { parsed: Partial<Profile> | null }) => {
       if (!r.parsed || Object.keys(r.parsed).length === 0) return false;
-      if (!requireKey) return true;
-      const v = (r.parsed as Record<string, unknown>)[requireKey];
-      return !!v && typeof v === 'object';
+      if (requireKey) {
+        const v = (r.parsed as Record<string, unknown>)[requireKey];
+        if (!v || typeof v !== 'object') return false;
+      }
+      // A present key is not the same as a usable one. Schema B returned a valid
+      // `aiEra` with no `irreplaceable.cells` on 2026-08-26, which counted as
+      // success, so deepMerge quietly filled the four capability cells from the
+      // fallback and the user got generic prose where their own should have been.
+      return deepOk ? deepOk(r.parsed) : true;
     };
     // Voice violations reuse the SAME single retry as malformed JSON, so the common
     // (clean) case still costs one call. This is the drift Drew reported on
@@ -215,7 +221,13 @@ export async function generateCombinedProfile(
     // Two PARALLEL halves (identity + market/AI-era) so wall-clock is the slower
     // half, not the sum. Each half parses defensively, so one malformed half still
     // leaves the rest (over the deterministic fallback).
-    const [a, b] = await Promise.all([gen(PROFILE_SCHEMA_A), gen(PROFILE_SCHEMA_B)]);
+    const [a, b] = await Promise.all([
+      gen(PROFILE_SCHEMA_A, 'hero'),
+      gen(PROFILE_SCHEMA_B, 'aiEra', (parsed) => {
+        const cells = (parsed as Profile).aiEra?.irreplaceable?.cells;
+        return Array.isArray(cells) && cells.length >= 4 && cells.every((c) => !!c?.cap && !!c?.body);
+      }),
+    ]);
     // Deep-merge (not a shallow spread) so a partial nested object from the model
     // can't drop the fallback's complete nested fields.
     const profile = deepStripDashes(
@@ -274,7 +286,10 @@ export async function regenerateAiEraOnly(
   const gen = makeGen(buildSummary(scores, answers, name), usage);
 
   try {
-    const b = await gen(PROFILE_SCHEMA_B, 'aiEra');
+    const b = await gen(PROFILE_SCHEMA_B, 'aiEra', (parsed) => {
+      const cells = (parsed as Profile).aiEra?.irreplaceable?.cells;
+      return Array.isArray(cells) && cells.length >= 4 && cells.every((c) => !!c?.cap && !!c?.body);
+    });
     if (!b.parsed.aiEra || typeof b.parsed.aiEra !== 'object') {
       const keys = Object.keys(b.parsed || {}).join(', ') || '(none)';
       return {
