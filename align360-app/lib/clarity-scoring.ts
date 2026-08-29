@@ -37,44 +37,51 @@ export type ClarityScores = {
 };
 
 type BandDef = { key: string; label: string; min: number; max: number };
-// progression: ordered ladder node labels (may be finer than `bands`).
-// progressionGoal true → the last node is a goal beyond the top band and the
-// "now" node tracks the band index (Impact Readiness). false/absent → the ladder
-// is a stage spectrum and the "now" node is the score placed across the N stages.
-type Cfg = { scoreName: string; bands: BandDef[]; progression?: string[]; progressionGoal?: boolean };
+type Cfg = { scoreName: string; bands: BandDef[] };
 
-/** Five-band ladders, sourced from the Drive result reports. */
+/**
+ * Canonical stage ladders. Source: Samuel's "Stage Ladder Correction - Gap Memo"
+ * and Knowledge Pack Bundle IR/VS/Currencies v1 CORRECTED (2026-08-28).
+ *
+ * There is deliberately ONE list per assessment. Every drift Drew reported
+ * (2026-07-14 and again 2026-08-18) came from a score-band list and a separate
+ * progression list carrying different names for the same position, then being
+ * reconciled by proportional mapping. The bands ARE the ladder now, so the
+ * headline and the progression strip are the same string by construction and
+ * there is nothing left to keep in sync.
+ *
+ * Two substantive corrections came with the canonical set:
+ *   - Impact Readiness has SIX stages, not five. "Clarity" was missing entirely,
+ *     and "Impact at Scale" is a real reachable stage rather than a goal node
+ *     nobody could land on.
+ *   - Value Spectrum has EIGHT stages with their own ranges. The app previously
+ *     ran five bands ("Comparison Loop", "Emerging Worth", "Confident Value")
+ *     whose names appear nowhere in the canonical set, which is why three of the
+ *     eight ladder stages were unreachable.
+ */
 const CONFIG: Record<string, Cfg> = {
   'impact-readiness': {
     scoreName: 'Conviction Score',
     bands: [
-      { key: 'insecure', label: 'Insecure', min: 0, max: 20 },
-      { key: 'uncertain', label: 'Uncertain', min: 21, max: 40 },
-      { key: 'discovering', label: 'Discovering', min: 41, max: 60 },
-      { key: 'aligning', label: 'Aligning', min: 61, max: 80 },
-      { key: 'convicted', label: 'Convicted', min: 81, max: 100 },
+      { key: 'insecurity', label: 'Insecurity', min: 0, max: 39 },
+      { key: 'awareness', label: 'Awareness', min: 40, max: 51 },
+      { key: 'clarity', label: 'Clarity', min: 52, max: 63 },
+      { key: 'alignment', label: 'Alignment', min: 64, max: 75 },
+      { key: 'conviction', label: 'Conviction', min: 76, max: 87 },
+      { key: 'impact', label: 'Impact at Scale', min: 88, max: 100 },
     ],
-    // Progression strip uses Samuel's A360 standard wording (noun stages) and adds
-    // Impact as the goal node beyond the top band. The headline level still uses the
-    // bands above (e.g. score 86 → "Convicted"); the ladder shows "Conviction → Impact".
-    progression: ['Insecurity', 'Awareness', 'Clarity', 'Alignment', 'Conviction', 'Impact'],
-    progressionGoal: true,
   },
   'value-spectrum': {
     scoreName: 'Value Score',
     bands: [
-      { key: 'inferiority', label: 'Inferiority Complex', min: 0, max: 20 },
-      { key: 'comparison', label: 'Comparison Loop', min: 21, max: 40 },
-      { key: 'emerging', label: 'Emerging Worth', min: 41, max: 60 },
-      { key: 'confident', label: 'Confident Value', min: 61, max: 80 },
-      { key: 'rockstar', label: 'Authentic Rockstar', min: 81, max: 100 },
-    ],
-    // The Value Spectrum template renders an 8-stage narrative ladder (finer than the
-    // 5 scoring bands above). The headline level still comes from the bands; the ladder
-    // "now" node is the overall score placed across these 8 stages (~12.5 pts each).
-    progression: [
-      'Inferiority Complex', 'Impostor Pattern', 'Value Perceiving', 'Value Aware',
-      'Value Aligned', 'Identity Aligned', 'Authentic', 'Authentic Rockstar',
+      { key: 'inferiority', label: 'Inferiority Complex', min: 0, max: 12 },
+      { key: 'impostor', label: 'Impostor Pattern', min: 13, max: 25 },
+      { key: 'perceiving', label: 'Value Perceiving', min: 26, max: 40 },
+      { key: 'aware', label: 'Value Aware', min: 41, max: 55 },
+      { key: 'aligned', label: 'Value Aligned', min: 56, max: 70 },
+      { key: 'identity', label: 'Identity Aligned', min: 71, max: 82 },
+      { key: 'authentic', label: 'Authentic', min: 83, max: 90 },
+      { key: 'rockstar', label: 'Authentic Rockstar', min: 91, max: 100 },
     ],
   },
 };
@@ -155,32 +162,9 @@ export function computeClarityScores(slug: string, answers: Record<string, strin
   const strengths = subs.filter((s) => s.points >= 10);
 
   const band = bandFor(cfg.bands, overall);
-  let ladder: ClarityBand[];
-  let ladderNow: number;
-  if (cfg.progression) {
-    const n = cfg.progression.length;
-    if (cfg.progressionGoal) {
-      // Impact Readiness: nodes align to the score bands; the last node is the goal
-      // beyond the top band, and the current node tracks the band index.
-      ladder = cfg.progression.map((label, i) => ({ key: `p${i}`, label, goal: i === n - 1 }));
-      ladderNow = band.index;
-    } else {
-      // Value Spectrum: an N-stage narrative ladder (finer than the 5 score bands).
-      // Highlight the "now" node by the SAME band the headline shows — mapped
-      // proportionally onto the N stages — so the title/paragraph and the progression
-      // strip agree (Drew, 2026-07-14: title said "Authentic Rockstar" while the ladder
-      // showed "Authentic", because the ladder used an even 8-way split while the
-      // headline used the 81+ band). Top band -> top stage, both "Authentic Rockstar".
-      ladder = cfg.progression.map((label, i) => ({ key: `p${i}`, label }));
-      const bandMax = cfg.bands.length - 1;
-      ladderNow = bandMax > 0
-        ? Math.round((band.index / bandMax) * (n - 1))
-        : Math.max(0, Math.min(n - 1, Math.floor((overall / 100) * n)));
-    }
-  } else {
-    ladder = cfg.bands.map((b) => ({ key: b.key, label: b.label }));
-    ladderNow = band.index;
-  }
+  // One list: the ladder is the bands. Nothing to reconcile.
+  const ladder: ClarityBand[] = cfg.bands.map((b) => ({ key: b.key, label: b.label }));
+  const ladderNow = band.index;
 
   // The headline level takes its LABEL from the ladder node the marker sits on,
   // keeping the band's key and index for scoring.

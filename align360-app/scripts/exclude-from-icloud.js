@@ -19,7 +19,10 @@ const { join } = require('node:path');
 if (process.platform !== 'darwin') process.exit(0);
 
 const root = join(__dirname, '..');
-for (const dir of ['node_modules', '.next']) {
+// `content` holds the assessment markdown the app reads at request time. An
+// evicted file there reads as an EMPTY STRING rather than throwing, so the
+// assessment silently parses to zero questions instead of failing.
+for (const dir of ['node_modules', '.next', 'content']) {
   const target = join(root, dir);
   try {
     if (!existsSync(target)) mkdirSync(target, { recursive: true });

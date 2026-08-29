@@ -26,6 +26,16 @@ for (const slug of SLUGS) {
   const a = getAssessment(slug);
   if (!a) { console.log(`  SKIP ${slug} (assessment not found)`); continue; }
   const questions = a.sections.flatMap((s) => s.questions);
+  // A dataless iCloud read returns an EMPTY string rather than throwing, so the
+  // markdown parses to zero sections and every score computes as 0. The sweep
+  // then "passes" while testing nothing: on 2026-08-28 it reported 32 combinations
+  // and one reachable label instead of 592 and eight. Fail loudly instead.
+  if (questions.length < 5) {
+    console.log(`  FAIL ${slug}: only ${questions.length} question(s) loaded. Content did not read.`);
+    console.log(`       Re-run; an iCloud-evicted file reads empty once, then materializes.`);
+    failures++;
+    continue;
+  }
   seen.set(slug, new Set());
 
   // Sweep: give the first `k` questions a high value and the rest a low one, for
