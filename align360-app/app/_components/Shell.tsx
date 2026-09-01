@@ -115,7 +115,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   // to /onboarding — which is every admin who is not also a regular user. The
   // paywall gate would then do the same to /subscribe. Server-side gating being
   // correct is not enough; both gates have to agree.
-  const BARE_PREFIXES = ['/login', '/signup', '/auth', '/invite', '/subscribe', '/pricing', '/contact', '/faq', '/admin', '/enterprise'];
+  const BARE_PREFIXES = ['/login', '/signup', '/auth', '/invite', '/subscribe', '/pricing', '/contact', '/faq', '/admin', '/enterprise', '/find-your-fit'];
   const isBare =
     pathname === '/' ||
     pathname === '/onboarding' ||

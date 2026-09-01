@@ -1,0 +1,96 @@
+/* Find Your Fit. Samuel's palette from align360_find_your_fit.html, mapped onto
+   the app's own tokens so the page matches the rest of the site. Scoped to .fyf
+   because landing.css binds its variables under .lp, not :root. */
+
+.fyf {
+  --bg:#FBF7FA; --dark:#1B0A24; --body:#2A122E; --magenta:#7E1A4C;
+  --mauve:#9A4A78; --gold:#B8873F; --rule:#4E0230; --soft:#3C2A40; --border:#E3D9DE;
+
+  background: var(--bg);
+  color: var(--body);
+  font-family: 'Jost', -apple-system, sans-serif;
+  min-height: 100vh;
+  /* The app shell sets body{overflow:hidden}; like .lp this page owns its scroll. */
+  height: 100vh; overflow-y: auto; overflow-x: hidden;
+}
+.fyf * { box-sizing: border-box; margin: 0; padding: 0; }
+.fyf a { color: inherit; text-decoration: none; }
+.fyf-wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 80px; }
+
+.fyf-head { display:flex; align-items:center; justify-content:center; gap:10px;
+  padding-bottom:18px; border-bottom:1.4px solid var(--rule); margin-bottom:34px; }
+.fyf-head .align-mark-img { height:22px; }
+.fyf-word { font-family:'Cinzel',serif; font-weight:600; font-size:22px;
+  letter-spacing:5px; color:var(--dark); }
+
+.fyf-h1 { font-family:'Cormorant Garamond',serif; font-weight:600; font-size:34px;
+  color:var(--dark); text-align:center; line-height:1.2; margin-bottom:8px; }
+.fyf-sub { font-family:'Cormorant Garamond',serif; font-weight:300; font-style:italic;
+  font-size:21px; color:var(--magenta); text-align:center; margin-bottom:30px; }
+
+.fyf-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:34px; }
+.fyf-card { border:1.5px solid var(--border); background:#fff; border-radius:4px;
+  padding:18px 20px; cursor:pointer; transition:border-color .15s ease, box-shadow .15s ease;
+  text-align:left; display:flex; flex-direction:column; gap:4px; font-family:inherit; }
+.fyf-card:hover { border-color:var(--mauve); }
+.fyf-card.on { border-color:var(--magenta); background:#FDF6FA; box-shadow:0 0 0 1px var(--magenta); }
+.fyf-card-t { font-weight:600; font-size:15px; color:var(--dark); }
+.fyf-card-s { font-weight:400; font-size:12px; color:var(--soft); }
+
+.fyf-detail { border:1px solid var(--border); background:#fff; border-radius:4px;
+  padding:26px 28px; margin-bottom:30px; animation:fyf-in .25s ease; }
+@keyframes fyf-in { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+.fyf-eyebrow { font-weight:600; font-size:11px; letter-spacing:2px; color:var(--mauve);
+  text-transform:uppercase; margin-bottom:10px; }
+.fyf-pitch { font-size:15px; color:var(--dark); line-height:1.55; margin-bottom:16px; }
+.fyf-qa { margin-bottom:12px; }
+.fyf-qa b { color:var(--magenta); font-size:13px; }
+.fyf-qa p { font-size:13.5px; line-height:1.5; color:var(--body); margin-top:2px; }
+
+.fyf-label { font-weight:600; font-size:11px; letter-spacing:2px; color:var(--mauve);
+  text-transform:uppercase; margin-bottom:14px; text-align:center; }
+
+.fyf-form { border:1px solid var(--border); background:#fff; border-radius:4px;
+  padding:26px 28px; margin-bottom:22px; }
+.fyf-field { margin-bottom:14px; }
+.fyf-field label { display:block; font-size:12.5px; font-weight:500; color:var(--soft); margin-bottom:5px; }
+.fyf-form input, .fyf-form textarea, .fyf-form select {
+  width:100%; border:1px solid var(--border); border-radius:3px; padding:10px 12px;
+  font-family:inherit; font-size:14px; color:var(--dark); background:var(--bg); }
+.fyf-form input:focus, .fyf-form textarea:focus, .fyf-form select:focus {
+  outline:none; border-color:var(--magenta); }
+.fyf-form textarea { min-height:80px; resize:vertical; }
+.fyf-row2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+.fyf-err { font-size:13px; color:#B3261E; margin:4px 0 8px; }
+.fyf-submit { width:100%; background:var(--rule); color:#fff; border:none; border-radius:3px;
+  padding:13px; font-family:inherit; font-weight:600; font-size:14px; letter-spacing:.5px;
+  cursor:pointer; margin-top:4px; }
+.fyf-submit:hover:not(:disabled) { background:var(--magenta); }
+.fyf-submit:disabled { opacity:.6; cursor:default; }
+
+.fyf-sent h2 { font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--dark);
+  font-weight:600; margin-bottom:6px; }
+.fyf-sent p { font-size:14px; color:var(--soft); line-height:1.5; }
+
+.fyf-or { display:flex; align-items:center; gap:12px; margin:8px 0 22px; color:var(--soft); font-size:12px; }
+.fyf-or::before, .fyf-or::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.fyf-book { border:1.5px solid var(--rule); background:var(--dark); border-radius:4px;
+  padding:24px 28px; text-align:center; }
+.fyf-book-t { font-family:'Cormorant Garamond',serif; font-weight:600; font-size:20px;
+  color:#fff; margin-bottom:6px; }
+.fyf-book-s { font-size:13px; color:#D8CBD6; margin-bottom:16px; }
+.fyf-book-btn { display:inline-block; background:var(--gold); color:var(--dark);
+  font-weight:600; font-size:14px; padding:12px 28px; border-radius:3px; letter-spacing:.3px; }
+.fyf-book-btn:hover { background:#cfa050; }
+
+.fyf-foot { text-align:center; margin-top:34px; font-size:12px; color:var(--soft); }
+.fyf-foot a { color:var(--mauve); }
+
+@media (max-width:560px) {
+  .fyf-cards, .fyf-row2 { grid-template-columns:1fr; }
+  .fyf-wrap { padding:36px 18px 64px; }
+  .fyf-h1 { font-size:28px; }
+  .fyf-sub { font-size:18px; }
+}
