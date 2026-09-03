@@ -1,7 +1,7 @@
 'use client';
 
 import '../landing.css';
-import './find-your-fit.css';
+import './fit.css';
 import { useState } from 'react';
 import Link from 'next/link';
 import AlignMark from '@/app/_components/AlignMark';

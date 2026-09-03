@@ -27,6 +27,14 @@ const nextConfig = {
         destination: 'https://align360.io/:path*',
         permanent: true,
       },
+      // find-your-fit was the original route name; renamed to /fit (Samuel,
+      // 2026-09-01, "easier to search, share or remember"). Redirect kept since
+      // the old link was already sent to Samuel and may be shared further.
+      {
+        source: '/find-your-fit',
+        destination: '/fit',
+        permanent: true,
+      },
     ];
   },
 };

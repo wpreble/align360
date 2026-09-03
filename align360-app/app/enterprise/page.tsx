@@ -223,10 +223,11 @@ export default function Enterprise() {
             <div>
               <h3>On certification, the straight answer</h3>
               <p>
-                We are not certified. No SOC 2, no HIPAA, no ISO 27001. Third party audits cost real money and
-                we will invest in them when revenue supports it. There is an architectural answer instead of a
-                promise to get certified later: on the sovereign lane we deploy into infrastructure we do not
-                manage, so your data stays inside your own compliance boundary.
+                On the sovereign lane, we deploy into infrastructure we do not manage, so your data stays
+                inside your own compliance boundary rather than depending on our certification status. We are
+                not SOC 2, HIPAA, or ISO 27001 certified today. Third party audits cost real money and we will
+                invest in them when revenue supports it, in the meantime the architecture is the answer, not a
+                promise to get certified later.
               </p>
             </div>
           </div>
